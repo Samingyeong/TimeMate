@@ -2,11 +2,14 @@ package com.example.timemate;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
@@ -75,8 +78,9 @@ public class SignupFormActivity extends AppCompatActivity {
 
         Executors.newSingleThreadExecutor().execute(() -> {
             // 중복 확인
-            User existingUser = db.userDao().getUserById(userId);
-            User existingEmail = db.userDao().getUserByEmail(email);
+            com.example.timemate.data.model.User existingUser = db.userDao().getUserById(userId);
+            // 이메일 중복 확인은 별도 메서드로 처리
+            boolean emailExists = isEmailExists(email);
 
             runOnUiThread(() -> {
                 if (existingUser != null) {
@@ -85,7 +89,7 @@ public class SignupFormActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (existingEmail != null) {
+                if (emailExists) {
                     Toast.makeText(this, "이미 사용 중인 이메일입니다", Toast.LENGTH_SHORT).show();
                     editEmail.requestFocus();
                     return;
@@ -115,5 +119,28 @@ public class SignupFormActivity extends AppCompatActivity {
                 });
             });
         });
+    }
+
+    /**
+     * 이메일 중복 확인
+     */
+    private boolean isEmailExists(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+
+        try {
+            // 모든 활성 사용자 조회해서 이메일 중복 확인
+            List<com.example.timemate.data.model.User> allUsers = db.userDao().getAllActiveUsers();
+            for (com.example.timemate.data.model.User user : allUsers) {
+                if (email.equals(user.email)) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            Log.e("SignupForm", "Email check error", e);
+            return false;
+        }
     }
 }

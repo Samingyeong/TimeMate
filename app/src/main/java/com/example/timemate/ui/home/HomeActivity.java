@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -21,10 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.timemate.NaverPlaceSearchService;
 import com.example.timemate.R;
@@ -45,8 +48,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 /**
@@ -73,11 +78,14 @@ public class HomeActivity extends AppCompatActivity {
     private com.google.android.material.card.MaterialCardView cardTomorrowReminder;
     private TextView textTomorrowTitle, textTomorrowRoute, textTomorrowDuration, textTomorrowDeparture;
     
-    // 일정 기반 추천 시스템 (준비 중)
-    private Spinner spinnerSchedules;
-    private RecyclerView recyclerRecommendations;
-    private TextView textRecommendationTitle;
-    // 추천 기능은 향후 구현 예정
+    // 캘린더 관련 UI
+    private CalendarView calendarView;
+    private Button btnPrevMonth, btnNextMonth;
+    private TextView textCurrentMonth;
+
+    // OOTD 추천 시스템
+    private RecyclerView recyclerOotd;
+    private TextView textOotdDescription;
     
     // 데이터 및 서비스
     private AppDatabase db;
@@ -101,12 +109,13 @@ public class HomeActivity extends AppCompatActivity {
         weatherService = new WeatherService();
         loadWeatherData();
 
-        // 4) 추천 시스템 초기화 (임시 비활성화)
-        setupRecommendationSystem();
+        // 4) 캘린더 및 OOTD 추천 시스템 초기화
+        setupCalendar();
+        setupOotdRecommendation();
 
         // 5) RecyclerView 설정
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerRecommendations.setLayoutManager(new LinearLayoutManager(this));
+        recyclerOotd.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // 6) 클릭 이벤트 설정
         setupClickListeners();
@@ -137,10 +146,15 @@ public class HomeActivity extends AppCompatActivity {
         textTomorrowDuration = findViewById(R.id.textTomorrowDuration);
         textTomorrowDeparture = findViewById(R.id.textTomorrowDeparture);
         
-        // 일정 기반 추천 시스템
-        spinnerSchedules = findViewById(R.id.spinnerSchedules);
-        recyclerRecommendations = findViewById(R.id.recyclerRecommendations);
-        textRecommendationTitle = findViewById(R.id.textRecommendationTitle);
+        // 캘린더 관련 UI
+        calendarView = findViewById(R.id.calendarView);
+        btnPrevMonth = findViewById(R.id.btnPrevMonth);
+        btnNextMonth = findViewById(R.id.btnNextMonth);
+        textCurrentMonth = findViewById(R.id.textCurrentMonth);
+
+        // OOTD 추천 시스템
+        recyclerOotd = findViewById(R.id.recyclerOotd);
+        textOotdDescription = findViewById(R.id.textOotdDescription);
     }
 
     private void setupClickListeners() {
@@ -317,19 +331,213 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void setupRecommendationSystem() {
-        // Spinner 초기화
-        if (spinnerSchedules != null) {
-            List<String> items = new ArrayList<>();
-            items.add("추천 기능 준비 중입니다");
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerSchedules.setAdapter(adapter);
+    private void setupCalendar() {
+        if (calendarView != null) {
+            // 현재 월 표시 업데이트
+            updateCurrentMonthDisplay();
+
+            // 일정이 있는 날짜 로드
+            loadScheduleDates();
+
+            // 캘린더 날짜 클릭 리스너
+            calendarView.setOnDateClickListener(this::showScheduleDetailDialog);
+
+            // 월 이동 버튼 리스너
+            btnPrevMonth.setOnClickListener(v -> {
+                calendarView.previousMonth();
+                updateCurrentMonthDisplay();
+                loadScheduleDates();
+            });
+
+            btnNextMonth.setOnClickListener(v -> {
+                calendarView.nextMonth();
+                updateCurrentMonthDisplay();
+                loadScheduleDates();
+            });
+        }
+    }
+
+    private void updateCurrentMonthDisplay() {
+        if (textCurrentMonth != null && calendarView != null) {
+            textCurrentMonth.setText(calendarView.getCurrentMonthYear());
+        }
+    }
+
+    private void loadScheduleDates() {
+        String currentUserId = userSession.getCurrentUserId();
+        if (currentUserId == null || calendarView == null) return;
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                // 현재 표시된 월의 모든 일정 조회
+                Calendar cal = calendarView.getCalendar();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+
+                // 해당 월의 첫날과 마지막날 계산
+                Calendar startCal = Calendar.getInstance();
+                startCal.set(year, month, 1);
+                Calendar endCal = Calendar.getInstance();
+                endCal.set(year, month, startCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String startDate = dateFormat.format(startCal.getTime());
+                String endDate = dateFormat.format(endCal.getTime());
+
+                List<Schedule> monthSchedules = db.scheduleDao().getSchedulesByDateRange(currentUserId, startDate, endDate);
+
+                // 일정이 있는 날짜들을 Set으로 변환
+                Set<String> scheduleDates = new HashSet<>();
+                for (Schedule schedule : monthSchedules) {
+                    String scheduleDate = dateFormat.format(new Date(schedule.dateTime));
+                    scheduleDates.add(scheduleDate);
+                }
+
+                runOnUiThread(() -> {
+                    calendarView.setScheduleDates(scheduleDates);
+                });
+
+            } catch (Exception e) {
+                // 에러 처리
+            }
+        });
+    }
+
+    private void showScheduleDetailDialog(Calendar selectedDate) {
+        String currentUserId = userSession.getCurrentUserId();
+        if (currentUserId == null) return;
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String selectedDateStr = dateFormat.format(selectedDate.getTime());
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                List<Schedule> daySchedules = db.scheduleDao().getSchedulesByDate(currentUserId, selectedDateStr);
+
+                runOnUiThread(() -> {
+                    if (daySchedules.isEmpty()) {
+                        // 일정이 없는 경우 간단한 다이얼로그
+                        showEmptyScheduleDialog(selectedDate);
+                    } else {
+                        // 일정이 있는 경우 상세 다이얼로그
+                        showScheduleDetailDialog(selectedDate, daySchedules);
+                    }
+                });
+
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "일정을 불러올 수 없습니다", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void showEmptyScheduleDialog(Calendar selectedDate) {
+        SimpleDateFormat displayFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN);
+        String dateStr = displayFormat.format(selectedDate.getTime());
+
+        new AlertDialog.Builder(this)
+                .setTitle(dateStr)
+                .setMessage("이 날짜에는 등록된 일정이 없습니다.")
+                .setPositiveButton("일정 추가", (dialog, which) -> {
+                    Intent intent = new Intent(this, ScheduleAddActivity.class);
+                    startActivity(intent);
+                })
+                .setNegativeButton("닫기", null)
+                .show();
+    }
+
+    private void showScheduleDetailDialog(Calendar selectedDate, List<Schedule> schedules) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_schedule_detail, null);
+
+        TextView textDialogDate = dialogView.findViewById(R.id.textDialogDate);
+        ViewPager2 viewPagerSchedules = dialogView.findViewById(R.id.viewPagerSchedules);
+        LinearLayout layoutIndicator = dialogView.findViewById(R.id.layoutIndicator);
+        Button btnAddSchedule = dialogView.findViewById(R.id.btnAddSchedule);
+        Button btnViewAll = dialogView.findViewById(R.id.btnViewAll);
+
+        SimpleDateFormat displayFormat = new SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREAN);
+        textDialogDate.setText(displayFormat.format(selectedDate.getTime()));
+
+        // ViewPager 어댑터 설정
+        ScheduleDetailAdapter adapter = new ScheduleDetailAdapter(this, schedules);
+        viewPagerSchedules.setAdapter(adapter);
+
+        // 페이지 인디케이터 설정 (2개 이상일 때만 표시)
+        if (schedules.size() > 1) {
+            layoutIndicator.setVisibility(View.VISIBLE);
+            setupPageIndicator(layoutIndicator, schedules.size(), viewPagerSchedules);
         }
 
-        // 추천 RecyclerView는 향후 구현 예정
-        if (recyclerRecommendations != null) {
-            recyclerRecommendations.setVisibility(View.GONE);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // 버튼 리스너
+        btnAddSchedule.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, ScheduleAddActivity.class);
+            startActivity(intent);
+        });
+
+        btnViewAll.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, ScheduleListActivity.class);
+            startActivity(intent);
+        });
+
+        dialogView.findViewById(R.id.btnCloseDialog).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
+    }
+
+    private void setupPageIndicator(LinearLayout layoutIndicator, int pageCount, ViewPager2 viewPager) {
+        // 페이지 인디케이터 점들 생성
+        for (int i = 0; i < pageCount; i++) {
+            View dot = new View(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(20, 20);
+            params.setMargins(8, 0, 8, 0);
+            dot.setLayoutParams(params);
+            dot.setBackgroundResource(R.drawable.indicator_dot_inactive);
+            layoutIndicator.addView(dot);
+        }
+
+        // 첫 번째 점 활성화
+        if (pageCount > 0) {
+            layoutIndicator.getChildAt(0).setBackgroundResource(R.drawable.indicator_dot_active);
+        }
+
+        // ViewPager 페이지 변경 리스너
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                for (int i = 0; i < layoutIndicator.getChildCount(); i++) {
+                    View dot = layoutIndicator.getChildAt(i);
+                    if (i == position) {
+                        dot.setBackgroundResource(R.drawable.indicator_dot_active);
+                    } else {
+                        dot.setBackgroundResource(R.drawable.indicator_dot_inactive);
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupOotdRecommendation() {
+        // OOTD 추천 기능 구현 (향후 확장)
+        if (textOotdDescription != null) {
+            textOotdDescription.setText("현재 날씨에 맞는 옷차림을 추천해드려요");
+        }
+
+        // 임시 OOTD 데이터
+        if (recyclerOotd != null) {
+            List<String> ootdItems = new ArrayList<>();
+            ootdItems.add("가벼운 니트");
+            ootdItems.add("청바지");
+            ootdItems.add("스니커즈");
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, ootdItems);
+            // RecyclerView 어댑터는 향후 구현
         }
     }
 

@@ -134,10 +134,31 @@ public class ProfileActivity extends AppCompatActivity {
     private void loadUserInfo() {
         String userName = userSession.getCurrentNickname();
         String userId = userSession.getCurrentUserId();
-        
+
         textUserName.setText(userName != null ? userName : "사용자");
         textUserId.setText(userId != null ? userId : "ID 없음");
-        textUserEmail.setText("이메일 정보 없음"); // 향후 구현
+
+        // 데이터베이스에서 사용자 정보 조회하여 이메일 가져오기
+        if (userId != null) {
+            Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    com.example.timemate.data.model.User user = db.userDao().getUserById(userId);
+                    runOnUiThread(() -> {
+                        if (user != null && user.email != null && !user.email.isEmpty()) {
+                            textUserEmail.setText(user.email);
+                        } else {
+                            textUserEmail.setText("이메일 정보 없음");
+                        }
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> {
+                        textUserEmail.setText("이메일 정보 없음");
+                    });
+                }
+            });
+        } else {
+            textUserEmail.setText("이메일 정보 없음");
+        }
     }
 
     private void copyUserIdToClipboard() {

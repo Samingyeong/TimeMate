@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- 장소명 -->
+    <TextView
+        android:id="@+id/textPlaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="장소명"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <!-- 주소 -->
+    <TextView
+        android:id="@+id/textPlaceAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="주소"
+        android:textSize="14sp"
+        android:textColor="@android:color/darker_gray"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+    <!-- 카테고리 -->
+    <TextView
+        android:id="@+id/textPlaceCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="카테고리"
+        android:textSize="12sp"
+        android:textColor="@color/sky_blue_accent"
+        android:background="@drawable/category_background"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:visibility="gone" />
+
+</LinearLayout>

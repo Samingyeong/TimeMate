@@ -171,27 +171,31 @@
                         android:textColor="@color/purple_700"
                         android:layout_marginBottom="12dp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/editDeparture"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="출발지를 입력하세요"
+                        android:hint="출발지를 입력하세요 (2글자 이상)"
                         android:background="@drawable/edit_text_background"
                         android:padding="12dp"
                         android:layout_marginBottom="8dp"
                         android:drawableStart="@drawable/ic_location_start"
-                        android:drawablePadding="8dp" />
+                        android:drawablePadding="8dp"
+                        android:completionThreshold="2"
+                        android:dropDownHeight="200dp" />
 
-                    <EditText
+                    <AutoCompleteTextView
                         android:id="@+id/editDestination"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="도착지를 입력하세요"
+                        android:hint="도착지를 입력하세요 (2글자 이상)"
                         android:background="@drawable/edit_text_background"
                         android:padding="12dp"
                         android:drawableStart="@drawable/ic_location_end"
                         android:drawablePadding="8dp"
-                        android:layout_marginBottom="12dp" />
+                        android:layout_marginBottom="12dp"
+                        android:completionThreshold="2"
+                        android:dropDownHeight="200dp" />
 
                     <!-- 길찾기 버튼 -->
                     <Button

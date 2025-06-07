@@ -3,6 +3,7 @@ package com.example.timemate.data.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -39,7 +40,8 @@ public class Schedule {
         this.isCompleted = false;
     }
 
-    // 전체 생성자
+    // 전체 생성자 (Room에서 무시)
+    @Ignore
     public Schedule(@NonNull String userId, @NonNull String title, @NonNull String date, @NonNull String time,
                    @Nullable String departure, @Nullable String destination, @Nullable String memo) {
         this();
