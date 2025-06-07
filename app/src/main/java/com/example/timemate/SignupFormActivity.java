@@ -17,14 +17,14 @@ public class SignupFormActivity extends AppCompatActivity {
 
     private EditText editNickname, editEmail, editPhone, editUserId, editPassword;
     private RadioGroup radioGenderGroup;
-    private AppDatabase db;
+    private com.example.timemate.data.database.AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup_form);
 
-        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "timeMate-db").build();
+        db = com.example.timemate.data.database.AppDatabase.getDatabase(this);
 
         editNickname = findViewById(R.id.editNickname);
         editEmail = findViewById(R.id.editEmail);
@@ -92,9 +92,8 @@ public class SignupFormActivity extends AppCompatActivity {
                 }
 
                 // 새 사용자 생성
-                User newUser = new User(userId, nickname, email);
-                newUser.phone = phone;
-                newUser.gender = gender;
+                com.example.timemate.data.model.User newUser = new com.example.timemate.data.model.User(userId, nickname);
+                newUser.email = email;
                 newUser.password = password;
 
                 Executors.newSingleThreadExecutor().execute(() -> {
@@ -104,11 +103,11 @@ public class SignupFormActivity extends AppCompatActivity {
                         Toast.makeText(this, "회원가입 성공!\n사용자 ID: " + userId, Toast.LENGTH_LONG).show();
 
                         // 자동 로그인 처리
-                        UserSession session = new UserSession(this);
-                        session.createLoginSession(newUser);
+                        com.example.timemate.util.UserSession session = com.example.timemate.util.UserSession.getInstance(this);
+                        session.login(newUser.userId, newUser.nickname);
 
                         // 홈 화면으로 이동
-                        Intent intent = new Intent(SignupFormActivity.this, HomeActivity.class);
+                        Intent intent = new Intent(SignupFormActivity.this, com.example.timemate.ui.home.HomeActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();

@@ -3,6 +3,7 @@ package com.example.timemate.data.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
@@ -20,6 +21,8 @@ public class User {
     @Nullable
     public String email;         // 이메일 (선택사항)
     @Nullable
+    public String password;      // 비밀번호 (계정 전환용)
+    @Nullable
     public String profileImage;  // 프로필 이미지 경로
     public long createdAt;       // 계정 생성 시간
     public long lastLoginAt;     // 마지막 로그인 시간
@@ -32,7 +35,8 @@ public class User {
         this.isActive = true;
     }
 
-    // 생성자
+    // 생성자 (Room에서 무시)
+    @Ignore
     public User(@NonNull String userId, @NonNull String nickname) {
         this();
         this.userId = userId;

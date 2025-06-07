@@ -36,15 +36,18 @@
         <activity
             android:name=".ScheduleListActivity"
             android:exported="true" />
-        <activity android:name=".ScheduleAddActivity" />
-        <activity android:name=".HomeActivity" />
-        <activity android:name=".FriendListActivity" />
-        <activity android:name=".FriendAddActivity" />
         <activity android:name=".NotificationActivity" />
         <activity android:name=".ScheduleReminderDetailActivity" />
         <activity android:name=".AccountSwitchActivity" />
-        <activity android:name=".RecommendationActivity" />
-        <activity android:name=".ProfileActivity" />
+        <activity android:name=".FriendAddActivity" />
+
+        <!-- 새로운 패키지 구조의 Activity들 -->
+        <activity android:name=".ui.home.HomeActivity" />
+        <activity android:name=".ui.schedule.ScheduleAddActivity" />
+        <activity android:name=".ui.schedule.ScheduleListActivity" />
+        <activity android:name=".ui.friend.FriendListActivity" />
+        <activity android:name=".ui.profile.ProfileActivity" />
+        <activity android:name=".ui.recommendation.RecommendationActivity" />
 
         <receiver android:name=".NotificationActionReceiver"
             android:exported="false" />

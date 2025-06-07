@@ -149,11 +149,11 @@ public class HomeActivity extends AppCompatActivity {
 
         // 6) 빠른 액션 버튼 클릭 처리
         cardAddSchedule.setOnClickListener(v -> {
-            startActivity(new Intent(HomeActivity.this, ScheduleAddActivity.class));
+            startActivity(new Intent(HomeActivity.this, com.example.timemate.ui.schedule.ScheduleAddActivity.class));
         });
 
         cardViewSchedules.setOnClickListener(v -> {
-            startActivity(new Intent(HomeActivity.this, ScheduleListActivity.class));
+            startActivity(new Intent(HomeActivity.this, com.example.timemate.ui.schedule.ScheduleListActivity.class));
         });
 
         // 알림 버튼 클릭 처리
@@ -409,6 +409,22 @@ public class HomeActivity extends AppCompatActivity {
             intent.putExtra("reminder_id", reminder.scheduleId);
             startActivity(intent);
         });
+    }
+
+    private void setupRecommendationSystem() {
+        // Spinner 초기화
+        if (spinnerSchedules != null) {
+            List<String> items = new ArrayList<>();
+            items.add("추천 기능 준비 중입니다");
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, items);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerSchedules.setAdapter(adapter);
+        }
+
+        // 추천 RecyclerView는 향후 구현 예정
+        if (recyclerRecommendations != null) {
+            recyclerRecommendations.setVisibility(View.GONE);
+        }
     }
 
     // 추천 시스템 메서드들 (향후 구현 예정)
