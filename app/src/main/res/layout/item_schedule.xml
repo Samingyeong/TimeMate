@@ -1,0 +1,29 @@
+<!-- res/layout/item_schedule.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="일정 제목" />
+
+    <TextView
+        android:id="@+id/textDateTime"
+        android:layout_marginTop="4dp"
+        android:text="날짜 및 시간"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textDepartureDestination"
+        android:layout_marginTop="4dp"
+        android:text="출발지 → 도착지"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>

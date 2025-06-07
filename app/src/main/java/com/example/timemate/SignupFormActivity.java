@@ -1,0 +1,120 @@
+package com.example.timemate;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+
+import java.util.concurrent.Executors;
+
+public class SignupFormActivity extends AppCompatActivity {
+
+    private EditText editNickname, editEmail, editPhone, editUserId, editPassword;
+    private RadioGroup radioGenderGroup;
+    private AppDatabase db;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signup_form);
+
+        db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "timeMate-db").build();
+
+        editNickname = findViewById(R.id.editNickname);
+        editEmail = findViewById(R.id.editEmail);
+        editPhone = findViewById(R.id.editPhone);
+        editUserId = findViewById(R.id.editUserId);
+        editPassword = findViewById(R.id.editPassword);
+        radioGenderGroup = findViewById(R.id.radioGenderGroup);
+
+        Button btnSignup = findViewById(R.id.btnSignup);
+        btnSignup.setOnClickListener(v -> signupUser());
+    }
+
+    private void signupUser() {
+        String nickname = editNickname.getText().toString().trim();
+        String email = editEmail.getText().toString().trim();
+        String phone = editPhone.getText().toString().trim();
+        String userId = editUserId.getText().toString().trim();
+        String password = editPassword.getText().toString().trim();
+
+        // 입력 검증
+        if (nickname.isEmpty()) {
+            Toast.makeText(this, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show();
+            editNickname.requestFocus();
+            return;
+        }
+
+        if (email.isEmpty()) {
+            Toast.makeText(this, "이메일을 입력해주세요", Toast.LENGTH_SHORT).show();
+            editEmail.requestFocus();
+            return;
+        }
+
+        if (userId.isEmpty()) {
+            Toast.makeText(this, "사용자 ID를 입력해주세요", Toast.LENGTH_SHORT).show();
+            editUserId.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            Toast.makeText(this, "비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show();
+            editPassword.requestFocus();
+            return;
+        }
+
+        int selectedGenderId = radioGenderGroup.getCheckedRadioButtonId();
+        RadioButton selectedGenderButton = findViewById(selectedGenderId);
+        String gender = selectedGenderButton != null ? selectedGenderButton.getText().toString() : "";
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            // 중복 확인
+            User existingUser = db.userDao().getUserById(userId);
+            User existingEmail = db.userDao().getUserByEmail(email);
+
+            runOnUiThread(() -> {
+                if (existingUser != null) {
+                    Toast.makeText(this, "이미 사용 중인 사용자 ID입니다", Toast.LENGTH_SHORT).show();
+                    editUserId.requestFocus();
+                    return;
+                }
+
+                if (existingEmail != null) {
+                    Toast.makeText(this, "이미 사용 중인 이메일입니다", Toast.LENGTH_SHORT).show();
+                    editEmail.requestFocus();
+                    return;
+                }
+
+                // 새 사용자 생성
+                User newUser = new User(userId, nickname, email);
+                newUser.phone = phone;
+                newUser.gender = gender;
+                newUser.password = password;
+
+                Executors.newSingleThreadExecutor().execute(() -> {
+                    db.userDao().insert(newUser);
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "회원가입 성공!\n사용자 ID: " + userId, Toast.LENGTH_LONG).show();
+
+                        // 자동 로그인 처리
+                        UserSession session = new UserSession(this);
+                        session.createLoginSession(newUser);
+
+                        // 홈 화면으로 이동
+                        Intent intent = new Intent(SignupFormActivity.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    });
+                });
+            });
+        });
+    }
+}
