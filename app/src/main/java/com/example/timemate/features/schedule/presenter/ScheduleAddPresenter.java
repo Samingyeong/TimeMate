@@ -159,28 +159,58 @@ public class ScheduleAddPresenter {
                 }
 
                 // 일정에 사용자 ID 설정 (NULL 안전 처리)
-                schedule.userId = currentUserId != null ? currentUserId : "";
+                if (currentUserId == null || currentUserId.trim().isEmpty()) {
+                    android.util.Log.e("ScheduleAddPresenter", "❌ 사용자 ID가 유효하지 않음: " + currentUserId);
+                    view.showError("로그인 정보가 유효하지 않습니다. 다시 로그인해주세요.");
+                    return;
+                }
+
+                schedule.userId = currentUserId;
                 schedule.createdAt = System.currentTimeMillis();
+                schedule.updatedAt = System.currentTimeMillis();
 
-                // 필수 필드 NULL 체크
-                if (schedule.title == null) schedule.title = "";
-                if (schedule.date == null) schedule.date = "";
-                if (schedule.time == null) schedule.time = "";
+                // 필수 필드 NULL 체크 및 기본값 설정
+                if (schedule.title == null || schedule.title.trim().isEmpty()) {
+                    schedule.title = "제목 없음";
+                }
+                if (schedule.date == null || schedule.date.trim().isEmpty()) {
+                    android.util.Log.e("ScheduleAddPresenter", "❌ 날짜가 설정되지 않음");
+                    view.showError("날짜를 선택해주세요.");
+                    return;
+                }
+                if (schedule.time == null || schedule.time.trim().isEmpty()) {
+                    android.util.Log.e("ScheduleAddPresenter", "❌ 시간이 설정되지 않음");
+                    view.showError("시간을 선택해주세요.");
+                    return;
+                }
 
-                android.util.Log.d("ScheduleAddPresenter", "💾 일정 저장 시작 - 제목: " + schedule.title + ", 사용자: " + schedule.userId);
+                android.util.Log.d("ScheduleAddPresenter", "💾 일정 저장 시작");
+                android.util.Log.d("ScheduleAddPresenter", "📋 제목: " + schedule.title);
+                android.util.Log.d("ScheduleAddPresenter", "👤 사용자: " + schedule.userId);
+                android.util.Log.d("ScheduleAddPresenter", "📅 날짜: " + schedule.date);
+                android.util.Log.d("ScheduleAddPresenter", "⏰ 시간: " + schedule.time);
 
                 // 일정 저장
                 long scheduleId = database.scheduleDao().insert(schedule);
 
-                android.util.Log.d("ScheduleAddPresenter", "✅ 일정 저장 완료 - ID: " + scheduleId);
+                android.util.Log.d("ScheduleAddPresenter", "✅ 일정 저장 완료 - 생성된 ID: " + scheduleId);
 
-                // 저장된 일정 확인
+                // 저장된 일정 즉시 확인
                 Schedule savedSchedule = database.scheduleDao().getScheduleById((int)scheduleId);
                 if (savedSchedule != null) {
-                    android.util.Log.d("ScheduleAddPresenter", "✅ 저장 확인 성공 - 제목: " + savedSchedule.title + ", 사용자: " + savedSchedule.userId);
+                    android.util.Log.d("ScheduleAddPresenter", "✅ 저장 확인 성공");
+                    android.util.Log.d("ScheduleAddPresenter", "📋 저장된 제목: " + savedSchedule.title);
+                    android.util.Log.d("ScheduleAddPresenter", "👤 저장된 사용자: " + savedSchedule.userId);
+                    android.util.Log.d("ScheduleAddPresenter", "📅 저장된 날짜: " + savedSchedule.date);
                 } else {
                     android.util.Log.e("ScheduleAddPresenter", "❌ 저장 확인 실패 - 일정을 다시 조회할 수 없음");
+                    view.showError("일정 저장에 실패했습니다. 다시 시도해주세요.");
+                    return;
                 }
+
+                // 현재 사용자의 전체 일정 수 확인
+                java.util.List<Schedule> userSchedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
+                android.util.Log.d("ScheduleAddPresenter", "📊 저장 후 사용자 일정 총 개수: " + userSchedules.size());
 
                 // 친구 초대 처리
                 if (selectedFriends != null && !selectedFriends.isEmpty()) {

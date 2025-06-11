@@ -2669,19 +2669,27 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
 
     private Schedule createScheduleFromInput() {
         Schedule schedule = new Schedule();
+
+        // 기본 정보 설정 (NULL 안전 처리)
         schedule.title = editTitle.getText().toString().trim();
         schedule.memo = editMemo.getText().toString().trim();
         schedule.departure = editDeparture.getText().toString().trim();
         schedule.destination = editDestination.getText().toString().trim();
 
-        // 날짜와 시간 결합
-        Calendar combined = Calendar.getInstance();
-        combined.set(selectedDate.get(Calendar.YEAR),
-                    selectedDate.get(Calendar.MONTH),
-                    selectedDate.get(Calendar.DAY_OF_MONTH),
-                    selectedTime.get(Calendar.HOUR_OF_DAY),
-                    selectedTime.get(Calendar.MINUTE));
-        schedule.setScheduledDate(combined.getTime());
+        // 빈 문자열을 NULL로 변환하지 않고 그대로 유지
+        if (schedule.title.isEmpty()) schedule.title = "제목 없음";
+        if (schedule.memo.isEmpty()) schedule.memo = "";
+        if (schedule.departure.isEmpty()) schedule.departure = "";
+        if (schedule.destination.isEmpty()) schedule.destination = "";
+
+        // 날짜와 시간 명시적 설정
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+        schedule.date = dateFormat.format(selectedDate.getTime());
+        schedule.time = timeFormat.format(selectedTime.getTime());
+
+        Log.d("ScheduleAdd", "📅 일정 생성 - 제목: " + schedule.title + ", 날짜: " + schedule.date + ", 시간: " + schedule.time);
 
         // 선택된 경로 정보 저장
         if (selectedRouteInfo != null && !selectedRouteInfo.isEmpty()) {
@@ -2693,6 +2701,11 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
             schedule.selectedTransportModes = selectedTransportModes;
             Log.d("ScheduleAdd", "✅ 새 일정 - 교통수단 저장: " + selectedTransportModes);
         }
+
+        // 기본값 설정
+        schedule.isCompleted = false;
+        schedule.createdAt = System.currentTimeMillis();
+        schedule.updatedAt = System.currentTimeMillis();
 
         return schedule;
     }

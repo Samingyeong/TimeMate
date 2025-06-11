@@ -461,6 +461,25 @@ public class ScheduleListActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ScheduleAddActivity.class);
             startActivityForResult(intent, REQUEST_ADD_SCHEDULE);
         });
+
+        // 디버깅용 강제 새로고침 (헤더 더블 탭)
+        if (findViewById(R.id.layoutHeader) != null) {
+            findViewById(R.id.layoutHeader).setOnClickListener(new View.OnClickListener() {
+                private long lastClickTime = 0;
+
+                @Override
+                public void onClick(View v) {
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - lastClickTime < 500) { // 더블 탭
+                        Log.d(TAG, "🔄 헤더 더블 탭 - 강제 새로고침 실행");
+                        Toast.makeText(ScheduleListActivity.this, "강제 새로고침 중...", Toast.LENGTH_SHORT).show();
+                        loadSchedules();
+                        verifyDatabaseTables(); // 데이터베이스 상태 확인
+                    }
+                    lastClickTime = currentTime;
+                }
+            });
+        }
     }
 
     /**
@@ -1121,16 +1140,25 @@ public class ScheduleListActivity extends AppCompatActivity {
         Log.d(TAG, "📱 onActivityResult - requestCode: " + requestCode + ", resultCode: " + resultCode);
 
         if (requestCode == REQUEST_ADD_SCHEDULE && resultCode == RESULT_OK) {
-            Log.d(TAG, "✅ 일정 추가/수정 완료, 목록 새로고침 시작");
+            Log.d(TAG, "✅ 일정 추가/수정 완료, 강력한 새로고침 시작");
 
-            // 약간의 딜레이 후 새로고침 (데이터베이스 저장 완료 대기)
-            new android.os.Handler().postDelayed(() -> {
-                Log.d(TAG, "🔄 딜레이 후 일정 새로고침 실행");
-                loadSchedules();
-            }, 500); // 0.5초 딜레이
-
-            // 즉시 새로고침도 실행
+            // 즉시 새로고침
             loadSchedules();
+
+            // 1초 후 추가 새로고침 (데이터베이스 저장 완료 확실히 대기)
+            new android.os.Handler().postDelayed(() -> {
+                Log.d(TAG, "🔄 1차 딜레이 후 일정 새로고침 실행");
+                loadSchedules();
+                verifyDatabaseTables(); // 데이터베이스 상태 확인
+            }, 1000);
+
+            // 2초 후 최종 새로고침
+            new android.os.Handler().postDelayed(() -> {
+                Log.d(TAG, "🔄 2차 딜레이 후 최종 일정 새로고침 실행");
+                loadSchedules();
+            }, 2000);
+
+            Toast.makeText(this, "일정이 저장되었습니다. 목록을 새로고침합니다.", Toast.LENGTH_SHORT).show();
         }
     }
 
