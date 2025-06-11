@@ -34,6 +34,10 @@ public interface ScheduleDao {
     @Query("SELECT * FROM schedules WHERE userId = :userId ORDER BY date ASC, time ASC")
     List<Schedule> getSchedulesByUserId(String userId);
 
+    // 오늘 이후 일정만 조회 (과거 일정 숨김)
+    @Query("SELECT * FROM schedules WHERE userId = :userId AND date >= :todayDate ORDER BY date ASC, time ASC")
+    List<Schedule> getSchedulesByUserIdFromToday(String userId, String todayDate);
+
     @Query("SELECT * FROM schedules WHERE userId = :userId AND date BETWEEN :startDate AND :endDate ORDER BY date ASC, time ASC")
     List<Schedule> getSchedulesByUserAndDateRange(String userId, String startDate, String endDate);
 

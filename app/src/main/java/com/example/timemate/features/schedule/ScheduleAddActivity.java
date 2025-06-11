@@ -2548,13 +2548,8 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
                 // 편집 모드: 일정 업데이트
                 updateSchedule(schedule);
             } else {
-                // 새 일정 생성
+                // 새 일정 생성 (친구 초대는 presenter에서 처리)
                 presenter.saveSchedule(schedule, selectedFriends);
-
-                // 선택된 친구들에게 알림 전송
-                if (selectedFriends != null && !selectedFriends.isEmpty()) {
-                    sendFriendInvitations(schedule, selectedFriends);
-                }
             }
 
         } catch (Exception e) {

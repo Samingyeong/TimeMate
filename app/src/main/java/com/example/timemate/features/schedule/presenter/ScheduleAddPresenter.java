@@ -167,7 +167,7 @@ public class ScheduleAddPresenter {
 
                 // 친구 초대 처리
                 if (selectedFriends != null && !selectedFriends.isEmpty()) {
-                    saveSharedSchedules(scheduleId, selectedFriends);
+                    saveSharedSchedules(scheduleId, schedule, selectedFriends);
                 }
 
                 // 알림 설정
@@ -208,17 +208,37 @@ public class ScheduleAddPresenter {
     /**
      * 공유 일정 저장
      */
-    private void saveSharedSchedules(long scheduleId, List<Friend> friends) {
+    private void saveSharedSchedules(long scheduleId, Schedule schedule, List<Friend> friends) {
         try {
+            String currentUserId = userSession.getCurrentUserId();
+            String currentNickname = userSession.getCurrentUserName();
+
             for (Friend friend : friends) {
-                com.example.timemate.data.model.SharedSchedule sharedSchedule = 
+                com.example.timemate.data.model.SharedSchedule sharedSchedule =
                     new com.example.timemate.data.model.SharedSchedule();
+
                 sharedSchedule.originalScheduleId = (int) scheduleId;
-                sharedSchedule.invitedUserId = String.valueOf(friend.id);
+                sharedSchedule.creatorUserId = currentUserId;
+                sharedSchedule.creatorNickname = currentNickname != null ? currentNickname : currentUserId;
+                sharedSchedule.invitedUserId = friend.friendUserId;
+                sharedSchedule.invitedNickname = friend.friendNickname;
+
+                // 일정 정보 캐시
+                sharedSchedule.title = schedule.title;
+                sharedSchedule.date = schedule.date;
+                sharedSchedule.time = schedule.time;
+                sharedSchedule.departure = schedule.departure;
+                sharedSchedule.destination = schedule.destination;
+                sharedSchedule.memo = schedule.memo;
+
                 sharedSchedule.status = "pending"; // 대기 중
+                sharedSchedule.isNotificationSent = false;
+                sharedSchedule.isNotificationRead = false;
                 sharedSchedule.createdAt = System.currentTimeMillis();
+                sharedSchedule.updatedAt = System.currentTimeMillis();
 
                 database.sharedScheduleDao().insert(sharedSchedule);
+                android.util.Log.d("ScheduleAddPresenter", "공유 일정 저장: " + friend.friendNickname);
             }
         } catch (Exception e) {
             android.util.Log.e("ScheduleAddPresenter", "Error saving shared schedules", e);

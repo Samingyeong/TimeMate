@@ -240,26 +240,41 @@ public class ScheduleListActivity extends AppCompatActivity {
     }
 
     /**
-     * 특정 날짜의 일정 표시
+     * 특정 날짜의 일정 표시 (과거 일정 포함)
      */
     private void showSchedulesForDate(Calendar date) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String selectedDateStr = dateFormat.format(date.getTime());
 
-            // 해당 날짜의 일정 필터링
-            List<Schedule> daySchedules = new ArrayList<>();
-            for (Schedule schedule : scheduleList) {
-                if (schedule.date != null && schedule.date.equals(selectedDateStr)) {
-                    daySchedules.add(schedule);
-                }
+            // 데이터베이스에서 해당 날짜의 모든 일정 조회 (과거 일정 포함)
+            String currentUserId = userSession.getCurrentUserId();
+            if (currentUserId == null) {
+                Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            if (daySchedules.isEmpty()) {
-                Toast.makeText(this, "선택한 날짜에 일정이 없습니다", Toast.LENGTH_SHORT).show();
-            } else {
-                showScheduleDetailDialog(daySchedules, selectedDateStr);
-            }
+            executor.execute(() -> {
+                try {
+                    // 해당 날짜의 모든 일정 조회 (과거 일정도 포함)
+                    List<Schedule> daySchedules = database.scheduleDao().getSchedulesByUserAndDateRange(
+                        currentUserId, selectedDateStr, selectedDateStr);
+
+                    runOnUiThread(() -> {
+                        if (daySchedules.isEmpty()) {
+                            Toast.makeText(this, "선택한 날짜에 일정이 없습니다", Toast.LENGTH_SHORT).show();
+                        } else {
+                            showScheduleDetailDialog(daySchedules, selectedDateStr);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Log.e(TAG, "날짜별 일정 조회 오류", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "일정을 불러올 수 없습니다", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
 
         } catch (Exception e) {
             Log.e(TAG, "날짜별 일정 표시 오류", e);
@@ -423,8 +438,14 @@ public class ScheduleListActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "📊 데이터베이스에서 일정 조회 중...");
-                List<Schedule> schedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
-                Log.d(TAG, "📊 조회된 내 일정 수: " + (schedules != null ? schedules.size() : "null"));
+
+                // 오늘 날짜 계산
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String todayDate = dateFormat.format(new java.util.Date());
+
+                // 오늘 이후 일정만 조회 (과거 일정 숨김)
+                List<Schedule> schedules = database.scheduleDao().getSchedulesByUserIdFromToday(currentUserId, todayDate);
+                Log.d(TAG, "📊 조회된 내 일정 수 (오늘 이후): " + (schedules != null ? schedules.size() : "null"));
 
                 // 공유된 일정도 추가 (수락된 것만)
                 try {
