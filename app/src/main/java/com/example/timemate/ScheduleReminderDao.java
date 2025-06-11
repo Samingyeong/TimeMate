@@ -13,6 +13,9 @@ public interface ScheduleReminderDao {
     
     @Insert
     void insert(ScheduleReminder reminder);
+
+    @Insert
+    void insertReminder(ScheduleReminder reminder);
     
     @Update
     void update(ScheduleReminder reminder);

@@ -38,21 +38,21 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textTitle"
+                    android:id="@+id/textNotificationTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="알림 제목"
+                    android:text="📅 일정 초대"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@color/text_primary" />
 
                 <TextView
-                    android:id="@+id/textTime"
+                    android:id="@+id/textNotificationTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="시간"
+                    android:text="방금 전"
                     android:textSize="12sp"
-                    android:textColor="@android:color/darker_gray"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
@@ -61,12 +61,12 @@
 
         <!-- 알림 메시지 -->
         <TextView
-            android:id="@+id/textMessage"
+            android:id="@+id/textNotificationMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="알림 메시지 내용"
+            android:text="친구님이 일정에 초대했습니다"
             android:textSize="14sp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp"
             android:lineSpacingExtra="2dp" />
 
@@ -78,47 +78,30 @@
             android:orientation="horizontal"
             android:gravity="end">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReject"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginEnd="8dp"
+                android:text="거절"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="18dp"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:textColor="@color/text_secondary"
+                android:minWidth="80dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAccept"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="수락"
-                android:textSize="12sp"
-                android:backgroundTint="@color/green"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone"
-                style="@style/Widget.Material3.Button" />
-
-            <Button
-                android:id="@+id/btnReject"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="거절"
-                android:textSize="12sp"
-                android:backgroundTint="@color/red"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone"
-                style="@style/Widget.Material3.Button" />
-
-            <Button
-                android:id="@+id/btnMarkRead"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="읽음"
-                android:textSize="12sp"
-                android:backgroundTint="@color/purple_500"
-                android:layout_marginEnd="8dp"
-                android:visibility="gone"
-                style="@style/Widget.Material3.Button" />
-
-            <Button
-                android:id="@+id/btnDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="삭제"
-                android:textSize="12sp"
-                android:backgroundTint="@android:color/darker_gray"
-                style="@style/Widget.Material3.Button.OutlinedButton" />
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:cornerRadius="18dp"
+                app:backgroundTint="@color/ios_blue"
+                android:textColor="@android:color/white"
+                android:minWidth="80dp" />
 
         </LinearLayout>
 

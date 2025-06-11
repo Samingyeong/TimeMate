@@ -1,100 +1,123 @@
 package com.example.timemate.ui.recommendation;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.timemate.R;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.request.RequestOptions;
 
+import com.example.timemate.R;
+import com.example.timemate.network.api.NaverPlaceSearchService;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 추천 장소 어댑터
- * - 추천 장소 목록 표시
+ * - 네이버 Place Search API 결과 표시
  * - 평점, 거리, 카테고리 정보 표시
- * - 지도 연동 기능 (향후 구현)
+ * - 길찾기 기능 연동
  */
-public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAdapter.RecommendationViewHolder> {
+public class RecommendationAdapter extends RecyclerView.Adapter<RecommendationAdapter.PlaceViewHolder> {
 
-    /**
-     * 추천 장소 데이터 클래스
-     */
-    public static class RecommendationItem {
-        public String name;
-        public String address;
-        public String category;
-        public double rating;
-        public String distance;
+    private Context context;
+    private List<NaverPlaceSearchService.PlaceItem> places;
+    private OnPlaceClickListener listener;
 
-        public RecommendationItem(String name, String address, String category, double rating, String distance) {
-            this.name = name;
-            this.address = address;
-            this.category = category;
-            this.rating = rating;
-            this.distance = distance;
-        }
+    public interface OnPlaceClickListener {
+        void onPlaceClick(NaverPlaceSearchService.PlaceItem place);
     }
 
-    private List<RecommendationItem> items;
-    private OnItemClickListener listener;
-
-    public interface OnItemClickListener {
-        void onItemClick(RecommendationItem item);
-    }
-
-    public RecommendationAdapter(List<RecommendationItem> items, OnItemClickListener listener) {
-        this.items = items;
+    public RecommendationAdapter(Context context, OnPlaceClickListener listener) {
+        this.context = context;
+        this.places = new ArrayList<>();
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public RecommendationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PlaceViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_recommendation, parent, false);
-        return new RecommendationViewHolder(view);
+        return new PlaceViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecommendationViewHolder holder, int position) {
-        RecommendationItem item = items.get(position);
-        holder.bind(item);
+    public void onBindViewHolder(@NonNull PlaceViewHolder holder, int position) {
+        NaverPlaceSearchService.PlaceItem place = places.get(position);
+        holder.bind(place);
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return places.size();
     }
 
-    public void updateItems(List<RecommendationItem> newItems) {
-        this.items = newItems;
+    public void updatePlaces(List<NaverPlaceSearchService.PlaceItem> newPlaces) {
+        this.places = newPlaces;
         notifyDataSetChanged();
     }
 
-    class RecommendationViewHolder extends RecyclerView.ViewHolder {
-        private TextView textName, textLocation, textRating, textDescription;
+    class PlaceViewHolder extends RecyclerView.ViewHolder {
+        private ImageView imagePlacePhoto;
+        private TextView textPlaceIcon, textPlaceName, textPlaceCategory, textPlaceAddress;
+        private TextView textPlaceRating, textPlaceDistance;
+        private Button btnNavigation;
 
-        public RecommendationViewHolder(@NonNull View itemView) {
+        public PlaceViewHolder(@NonNull View itemView) {
             super(itemView);
-            textName = itemView.findViewById(R.id.textName);
-            textLocation = itemView.findViewById(R.id.textLocation);
-            textRating = itemView.findViewById(R.id.textRating);
-            textDescription = itemView.findViewById(R.id.textDescription);
+            imagePlacePhoto = itemView.findViewById(R.id.imagePlacePhoto);
+            textPlaceIcon = itemView.findViewById(R.id.textPlaceIcon);
+            textPlaceName = itemView.findViewById(R.id.textPlaceName);
+            textPlaceCategory = itemView.findViewById(R.id.textPlaceCategory);
+            textPlaceAddress = itemView.findViewById(R.id.textPlaceAddress);
+            textPlaceRating = itemView.findViewById(R.id.textPlaceRating);
+            textPlaceDistance = itemView.findViewById(R.id.textPlaceDistance);
+            btnNavigation = itemView.findViewById(R.id.btnNavigation);
         }
 
-        public void bind(RecommendationItem item) {
-            textName.setText(item.name);
-            textLocation.setText(item.address);
-            textRating.setText(String.format("%.1f★", item.rating));
-            textDescription.setText(item.category + " • " + item.distance);
+        public void bind(NaverPlaceSearchService.PlaceItem place) {
+            // 실제 장소 이미지 로딩
+            if (place.imageUrl != null && !place.imageUrl.isEmpty()) {
+                Glide.with(context)
+                    .load(place.imageUrl)
+                    .apply(new RequestOptions()
+                        .transform(new RoundedCorners(16))
+                        .placeholder(R.drawable.ic_map_placeholder)
+                        .error(R.drawable.ic_map_error))
+                    .into(imagePlacePhoto);
+            } else {
+                // 기본 이미지 설정
+                imagePlacePhoto.setImageResource(R.drawable.ic_map_placeholder);
+            }
 
+            textPlaceIcon.setText(place.getCategoryIcon());
+            textPlaceName.setText(place.name);
+            textPlaceCategory.setText(place.category);
+            textPlaceAddress.setText(place.getDisplayAddress());
+            textPlaceRating.setText(String.format("⭐ %.1f", place.rating));
+            textPlaceDistance.setText("📍 " + place.distance);
+
+            // 길찾기 버튼 클릭
+            btnNavigation.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onPlaceClick(place);
+                }
+            });
+
+            // 전체 아이템 클릭
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
-                    listener.onItemClick(item);
+                    listener.onPlaceClick(place);
                 }
             });
         }

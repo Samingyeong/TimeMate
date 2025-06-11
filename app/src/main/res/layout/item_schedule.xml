@@ -1,29 +1,108 @@
-<!-- res/layout/item_schedule.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="12dp"
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardBackground"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/card_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardBackgroundColor="@color/card_background"
+    app:strokeWidth="0dp">
 
-    <TextView
-        android:id="@+id/textTitle"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="일정 제목" />
+        android:orientation="horizontal"
+        android:padding="@dimen/card_padding"
+        android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/textDateTime"
-        android:layout_marginTop="4dp"
-        android:text="날짜 및 시간"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <!-- 일정 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textDepartureDestination"
-        android:layout_marginTop="4dp"
-        android:text="출발지 → 도착지"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일정 제목"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/textDateTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="날짜 및 시간"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:fontFamily="sans-serif-light" />
+
+            <TextView
+                android:id="@+id/textLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="출발지 → 도착지"
+                android:textSize="12sp"
+                android:textColor="@color/text_tertiary"
+                android:fontFamily="sans-serif-light"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/textMemo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="메모"
+                android:textSize="12sp"
+                android:textColor="@color/text_tertiary"
+                android:fontFamily="sans-serif-light"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- 액션 버튼들 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <CheckBox
+                android:id="@+id/checkCompleted"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginBottom="8dp"
+                android:buttonTint="@color/accent" />
+
+            <ImageButton
+                android:id="@+id/btnEdit"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_edit"
+                android:contentDescription="일정 수정"
+                android:scaleType="centerInside"
+                app:tint="@color/text_tertiary" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

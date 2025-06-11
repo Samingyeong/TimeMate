@@ -8,8 +8,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".TimeMateApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,9 +21,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/TimeMateTheme"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-
+        <!-- API 키는 BuildConfig를 통해 안전하게 관리됩니다 -->
+        <!-- 메타데이터 방식은 보안상 위험하므로 제거하고 BuildConfig 사용 -->
 
         <activity
             android:name=".MainActivity"
@@ -33,23 +38,31 @@
 
         <activity android:name=".SignupFormActivity" />
         <activity android:name=".ManualLoginActivity" />
-        <activity
-            android:name=".ScheduleListActivity"
-            android:exported="true" />
-        <activity android:name=".NotificationActivity" />
+        <activity android:name=".PasswordResetActivity" />
+        <activity android:name=".features.notification.NotificationActivity" />
         <activity android:name=".ScheduleReminderDetailActivity" />
         <activity android:name=".AccountSwitchActivity" />
-        <activity android:name=".FriendAddActivity" />
 
-        <!-- 새로운 패키지 구조의 Activity들 -->
+        <!-- 새로운 features 패키지 구조의 Activity들 -->
+        <activity android:name=".features.home.HomeActivity" />
+        <activity android:name=".features.schedule.ScheduleAddActivity" />
+        <activity android:name=".features.schedule.ScheduleListActivity" />
+        <activity android:name=".features.friend.FriendListActivity" />
+        <activity android:name=".features.friend.FriendAddActivity" />
+        <activity android:name=".features.profile.ProfileActivity" />
+
+        <!-- 기존 ui 패키지 Activity들도 유지 (호환성) -->
         <activity android:name=".ui.home.HomeActivity" />
-        <activity android:name=".ui.schedule.ScheduleAddActivity" />
         <activity android:name=".ui.schedule.ScheduleListActivity" />
         <activity android:name=".ui.friend.FriendListActivity" />
         <activity android:name=".ui.profile.ProfileActivity" />
         <activity android:name=".ui.recommendation.RecommendationActivity" />
 
         <receiver android:name=".NotificationActionReceiver"
+            android:exported="false" />
+
+        <!-- 일정 알림 Snooze 기능 -->
+        <receiver android:name=".notification.SnoozeReceiver"
             android:exported="false" />
     </application>
 

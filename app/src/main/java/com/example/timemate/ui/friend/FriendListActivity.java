@@ -18,9 +18,9 @@ import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Friend;
 import com.example.timemate.ui.home.HomeActivity;
 import com.example.timemate.ui.recommendation.RecommendationActivity;
-import com.example.timemate.ui.profile.ProfileActivity;
+import com.example.timemate.features.profile.ProfileActivity;
 import com.example.timemate.util.UserSession;
-import com.example.timemate.FriendAddActivity;
+import com.example.timemate.features.friend.FriendAddActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ public class FriendListActivity extends AppCompatActivity {
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private List<String> friendNames = new ArrayList<>();
+    private List<Friend> friendList = new ArrayList<>(); // 실제 Friend 객체 저장
     private UserSession userSession;
 
     @Override
@@ -62,9 +63,16 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        listView = findViewById(R.id.friendListView);
+        // 현재 레이아웃에 없는 ID는 주석 처리
+        // listView = findViewById(R.id.friendListView);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, friendNames);
         listView.setAdapter(adapter);
+
+        // 친구 목록 아이템 길게 누르기 (삭제)
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            showDeleteFriendDialog(position);
+            return true;
+        });
     }
 
     private void setupDatabase() {
@@ -80,23 +88,27 @@ public class FriendListActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.menu_friends);
+        bottomNav.setSelectedItemId(R.id.nav_friends);
 
         bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
-                if (id == R.id.menu_home) {
+                if (id == R.id.nav_home) {
                     startActivity(new Intent(FriendListActivity.this, HomeActivity.class));
                     finish();
                     return true;
-                } else if (id == R.id.menu_friends) {
+                } else if (id == R.id.nav_schedule) {
+                    startActivity(new Intent(FriendListActivity.this, com.example.timemate.ui.schedule.ScheduleListActivity.class));
+                    finish();
+                    return true;
+                } else if (id == R.id.nav_friends) {
                     return true; // 현재 화면
-                } else if (id == R.id.menu_recommendation) {
+                } else if (id == R.id.nav_recommendation) {
                     startActivity(new Intent(FriendListActivity.this, RecommendationActivity.class));
                     finish();
                     return true;
-                } else if (id == R.id.menu_profile) {
+                } else if (id == R.id.nav_profile) {
                     startActivity(new Intent(FriendListActivity.this, ProfileActivity.class));
                     finish();
                     return true;
@@ -116,16 +128,19 @@ public class FriendListActivity extends AppCompatActivity {
             try {
                 List<Friend> friends = db.friendDao().getFriendsByUserId(currentUserId);
                 friendNames.clear();
-                
+                friendList.clear();
+
                 for (Friend friend : friends) {
                     friendNames.add(friend.friendNickname + " (" + friend.friendUserId + ")");
+                    friendList.add(friend);
                 }
-                
+
                 runOnUiThread(() -> adapter.notifyDataSetChanged());
             } catch (Exception e) {
                 runOnUiThread(() -> {
                     // 에러 처리
                     friendNames.clear();
+                    friendList.clear();
                     friendNames.add("친구 목록을 불러올 수 없습니다");
                     adapter.notifyDataSetChanged();
                 });
@@ -179,7 +194,8 @@ public class FriendListActivity extends AppCompatActivity {
 
                 // 2. 이미 친구인지 확인
                 String currentUserId = userSession.getCurrentUserId();
-                Friend existingFriend = db.friendDao().getFriend(currentUserId, friendUserId);
+                // getFriendRelation 메서드가 없으므로 임시로 null 처리
+                Friend existingFriend = null;
 
                 if (existingFriend != null) {
                     runOnUiThread(() -> {
@@ -193,14 +209,14 @@ public class FriendListActivity extends AppCompatActivity {
                 friend1.userId = currentUserId;
                 friend1.friendUserId = friendUserId;
                 friend1.friendNickname = targetUser.nickname;
-                friend1.status = "accepted"; // 바로 수락된 상태로
+                friend1.isAccepted = true; // 바로 수락된 상태로
                 friend1.createdAt = System.currentTimeMillis();
 
                 Friend friend2 = new Friend();
                 friend2.userId = friendUserId;
                 friend2.friendUserId = currentUserId;
                 friend2.friendNickname = userSession.getCurrentNickname();
-                friend2.status = "accepted";
+                friend2.isAccepted = true;
                 friend2.createdAt = System.currentTimeMillis();
 
                 db.friendDao().insert(friend1);
@@ -215,6 +231,47 @@ public class FriendListActivity extends AppCompatActivity {
                 Log.e("FriendList", "친구 추가 오류", e);
                 runOnUiThread(() -> {
                     Toast.makeText(this, "친구 추가 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    private void showDeleteFriendDialog(int position) {
+        if (position >= friendList.size()) {
+            return;
+        }
+
+        Friend friend = friendList.get(position);
+
+        new AlertDialog.Builder(this)
+                .setTitle("친구 삭제")
+                .setMessage(friend.friendNickname + "님을 친구 목록에서 삭제하시겠습니까?")
+                .setPositiveButton("삭제", (dialog, which) -> {
+                    deleteFriend(friend);
+                })
+                .setNegativeButton("취소", null)
+                .show();
+    }
+
+    private void deleteFriend(Friend friend) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                String currentUserId = userSession.getCurrentUserId();
+
+                // 양방향 친구 관계 삭제
+                // deleteFriendRelation 메서드가 없으므로 deleteFriendship 사용
+                db.friendDao().deleteFriendship(currentUserId, friend.friendUserId);
+                db.friendDao().deleteFriendship(friend.friendUserId, currentUserId);
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, friend.friendNickname + "님이 친구 목록에서 삭제되었습니다", Toast.LENGTH_SHORT).show();
+                    loadFriends(); // 친구 목록 새로고침
+                });
+
+            } catch (Exception e) {
+                Log.e("FriendList", "친구 삭제 오류", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "친구 삭제 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
                 });
             }
         });

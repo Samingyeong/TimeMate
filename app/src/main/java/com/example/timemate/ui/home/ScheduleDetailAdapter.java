@@ -95,8 +95,7 @@ public class ScheduleDetailAdapter extends RecyclerView.Adapter<ScheduleDetailAd
             textScheduleTitle.setText(schedule.title);
             
             // 시간 설정
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.KOREAN);
-            textScheduleTime.setText(timeFormat.format(schedule.dateTime));
+            textScheduleTime.setText(schedule.time);
             
             // 위치 정보 설정
             if (schedule.departure != null && !schedule.departure.isEmpty() &&
@@ -108,14 +107,9 @@ public class ScheduleDetailAdapter extends RecyclerView.Adapter<ScheduleDetailAd
                 layoutLocation.setVisibility(View.GONE);
             }
             
-            // 친구 정보 설정
-            if (schedule.friendIds != null && !schedule.friendIds.isEmpty()) {
-                layoutFriends.setVisibility(View.VISIBLE);
-                String friendsText = "함께하는 친구: " + schedule.friendIds.size() + "명";
-                textFriends.setText(friendsText);
-            } else {
-                layoutFriends.setVisibility(View.GONE);
-            }
+            // 친구 정보 설정 (향후 구현)
+            // 현재 Schedule 모델에 friendIds 필드가 없으므로 임시로 숨김
+            layoutFriends.setVisibility(View.GONE);
             
             // 메모 설정
             if (schedule.memo != null && !schedule.memo.isEmpty()) {

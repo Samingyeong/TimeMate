@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- iOS 감성 통합 디자인 시스템 -->
+
+    <!-- 카드 관련 -->
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_elevation_selected">4dp</dimen>
+    <dimen name="card_elevation_pressed">6dp</dimen>
+    <dimen name="card_margin">12dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="card_height">72dp</dimen>
+
+    <!-- 기존 호환성 -->
+    <dimen name="route_card_corner_radius">@dimen/card_corner_radius</dimen>
+    <dimen name="route_card_elevation">@dimen/card_elevation</dimen>
+    <dimen name="route_card_margin">@dimen/card_margin</dimen>
+    <dimen name="route_card_padding">@dimen/card_padding</dimen>
+    <dimen name="route_card_spacing">@dimen/card_spacing</dimen>
+    
+    <!-- 텍스트 크기 -->
+    <dimen name="route_title_text_size">18sp</dimen>
+    <dimen name="route_subtitle_text_size">14sp</dimen>
+    <dimen name="route_detail_text_size">12sp</dimen>
+    <dimen name="route_time_text_size">16sp</dimen>
+    
+    <!-- 아이콘 크기 -->
+    <dimen name="route_icon_size">24dp</dimen>
+    <dimen name="route_icon_small">20dp</dimen>
+    <dimen name="route_checkbox_size">20dp</dimen>
+    
+    <!-- 모달 관련 -->
+    <dimen name="modal_corner_radius">16dp</dimen>
+    <dimen name="modal_handle_width">36dp</dimen>
+    <dimen name="modal_handle_height">4dp</dimen>
+    <dimen name="modal_handle_margin">8dp</dimen>
+    
+    <!-- 간격 -->
+    <dimen name="route_section_spacing">16dp</dimen>
+    <dimen name="route_item_spacing">12dp</dimen>
+    <dimen name="route_content_spacing">8dp</dimen>
+    
+    <!-- 버튼 -->
+    <dimen name="route_button_height">48dp</dimen>
+    <dimen name="route_button_corner_radius">12dp</dimen>
+    
+</resources>

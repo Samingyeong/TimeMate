@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_margin="8dp"
+    android:background="@drawable/route_normal_background"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 상단: 경로 타입 및 요약 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <!-- 경로 타입 아이콘 -->
+        <ImageView
+            android:id="@+id/imgTransportMode"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_transit"
+            android:layout_marginEnd="8dp"
+            app:tint="@color/sky_blue_accent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 경로 타입 -->
+            <TextView
+                android:id="@+id/textRouteType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="대중교통"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+            <!-- 경로 요약 -->
+            <TextView
+                android:id="@+id/textRouteSummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="지하철 + 버스 이용"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- 추천 배지 (첫 번째 항목에만 표시) -->
+        <TextView
+            android:id="@+id/textRecommended"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="추천"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:background="@drawable/recommended_badge"
+            android:padding="4dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- 중간: 시간, 거리, 비용 정보 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <!-- 소요 시간 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="시간"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/textDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25분"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/divider"
+            android:layout_marginHorizontal="8dp" />
+
+        <!-- 거리 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="거리"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/textDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3.2km"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+        <!-- 구분선 -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/divider"
+            android:layout_marginHorizontal="8dp" />
+
+        <!-- 비용 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="비용"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/textCost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1,500원"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginTop="2dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- 하단: 상세 설명 -->
+    <TextView
+        android:id="@+id/textDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="지하철과 버스를 이용한 최적 경로입니다."
+        android:textSize="13sp"
+        android:textColor="@color/text_secondary"
+        android:lineSpacingExtra="2dp" />
+
+</LinearLayout>

@@ -29,6 +29,10 @@ public class Schedule {
     public String destination;   // 도착지
     @Nullable
     public String memo;          // 메모
+    @Nullable
+    public String routeInfo;     // 선택된 경로 정보
+    @Nullable
+    public String selectedTransportModes; // 선택된 교통수단들 (JSON 형태)
     public boolean isCompleted;  // 완료 여부
     public long createdAt;       // 생성 시간
     public long updatedAt;       // 수정 시간
@@ -52,6 +56,8 @@ public class Schedule {
         this.departure = departure;
         this.destination = destination;
         this.memo = memo;
+        this.routeInfo = null;
+        this.selectedTransportModes = null;
     }
 
     // 편의 메서드들
@@ -70,6 +76,25 @@ public class Schedule {
 
     public void updateTimestamp() {
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    // 호환성을 위한 메서드들
+    public java.util.Date getScheduledDate() {
+        try {
+            java.text.SimpleDateFormat format = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm");
+            return format.parse(date + " " + time);
+        } catch (Exception e) {
+            return new java.util.Date();
+        }
+    }
+
+    public void setScheduledDate(java.util.Date scheduledDate) {
+        if (scheduledDate != null) {
+            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm");
+            this.date = dateFormat.format(scheduledDate);
+            this.time = timeFormat.format(scheduledDate);
+        }
     }
 
     @Override

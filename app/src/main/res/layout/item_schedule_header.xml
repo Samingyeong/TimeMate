@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="16dp"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/textSectionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="오늘의 일정"
+        style="@style/TimeMateTextSubtitle"
+        android:textColor="@color/ios_blue" />
+
+    <TextView
+        android:id="@+id/textScheduleCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3개"
+        style="@style/TimeMateTextCaption"
+        android:textColor="@color/text_hint"
+        android:background="@drawable/ios_badge_background"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp" />
+
+</LinearLayout>

@@ -4,25 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#f5f5f5">
+    android:background="@color/background_primary">
 
     <!-- 헤더 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500"
+        android:background="@color/background_primary"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:elevation="2dp">
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:src="@drawable/ic_arrow_back"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            app:tint="@android:color/white"
-            android:layout_marginTop="20dp" />
+            android:background="@drawable/circle_background"
+            app:tint="@color/text_primary"
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:layout_width="0dp"
@@ -31,123 +32,181 @@
             android:text="친구 추가"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/white"
+            android:textColor="@color/text_primary"
             android:gravity="center" />
 
         <View
-            android:layout_width="48dp"
-            android:layout_height="48dp" />
+            android:layout_width="44dp"
+            android:layout_height="44dp" />
 
     </LinearLayout>
 
-    <!-- 컨텐츠 -->
-    <LinearLayout
+    <!-- 스크롤 가능한 컨텐츠 -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center_vertical">
+        android:fillViewport="true">
 
-        <!-- 친구 ID 입력 -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+            android:orientation="vertical"
+            android:padding="20dp">
 
+            <!-- 환영 메시지 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:gravity="center"
+                android:layout_marginBottom="32dp">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/ic_friends"
+                    android:background="@drawable/circle_background"
+                    android:padding="20dp"
+                    android:layout_marginBottom="16dp"
+                    app:tint="@color/accent" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="친구 ID"
-                    android:textSize="16sp"
+                    android:text="새로운 친구를 추가해보세요!"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@color/purple_700"
+                    android:textColor="@color/text_primary"
                     android:layout_marginBottom="8dp" />
 
-                <EditText
-                    android:id="@+id/editFriendId"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:hint="친구의 고유 ID를 입력하세요"
-                    android:background="@drawable/edit_text_background"
-                    android:padding="12dp"
-                    android:inputType="text"
-                    android:drawableStart="@drawable/ic_person"
-                    android:drawablePadding="8dp" />
+                    android:text="친구와 함께 일정을 공유하고 관리하세요"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:gravity="center" />
 
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- 친구 닉네임 입력 -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
+            <!-- 친구 ID 입력 -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/card_background">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="친구 닉네임"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/purple_700"
-                    android:layout_marginBottom="8dp" />
-
-                <EditText
-                    android:id="@+id/editFriendNickname"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="친구에게 표시될 닉네임을 입력하세요"
-                    android:background="@drawable/edit_text_background"
-                    android:padding="12dp"
-                    android:inputType="text"
-                    android:drawableStart="@drawable/ic_edit"
-                    android:drawablePadding="8dp" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👤 친구 ID"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="12dp" />
 
-        </com.google.android.material.card.MaterialCardView>
+                    <EditText
+                        android:id="@+id/editFriendId"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="친구의 고유 ID를 입력하세요"
+                        android:background="@drawable/timemate_edittext_background"
+                        android:padding="16dp"
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_hint"
+                        android:drawableStart="@drawable/ic_person"
+                        android:drawablePadding="12dp"
+                        app:drawableTint="@color/text_secondary" />
 
-        <!-- 안내 텍스트 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="💡 친구의 사용자 ID 찾는 방법:\n1. 친구에게 개인정보 화면을 열어달라고 요청\n2. 사용자 ID를 클릭하면 자동으로 복사됩니다\n3. 복사된 ID를 위에 입력하세요!"
-            android:textSize="13sp"
-            android:textColor="@color/text_secondary"
-            android:gravity="center"
-            android:lineSpacingExtra="3dp"
-            android:background="@color/pastel_yellow"
-            android:padding="12dp"
-            android:layout_marginBottom="32dp" />
+                </LinearLayout>
 
-        <!-- 추가 버튼 -->
-        <Button
-            android:id="@+id/btnAddFriend"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="친구 추가"
-            android:textSize="16sp"
-            android:backgroundTint="@color/purple_500"
-            android:padding="16dp" />
+            </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
+            <!-- 친구 닉네임 입력 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/card_background">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✏️ 친구 닉네임"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="12dp" />
+
+                    <EditText
+                        android:id="@+id/editFriendNickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="친구에게 표시될 닉네임을 입력하세요"
+                        android:background="@drawable/timemate_edittext_background"
+                        android:padding="16dp"
+                        android:inputType="text"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_hint"
+                        android:drawableStart="@drawable/ic_edit"
+                        android:drawablePadding="12dp"
+                        app:drawableTint="@color/text_secondary" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 안내 텍스트 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="@dimen/card_corner_radius"
+                app:cardElevation="@dimen/card_elevation"
+                app:cardBackgroundColor="@color/pastel_sky">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💡 친구의 사용자 ID 찾는 방법:\n\n1. 친구에게 개인정보 화면을 열어달라고 요청\n2. 사용자 ID를 클릭하면 자동으로 복사됩니다\n3. 복사된 ID를 위에 입력하세요!"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_primary"
+                    android:lineSpacingExtra="2dp"
+                    android:padding="16dp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 추가 버튼 -->
+            <Button
+                android:id="@+id/btnAddFriend"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="👥 친구 추가"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                style="@style/TimeMateButton"
+                android:layout_marginBottom="20dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

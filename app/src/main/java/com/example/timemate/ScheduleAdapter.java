@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.timemate.data.model.Schedule;
+
 import java.util.List;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
@@ -29,7 +31,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         Schedule schedule = scheduleList.get(position);
         holder.textTitle.setText(schedule.title);
-        holder.textDateTime.setText(schedule.dateTime);
+        holder.textDateTime.setText(schedule.getFullDateTime());
         holder.textDepartureDestination.setText(schedule.departure + " → " + schedule.destination);
     }
 
@@ -45,7 +47,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             super(itemView);
             textTitle = itemView.findViewById(R.id.textTitle);
             textDateTime = itemView.findViewById(R.id.textDateTime);
-            textDepartureDestination = itemView.findViewById(R.id.textDepartureDestination);
+            textDepartureDestination = itemView.findViewById(R.id.textLocation);
         }
     }
 }

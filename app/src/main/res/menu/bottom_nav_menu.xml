@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_recommendation"
-        android:title="맛집추천"
-        android:icon="@drawable/ic_location_end"/>
-    <item
-        android:id="@+id/menu_home"
+        android:id="@+id/nav_home"
         android:title="홈"
         android:icon="@drawable/ic_home"/>
     <item
-        android:id="@+id/menu_friends"
+        android:id="@+id/nav_schedule"
+        android:title="일정"
+        android:icon="@drawable/ic_schedule"/>
+    <item
+        android:id="@+id/nav_friends"
         android:title="친구목록"
         android:icon="@drawable/ic_friends"/>
     <item
-        android:id="@+id/menu_profile"
-        android:title="개인정보"
+        android:id="@+id/nav_recommendation"
+        android:title="추천"
+        android:icon="@drawable/ic_location_end"/>
+    <item
+        android:id="@+id/nav_profile"
+        android:title="프로필"
         android:icon="@drawable/ic_profile"/>
 </menu>

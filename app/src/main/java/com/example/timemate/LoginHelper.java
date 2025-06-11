@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.timemate.data.database.AppDatabase;
+import com.example.timemate.features.home.HomeActivity;
 import com.kakao.sdk.user.UserApiClient;
 
 import java.util.concurrent.Executors;
@@ -45,7 +47,7 @@ public class LoginHelper {
                 String nickname = kakaoUser.getKakaoAccount().getProfile().getNickname();
                 String profileUrl = kakaoUser.getKakaoAccount().getProfile().getProfileImageUrl();
 
-                com.example.timemate.User newUser = new com.example.timemate.User();
+                com.example.timemate.data.model.User newUser = new com.example.timemate.data.model.User();
                 newUser.userId = userId;
                 newUser.nickname = nickname;
                 newUser.profileImage = profileUrl;
@@ -55,7 +57,7 @@ public class LoginHelper {
                 });
 
                 // ✅ 로그인 성공 시 홈 화면으로 이동
-                Intent intent = new Intent(context, ScheduleListActivity.class);
+                Intent intent = new Intent(context, com.example.timemate.ui.home.HomeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
             }

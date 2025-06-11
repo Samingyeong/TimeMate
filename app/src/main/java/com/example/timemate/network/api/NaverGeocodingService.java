@@ -20,9 +20,9 @@ import java.util.concurrent.Executors;
 public class NaverGeocodingService {
     
     private static final String TAG = "NaverGeocoding";
-    private static final String CLIENT_ID = "YOUR_CLIENT_ID"; // 실제 클라이언트 ID로 교체
-    private static final String CLIENT_SECRET = "YOUR_CLIENT_SECRET"; // 실제 클라이언트 시크릿으로 교체
-    private static final String GEOCODING_URL = "https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode";
+    private static final String CLIENT_ID = "dnnydofmgg";
+    private static final String CLIENT_SECRET = "GlevAwH7wuE5x2zfXuzwL9KVcHJUq5p7P7zYSF45";
+    private static final String GEOCODING_URL = "https://maps.apigw.ntruss.com/map-geocode/v2/geocode";
     
     private ExecutorService executor = Executors.newSingleThreadExecutor();
 

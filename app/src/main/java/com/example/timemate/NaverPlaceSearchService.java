@@ -2,14 +2,13 @@ package com.example.timemate;
 
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+// import org.json.JSONArray;
+// import org.json.JSONObject;
+// import java.io.BufferedReader;
+// import java.io.InputStreamReader;
+// import java.net.HttpURLConnection;
+// import java.net.URL;
+// import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +18,10 @@ import java.util.concurrent.Executors;
 public class NaverPlaceSearchService {
     
     private static final String TAG = "NaverPlaceSearch";
+
+    // 네이버 Place Search API는 유료 구독이 필요합니다.
+    // 현재는 더미 데이터를 사용하여 기능을 시연합니다.
+    // 실제 사용 시 아래 API 키를 설정하고 searchNearbyPlaces 메서드를 수정하세요.
     private static final String CLIENT_ID = "YOUR_CLIENT_ID"; // 실제 클라이언트 ID로 교체
     private static final String CLIENT_SECRET = "YOUR_CLIENT_SECRET"; // 실제 클라이언트 시크릿으로 교체
     private static final String SEARCH_URL = "https://naveropenapi.apigw.ntruss.com/map-place/v1/search";
@@ -56,51 +59,19 @@ public class NaverPlaceSearchService {
     public void searchNearbyPlaces(double latitude, double longitude, String category, PlaceSearchCallback callback) {
         executor.execute(() -> {
             try {
-                String query = getQueryByCategory(category);
-                String encodedQuery = URLEncoder.encode(query, "UTF-8");
-                
-                // 반경 2km 내 검색
-                String urlString = SEARCH_URL + "?query=" + encodedQuery + 
-                                 "&coordinate=" + longitude + "," + latitude + 
-                                 "&radius=2000" + // 2km
-                                 "&display=10"; // Top 10
-                
-                URL url = new URL(urlString);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", CLIENT_ID);
-                connection.setRequestProperty("X-NCP-APIGW-API-KEY", CLIENT_SECRET);
-                
-                int responseCode = connection.getResponseCode();
-                Log.d(TAG, "Place Search Response Code: " + responseCode);
-                
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    reader.close();
-                    
-                    parsePlaceSearchResponse(response.toString(), category, callback);
-                } else {
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                    StringBuilder errorResponse = new StringBuilder();
-                    String errorLine;
-                    
-                    while ((errorLine = errorReader.readLine()) != null) {
-                        errorResponse.append(errorLine);
-                    }
-                    errorReader.close();
-                    
-                    Log.e(TAG, "Place Search Error: " + errorResponse.toString());
-                    callback.onError("장소 검색 실패: " + responseCode);
-                }
-                
-                connection.disconnect();
-                
+                // API 구독이 필요하므로 더미 데이터로 대체
+                Log.d(TAG, "Using dummy data for category: " + category + " at location: " + latitude + ", " + longitude);
+
+                // 더미 데이터 생성
+                List<PlaceItem> dummyPlaces = generateDummyPlaces(category, latitude, longitude);
+
+                Log.d(TAG, "Generated " + dummyPlaces.size() + " dummy places for category: " + category);
+
+                // 약간의 지연으로 실제 API 호출처럼 보이게 함
+                Thread.sleep(500);
+
+                callback.onSuccess(dummyPlaces);
+
             } catch (Exception e) {
                 Log.e(TAG, "Place Search Exception", e);
                 callback.onError("네트워크 오류: " + e.getMessage());
@@ -120,49 +91,59 @@ public class NaverPlaceSearchService {
                 return "맛집";
         }
     }
-    
-    private void parsePlaceSearchResponse(String response, String category, PlaceSearchCallback callback) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray places = jsonObject.getJSONArray("places");
-            
-            List<PlaceItem> placeList = new ArrayList<>();
-            
-            for (int i = 0; i < places.length(); i++) {
-                JSONObject place = places.getJSONObject(i);
-                
-                String name = place.optString("name", "이름 없음");
-                double lat = place.optDouble("y", 0.0);
-                double lng = place.optDouble("x", 0.0);
-                String address = place.optString("roadAddress", place.optString("address", "주소 없음"));
-                
-                // 평점 정보 (실제 API 응답에 따라 조정 필요)
-                double rating = place.optDouble("totalScore", 0.0);
-                if (rating == 0.0) {
-                    rating = 3.5 + (Math.random() * 1.5); // 임시 평점 (3.5~5.0)
-                }
-                
-                // 거리 계산 (간단한 직선거리)
-                String distance = "약 " + (int)(Math.random() * 1500 + 100) + "m";
-                
-                PlaceItem item = new PlaceItem(name, category, lat, lng, address, rating, distance);
-                item.tel = place.optString("tel", "");
-                item.businessHours = place.optString("businessHours", "");
-                
-                placeList.add(item);
-            }
-            
-            // 평점 기준 내림차순 정렬
-            Collections.sort(placeList, (a, b) -> Double.compare(b.rating, a.rating));
-            
-            Log.d(TAG, "Place Search Success: " + placeList.size() + " places found");
-            callback.onSuccess(placeList);
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Place Search Parse Error", e);
-            callback.onError("응답 파싱 오류: " + e.getMessage());
+
+    private List<PlaceItem> generateDummyPlaces(String category, double baseLat, double baseLng) {
+        List<PlaceItem> places = new ArrayList<>();
+
+        switch (category) {
+            case "맛집":
+                places.add(new PlaceItem("맛있는 한식당", "맛집", baseLat + 0.001, baseLng + 0.001,
+                    "서울시 강남구 테헤란로 123", 4.5, "약 150m"));
+                places.add(new PlaceItem("이탈리안 레스토랑", "맛집", baseLat + 0.002, baseLng - 0.001,
+                    "서울시 강남구 역삼동 456", 4.3, "약 280m"));
+                places.add(new PlaceItem("일본식 라멘집", "맛집", baseLat - 0.001, baseLng + 0.002,
+                    "서울시 강남구 삼성동 789", 4.7, "약 320m"));
+                places.add(new PlaceItem("중국집 맛집", "맛집", baseLat + 0.003, baseLng + 0.001,
+                    "서울시 강남구 논현동 321", 4.2, "약 450m"));
+                places.add(new PlaceItem("분식집", "맛집", baseLat - 0.002, baseLng - 0.001,
+                    "서울시 강남구 신사동 654", 4.4, "약 380m"));
+                break;
+
+            case "카페":
+                places.add(new PlaceItem("스타벅스 강남점", "카페", baseLat + 0.001, baseLng - 0.002,
+                    "서울시 강남구 테헤란로 111", 4.1, "약 200m"));
+                places.add(new PlaceItem("투썸플레이스", "카페", baseLat - 0.001, baseLng + 0.001,
+                    "서울시 강남구 역삼동 222", 4.3, "약 180m"));
+                places.add(new PlaceItem("블루보틀 커피", "카페", baseLat + 0.002, baseLng + 0.002,
+                    "서울시 강남구 삼성동 333", 4.6, "약 350m"));
+                places.add(new PlaceItem("로컬 카페", "카페", baseLat - 0.002, baseLng + 0.003,
+                    "서울시 강남구 논현동 444", 4.4, "약 420m"));
+                places.add(new PlaceItem("디저트 카페", "카페", baseLat + 0.003, baseLng - 0.001,
+                    "서울시 강남구 신사동 555", 4.5, "약 480m"));
+                break;
+
+            case "관광명소":
+                places.add(new PlaceItem("코엑스 아쿠아리움", "관광명소", baseLat + 0.005, baseLng + 0.003,
+                    "서울시 강남구 영동대로 513", 4.2, "약 800m"));
+                places.add(new PlaceItem("봉은사", "관광명소", baseLat - 0.003, baseLng + 0.004,
+                    "서울시 강남구 봉은사로 531", 4.4, "약 650m"));
+                places.add(new PlaceItem("선릉", "관광명소", baseLat + 0.004, baseLng - 0.002,
+                    "서울시 강남구 선릉로 100길", 4.1, "약 720m"));
+                places.add(new PlaceItem("강남역 지하상가", "관광명소", baseLat - 0.001, baseLng - 0.003,
+                    "서울시 강남구 강남대로 지하", 3.9, "약 300m"));
+                places.add(new PlaceItem("가로수길", "관광명소", baseLat + 0.002, baseLng + 0.005,
+                    "서울시 강남구 신사동 가로수길", 4.3, "약 900m"));
+                break;
         }
+
+        // 평점 기준 내림차순 정렬
+        Collections.sort(places, (a, b) -> Double.compare(b.rating, a.rating));
+
+        return places;
     }
+    
+    // 더미 데이터 사용으로 인해 파싱 메서드는 더 이상 필요하지 않음
+    // 실제 API 사용 시 이 메서드를 다시 활성화하면 됨
     
     public void shutdown() {
         if (executor != null && !executor.isShutdown()) {

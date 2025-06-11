@@ -37,7 +37,24 @@ public class SignupFormActivity extends AppCompatActivity {
         radioGenderGroup = findViewById(R.id.radioGenderGroup);
 
         Button btnSignup = findViewById(R.id.btnSignup);
+        Button btnCancel = findViewById(R.id.btnCancel);
+
         btnSignup.setOnClickListener(v -> signupUser());
+        btnCancel.setOnClickListener(v -> {
+            // 취소 확인 다이얼로그
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("회원가입 취소")
+                .setMessage("회원가입을 취소하시겠습니까?\n입력한 정보가 모두 삭제됩니다.")
+                .setPositiveButton("취소", (dialog, which) -> {
+                    // 메인 화면으로 돌아가기
+                    Intent intent = new Intent(SignupFormActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("계속 작성", null)
+                .show();
+        });
     }
 
     private void signupUser() {
@@ -104,15 +121,17 @@ public class SignupFormActivity extends AppCompatActivity {
                     db.userDao().insert(newUser);
 
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "회원가입 성공!\n사용자 ID: " + userId, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "회원가입 성공!\n로그인 화면으로 이동합니다.", Toast.LENGTH_LONG).show();
 
-                        // 자동 로그인 처리
-                        com.example.timemate.util.UserSession session = com.example.timemate.util.UserSession.getInstance(this);
-                        session.login(newUser.userId, newUser.nickname);
-
-                        // 홈 화면으로 이동
-                        Intent intent = new Intent(SignupFormActivity.this, com.example.timemate.ui.home.HomeActivity.class);
+                        // 로그인 화면으로 이동 (자동 로그인 제거)
+                        Intent intent = new Intent(SignupFormActivity.this, ManualLoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                        // 회원가입한 사용자 정보를 로그인 화면에 전달
+                        intent.putExtra("signup_user_id", userId);
+                        intent.putExtra("signup_password", password);
+                        intent.putExtra("signup_success", true);
+
                         startActivity(intent);
                         finish();
                     });
@@ -142,5 +161,25 @@ public class SignupFormActivity extends AppCompatActivity {
             Log.e("SignupForm", "Email check error", e);
             return false;
         }
+    }
+
+    /**
+     * 뒤로가기 버튼 처리
+     */
+    @Override
+    public void onBackPressed() {
+        // 취소 확인 다이얼로그
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("회원가입 취소")
+            .setMessage("회원가입을 취소하시겠습니까?\n입력한 정보가 모두 삭제됩니다.")
+            .setPositiveButton("취소", (dialog, which) -> {
+                // 메인 화면으로 돌아가기
+                Intent intent = new Intent(SignupFormActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            })
+            .setNegativeButton("계속 작성", null)
+            .show();
     }
 }

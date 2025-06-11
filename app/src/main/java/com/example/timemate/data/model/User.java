@@ -57,6 +57,15 @@ public class User {
         updateLastLogin();
     }
 
+    // 호환성을 위한 메서드들
+    public String getName() {
+        return nickname;
+    }
+
+    public void setName(String name) {
+        this.nickname = name;
+    }
+
     @Override
     public String toString() {
         return "User{" +

@@ -39,14 +39,59 @@
 
     </LinearLayout>
 
-    <!-- 알림 리스트 -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerNotifications"
+    <!-- 알림 목록 -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false" />
+        android:layout_weight="1">
+
+        <!-- 알림 RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+
+        <!-- 빈 상태 -->
+        <LinearLayout
+            android:id="@+id/textEmptyNotifications"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔕"
+                android:textSize="64sp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="새로운 알림이 없습니다"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="친구 초대나 일정 공유 요청이 있으면\n여기에 표시됩니다"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:textAlignment="center"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
     <!-- 바텀 네비게이션 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

@@ -17,6 +17,7 @@ public class Notification {
     public String status; // "PENDING", "ACCEPTED", "REJECTED", "READ"
     public long timestamp;
     public boolean isRead;
+    public String senderName; // 보낸 사람 이름
 
     public Notification() {
         this.timestamp = System.currentTimeMillis();
@@ -30,6 +31,17 @@ public class Notification {
         this.type = type;
         this.title = title;
         this.message = message;
+    }
+
+    @Ignore
+    public Notification(String id, String title, String message, String type, long timestamp, boolean isRead, String senderName) {
+        this();
+        this.title = title;
+        this.message = message;
+        this.type = type;
+        this.timestamp = timestamp;
+        this.isRead = isRead;
+        this.senderName = senderName;
     }
 
     // 친구 초대 알림 생성

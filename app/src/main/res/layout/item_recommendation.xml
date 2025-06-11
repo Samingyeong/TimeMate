@@ -5,73 +5,125 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:strokeWidth="0dp">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="16dp">
 
-        <!-- 장소명 -->
-        <TextView
-            android:id="@+id/textName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="장소명"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:maxLines="1"
-            android:ellipsize="end" />
+        <!-- 장소 사진 -->
+        <FrameLayout
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginEnd="16dp">
 
-        <!-- 주소 -->
-        <TextView
-            android:id="@+id/textLocation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="주소"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            android:maxLines="2"
-            android:ellipsize="end" />
+            <!-- 실제 장소 사진 -->
+            <ImageView
+                android:id="@+id/imagePlacePhoto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@drawable/ios_card_background"
+                android:src="@drawable/ic_map_placeholder" />
 
-        <!-- 평점과 설명 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- 평점 -->
+            <!-- 카테고리 아이콘 (오버레이) -->
             <TextView
-                android:id="@+id/textRating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="4.5★"
-                android:textSize="14sp"
-                android:textColor="#FF9800"
-                android:textStyle="bold" />
-
-            <!-- 구분선 -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="12dp"
-                android:layout_marginHorizontal="8dp"
-                android:background="@android:color/darker_gray" />
-
-            <!-- 카테고리와 거리 -->
-            <TextView
-                android:id="@+id/textDescription"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="맛집 • 약 500m"
+                android:id="@+id/textPlaceIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="4dp"
+                android:background="@drawable/ios_card_background"
+                android:gravity="center"
+                android:text="🏪"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
+                android:elevation="2dp" />
+
+        </FrameLayout>
+
+        <!-- 장소 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 장소명 -->
+            <TextView
+                android:id="@+id/textPlaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="장소명"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- 카테고리 -->
+            <TextView
+                android:id="@+id/textPlaceCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="카테고리"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="4dp" />
+
+            <!-- 주소 -->
+            <TextView
+                android:id="@+id/textPlaceAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="주소"
+                android:textSize="12sp"
+                android:textColor="@color/text_secondary"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- 평점 및 거리 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/textPlaceRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⭐ 4.5"
+                    android:textSize="12sp"
+                    android:textColor="@color/ios_orange"
+                    android:layout_marginEnd="12dp" />
+
+                <TextView
+                    android:id="@+id/textPlaceDistance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍 500m"
+                    android:textSize="12sp"
+                    android:textColor="@color/ios_blue" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <!-- 길찾기 버튼 -->
+                <Button
+                    android:id="@+id/btnNavigation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:text="길찾기"
+                    android:textSize="12sp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:minWidth="60dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

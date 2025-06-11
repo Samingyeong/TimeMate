@@ -7,6 +7,8 @@ import android.widget.Toast;
 
 import androidx.room.Room;
 
+import com.example.timemate.data.database.AppDatabase;
+
 import java.util.concurrent.Executors;
 
 public class NotificationActionReceiver extends BroadcastReceiver {

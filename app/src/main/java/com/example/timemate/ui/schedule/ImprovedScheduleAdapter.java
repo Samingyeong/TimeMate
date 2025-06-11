@@ -3,6 +3,7 @@ package com.example.timemate.ui.schedule;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -112,7 +113,10 @@ public class ImprovedScheduleAdapter extends RecyclerView.Adapter<ImprovedSchedu
             } else {
                 textMemo.setVisibility(View.GONE);
             }
-            
+
+            // 경로 정보 표시 (새로 추가)
+            displayRouteInfo(schedule);
+
             // 공유 상태 표시 (향후 구현)
             iconShared.setVisibility(View.GONE);
             textFriends.setText("개인 일정");
@@ -125,6 +129,60 @@ public class ImprovedScheduleAdapter extends RecyclerView.Adapter<ImprovedSchedu
             itemView.setOnClickListener(v -> {
                 Toast.makeText(context, schedule.title + " 일정", Toast.LENGTH_SHORT).show();
             });
+        }
+
+        /**
+         * 저장된 경로 정보를 표시
+         */
+        private void displayRouteInfo(Schedule schedule) {
+            try {
+                // 선택된 교통수단 정보가 있는지 확인
+                if (schedule.selectedTransportModes != null && !schedule.selectedTransportModes.isEmpty()) {
+                    String[] transportModes = schedule.selectedTransportModes.split(",");
+                    StringBuilder routeDisplay = new StringBuilder();
+                    routeDisplay.append("🗺️ 선택된 경로: ");
+
+                    for (int i = 0; i < transportModes.length; i++) {
+                        if (i > 0) routeDisplay.append(", ");
+
+                        String mode = transportModes[i].trim();
+                        switch (mode) {
+                            case "대중교통":
+                                routeDisplay.append("🚌 대중교통");
+                                break;
+                            case "자동차":
+                                routeDisplay.append("🚗 자동차");
+                                break;
+                            case "자전거":
+                                routeDisplay.append("🚴 자전거");
+                                break;
+                            case "도보":
+                                routeDisplay.append("🚶 도보");
+                                break;
+                            case "택시":
+                                routeDisplay.append("🚕 택시");
+                                break;
+                            default:
+                                routeDisplay.append(mode);
+                                break;
+                        }
+                    }
+
+                    // 메모 아래에 경로 정보 추가 표시
+                    if (textMemo.getVisibility() == View.VISIBLE) {
+                        String currentMemo = textMemo.getText().toString();
+                        textMemo.setText(currentMemo + "\n\n" + routeDisplay.toString());
+                    } else {
+                        textMemo.setText(routeDisplay.toString());
+                        textMemo.setVisibility(View.VISIBLE);
+                    }
+
+                    Log.d("ScheduleAdapter", "✅ 경로 정보 표시: " + routeDisplay.toString());
+                }
+
+            } catch (Exception e) {
+                Log.e("ScheduleAdapter", "경로 정보 표시 오류", e);
+            }
         }
 
         private void openNavigation(Schedule schedule) {

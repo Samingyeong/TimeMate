@@ -9,7 +9,6 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        maven(url = "https://devrepo.kakao.com/nexus/content/groups/public/") // ✅ Kotlin DSL 문법
     }
 }
 

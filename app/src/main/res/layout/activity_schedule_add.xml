@@ -4,39 +4,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#f5f5f5">
+    android:background="@color/background_secondary">
 
-    <!-- 헤더 -->
+    <!-- iOS 스타일 헤더 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/purple_500"
+        style="@style/TimeMateAppBar"
         android:orientation="horizontal"
         android:padding="16dp"
+        android:paddingTop="8dp"
         android:gravity="center_vertical">
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:src="@drawable/ic_arrow_back"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            app:tint="@android:color/white"
-            android:layout_marginTop="20dp" />
+            android:background="@drawable/ios_button_background"
+            app:tint="@color/text_primary"
+            android:contentDescription="뒤로가기" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="새 일정 추가"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
+            style="@style/iOSHeadline"
+            android:textColor="@color/text_primary"
             android:gravity="center" />
 
         <View
-            android:layout_width="48dp"
-            android:layout_height="48dp" />
+            android:layout_width="44dp"
+            android:layout_height="44dp" />
 
     </LinearLayout>
 
@@ -52,150 +52,165 @@
             android:padding="16dp">
 
             <!-- 제목 입력 -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="24dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="일정 제목"
+                    style="@style/iOSSubheadline"
+                    android:textColor="@color/ios_blue"
+                    android:layout_marginBottom="12dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="일정 제목"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/purple_700"
-                        android:layout_marginBottom="8dp" />
+                <EditText
+                    android:id="@+id/editTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="예: 친구와 카페 가기"
+                    android:background="@drawable/timemate_edittext_background"
+                    android:padding="16dp"
+                    style="@style/iOSBody"
+                    android:textColorHint="@color/text_hint" />
 
-                    <EditText
-                        android:id="@+id/editTitle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="예: 친구와 카페 가기"
-                        android:background="@null"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
             <!-- 날짜 및 시간 선택 -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="날짜 및 시간"
+                    style="@style/iOSSubheadline"
+                    android:textColor="@color/ios_blue"
+                    android:layout_marginBottom="16dp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <Button
+                        android:id="@+id/btnSelectDate"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="날짜 및 시간"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/purple_700"
-                        android:layout_marginBottom="12dp" />
+                        android:layout_weight="1"
+                        android:text="날짜 선택"
+                        android:layout_marginEnd="8dp"
+                        style="@style/TimeMateButtonOutlined" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <Button
+                        android:id="@+id/btnSelectTime"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <Button
-                            android:id="@+id/btnSelectDate"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="날짜 선택"
-                            android:layout_marginEnd="8dp"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                        <Button
-                            android:id="@+id/btnSelectTime"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="시간 선택"
-                            android:layout_marginStart="8dp"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                    </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/textSelectedDateTime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="날짜와 시간을 선택해주세요"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray"
-                        android:gravity="center"
-                        android:layout_marginTop="8dp" />
+                        android:layout_weight="1"
+                        android:text="시간 선택"
+                        android:layout_marginStart="8dp"
+                        style="@style/TimeMateButtonOutlined" />
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 출발지 및 도착지 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/textSelectedDateTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:text="날짜와 시간을 선택해주세요"
+                    style="@style/iOSCallout"
+                    android:textColor="@color/text_hint"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="출발지 → 도착지"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/purple_700"
-                        android:layout_marginBottom="12dp" />
+            </LinearLayout>
+
+            <!-- 출발지 및 도착지 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="출발지 → 도착지"
+                    style="@style/TimeMateTextSubtitle"
+                    android:textColor="@color/ios_blue"
+                    android:layout_marginBottom="16dp" />
 
                     <AutoCompleteTextView
                         android:id="@+id/editDeparture"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="출발지를 입력하세요 (2글자 이상)"
-                        android:background="@drawable/edit_text_background"
-                        android:padding="12dp"
+                        android:background="@drawable/timemate_edittext_background"
+                        android:padding="16dp"
                         android:layout_marginBottom="8dp"
                         android:drawableStart="@drawable/ic_location_start"
-                        android:drawablePadding="8dp"
+                        android:drawablePadding="12dp"
                         android:completionThreshold="2"
-                        android:dropDownHeight="200dp" />
+                        android:dropDownHeight="0dp"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        style="@style/TimeMateTextBody"
+                        android:textColorHint="@color/text_hint" />
+
+                    <!-- 출발지 제안 목록 -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvDepSuggest"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/edit_text_background"
+                        android:elevation="4dp"
+                        android:visibility="gone" />
 
                     <AutoCompleteTextView
                         android:id="@+id/editDestination"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="도착지를 입력하세요 (2글자 이상)"
-                        android:background="@drawable/edit_text_background"
-                        android:padding="12dp"
+                        android:background="@drawable/timemate_edittext_background"
+                        android:padding="16dp"
+                        android:layout_marginBottom="8dp"
                         android:drawableStart="@drawable/ic_location_end"
-                        android:drawablePadding="8dp"
-                        android:layout_marginBottom="12dp"
+                        android:drawablePadding="12dp"
                         android:completionThreshold="2"
-                        android:dropDownHeight="200dp" />
+                        android:dropDownHeight="0dp"
+                        android:imeOptions="actionDone"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        style="@style/TimeMateTextBody"
+                        android:textColorHint="@color/text_hint" />
+
+                    <!-- 도착지 제안 목록 -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvDestSuggest"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginBottom="12dp"
+                        android:background="@drawable/edit_text_background"
+                        android:elevation="4dp"
+                        android:visibility="gone" />
 
                     <!-- 길찾기 버튼 -->
                     <Button
@@ -203,175 +218,130 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="길찾기"
-                        android:textSize="14sp"
-                        android:backgroundTint="@color/sky_blue_accent"
+                        android:layout_marginTop="8dp"
                         android:layout_marginBottom="12dp"
-                        style="@style/Widget.Material3.Button" />
+                        style="@style/TimeMateButtonPrimary" />
 
-                    <!-- 경로 정보 표시 -->
-                    <LinearLayout
+                    <!-- 선택된 경로 정보 카드 -->
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/layoutRouteInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:background="@color/sky_blue_light"
-                        android:padding="12dp"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="경로 정보"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary"
-                            android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="16dp"
+                        android:visibility="gone"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@android:color/white"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#E0E0E0">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="vertical"
+                            android:padding="20dp">
 
                             <TextView
-                                android:id="@+id/textDistance"
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="거리: -"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary" />
+                                android:text="✅ 선택된 경로"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/text_primary"
+                                android:layout_marginBottom="12dp" />
 
                             <TextView
-                                android:id="@+id/textDuration"
-                                android:layout_width="0dp"
+                                android:id="@+id/textRouteInfo"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="시간: -"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary" />
+                                android:text="경로 정보가 여기에 표시됩니다"
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="@color/text_secondary"
+                                android:lineSpacingExtra="4dp" />
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="4dp">
+                    </com.google.android.material.card.MaterialCardView>
 
-                            <TextView
-                                android:id="@+id/textTollFare"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="통행료: -"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary" />
-
-                            <TextView
-                                android:id="@+id/textFuelPrice"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="연료비: -"
-                                android:textSize="12sp"
-                                android:textColor="@color/text_secondary" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
             <!-- 친구 선택 -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
                 android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="24dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="함께할 친구"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/purple_700" />
-
-                        <Button
-                            android:id="@+id/btnSelectFriends"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="친구 선택"
-                            android:textSize="12sp"
-                            style="@style/Widget.Material3.Button.OutlinedButton" />
-
-                    </LinearLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <TextView
-                        android:id="@+id/textSelectedFriends"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="선택된 친구가 없습니다"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray"
-                        android:layout_marginTop="8dp" />
+                        android:layout_weight="1"
+                        android:text="함께할 친구"
+                        style="@style/TimeMateTextSubtitle"
+                        android:textColor="@color/ios_blue" />
 
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 메모 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
+                    <Button
+                        android:id="@+id/btnSelectFriends"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="메모"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/purple_700"
-                        android:layout_marginBottom="8dp" />
-
-                    <EditText
-                        android:id="@+id/editMemo"
-                        android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:hint="일정에 대한 메모를 입력하세요"
-                        android:background="@drawable/edit_text_background"
-                        android:padding="12dp"
-                        android:gravity="top"
-                        android:inputType="textMultiLine" />
+                        android:text="친구 선택"
+                        style="@style/TimeMateButtonOutlined" />
 
                 </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:id="@+id/textSelectedFriends"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="선택된 친구가 없습니다"
+                    style="@style/TimeMateTextBody"
+                    android:textColor="@color/text_hint"
+                    android:layout_marginTop="12dp" />
+
+            </LinearLayout>
+
+            <!-- 메모 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="메모"
+                    style="@style/TimeMateTextSubtitle"
+                    android:textColor="@color/ios_blue"
+                    android:layout_marginBottom="12dp" />
+
+                <EditText
+                    android:id="@+id/editMemo"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:hint="일정에 대한 메모를 입력하세요"
+                    android:background="@drawable/timemate_edittext_background"
+                    android:padding="16dp"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    style="@style/TimeMateTextBody"
+                    android:textColorHint="@color/text_hint" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -393,7 +363,7 @@
             android:layout_weight="1"
             android:text="취소"
             android:layout_marginEnd="8dp"
-            style="@style/Widget.Material3.Button.OutlinedButton" />
+            style="@style/TimeMateButtonOutlined" />
 
         <Button
             android:id="@+id/btnSaveSchedule"
@@ -402,7 +372,7 @@
             android:layout_weight="1"
             android:text="저장"
             android:layout_marginStart="8dp"
-            android:backgroundTint="@color/purple_500" />
+            style="@style/TimeMateButtonPrimary" />
 
     </LinearLayout>
 

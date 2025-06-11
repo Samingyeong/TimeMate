@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="로그인되지 않음"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginBottom="12dp" />
 
@@ -71,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="현재 계정으로 계속"
-                style="@style/TimeMateButton" />
+                android:textColor="@color/white" />
 
         </LinearLayout>
 
@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="👥 다른 계정"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:layout_marginBottom="12dp" />
@@ -117,8 +117,8 @@
             android:id="@+id/btnAddAccount"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="➕ 새 계정 만들기"
-            style="@style/TimeMateButton" />
+            android:text="새 계정 만들기"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

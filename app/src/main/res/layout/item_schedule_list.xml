@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:background="@drawable/card_normal">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <!-- 완료 체크박스 -->
+        <CheckBox
+            android:id="@+id/checkCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp" />
+
+        <!-- 일정 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 일정 제목 -->
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="일정 제목"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- 날짜 및 시간 -->
+            <TextView
+                android:id="@+id/textDateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="2024-01-15 09:00"
+                android:textSize="14sp"
+                android:textColor="@color/primary_color"
+                android:drawableStart="@drawable/ic_access_time"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical" />
+
+            <!-- 위치 정보 -->
+            <TextView
+                android:id="@+id/textLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="출발지 → 도착지"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:drawableStart="@drawable/ic_location_on"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <!-- 메모 (있는 경우만 표시) -->
+            <TextView
+                android:id="@+id/textMemo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="메모 내용"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- 편집 버튼 -->
+        <ImageButton
+            android:id="@+id/btnEdit"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_edit"
+            app:tint="@android:color/darker_gray"
+            android:contentDescription="편집" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

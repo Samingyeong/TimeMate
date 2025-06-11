@@ -4,20 +4,25 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- TimeMate 메인 컬러 - 파스텔 하늘색 테마 -->
-    <color name="sky_blue_primary">#AEE1F9</color>
+    <!-- TimeMate 메인 컬러 - 파스텔 블루 테마 -->
+    <color name="primary_color">#B5DFFF</color>
+    <color name="sky_blue">#B5DFFF</color>
+    <color name="sky_blue_primary">#B5DFFF</color>
     <color name="sky_blue_light">#E8F6FD</color>
-    <color name="sky_blue_dark">#7BC8E8</color>
+    <color name="sky_blue_dark">#007AFF</color>
     <color name="sky_blue_accent">#5BB6D6</color>
 
     <!-- iOS 스타일 보조 색상 -->
     <color name="ios_blue">#007AFF</color>
+    <color name="ios_blue_dark">#0056CC</color>
     <color name="ios_green">#34C759</color>
     <color name="ios_orange">#FF9500</color>
     <color name="ios_red">#FF3B30</color>
     <color name="ios_purple">#AF52DE</color>
     <color name="ios_pink">#FF2D92</color>
     <color name="ios_yellow">#FFCC00</color>
+
+
 
     <!-- 파스텔 보조 색상 -->
     <color name="pastel_blue">#E3F2FD</color>
@@ -26,19 +31,62 @@
     <color name="pastel_yellow">#FFF8DC</color>
     <color name="pastel_lavender">#F0F0FF</color>
     <color name="pastel_peach">#FFEEE6</color>
+    <color name="pastel_sky">#E8F6FD</color>
 
-    <!-- iOS 스타일 텍스트 색상 -->
-    <color name="text_primary">#1C1C1E</color>
-    <color name="text_secondary">#8E8E93</color>
-    <color name="text_tertiary">#C7C7CC</color>
-    <color name="text_hint">#D1D1D6</color>
+    <!-- iOS 스타일 텍스트 색상 (통합 디자인 시스템으로 이동됨) -->
 
-    <!-- iOS 스타일 배경 색상 -->
+    <!-- 추가 텍스트 색상 -->
+    <color name="dark_gray">#666666</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="gray">#999999</color>
+
+    <!-- 💙 블루 톤 색상 팔레트 -->
+    <color name="primary">#B5DFFF</color>                <!-- 메인 파스텔 스카이 블루 -->
+    <color name="accent">#007AFF</color>                 <!-- 포인트 iOS 블루 -->
+    <color name="background">#FFFFFF</color>             <!-- 배경 화이트 -->
+    <color name="surface">#FFFFFF</color>                <!-- 카드/서피스 화이트 -->
+
+    <!-- 카드 배경 (블루 톤) -->
+    <color name="card_background">#FFFFFF</color>        <!-- 화이트 카드 -->
+    <color name="card_selected">#33B5DFFF</color>        <!-- 파스텔 블루 20% 투명 -->
+    <color name="card_pressed">#4DB5DFFF</color>         <!-- 파스텔 블루 30% 투명 -->
+    <color name="card_stroke">#B5DFFF</color>            <!-- 파스텔 블루 테두리 -->
+
+    <!-- 텍스트 (블루 톤 조화) -->
+    <color name="text_primary">#1C1C1E</color>           <!-- 메인 텍스트 (다크 그레이) -->
+    <color name="text_secondary">#3A3A3C</color>         <!-- 보조 텍스트 (더 진한 그레이) -->
+    <color name="text_tertiary">#8E8E93</color>          <!-- 3차 텍스트 (미디엄 그레이) -->
+    <color name="text_hint">#C7C7CC</color>              <!-- 힌트 텍스트 (라이트 그레이) -->
+    <color name="text_on_primary">#FFFFFF</color>        <!-- 블루 배경 위 텍스트 (화이트) -->
+
+    <!-- 입력창 전용 색상 -->
+    <color name="text_input">#000000</color>             <!-- 입력 텍스트 (블랙) -->
+    <color name="text_input_hint">#8E8E93</color>        <!-- 입력 힌트 (미디엄 그레이) -->
+
+    <!-- 상태 색상 (iOS 스타일) -->
+    <color name="success">#34C759</color>                <!-- iOS 그린 -->
+    <color name="warning">#FF9500</color>                <!-- iOS 오렌지 -->
+    <color name="error">#FF3B30</color>                  <!-- iOS 레드 -->
+    <color name="info">#007AFF</color>                   <!-- iOS 블루 -->
+
+    <!-- 모달 관련 -->
+    <color name="modal_background">#F2F2F7</color>       <!-- iOS 모달 배경 -->
+    <color name="modal_handle">#C7C7CC</color>           <!-- iOS 모달 핸들 -->
+
+    <!-- 기존 호환성 -->
+    <color name="route_card_background">@color/card_background</color>
+    <color name="route_card_selected">@color/card_selected</color>
+    <color name="route_text_primary">@color/text_primary</color>
+    <color name="route_text_secondary">@color/text_secondary</color>
+    <color name="route_accent">@color/info</color>
+    <color name="route_success">@color/success</color>
+    <color name="route_warning">@color/warning</color>
+
+    <!-- iOS 스타일 배경 색상 (통합 디자인 시스템으로 이동됨) -->
     <color name="background_primary">#FFFFFF</color>
     <color name="background_secondary">#F2F2F7</color>
     <color name="background_tertiary">#FFFFFF</color>
-    <color name="background_light">#FAFAFA</color>
-    <color name="card_background">#FFFFFF</color>
+    <color name="background_light">#F8F9FA</color>
 
     <!-- 시스템 색상 (호환성) -->
     <color name="purple_500">#AF52DE</color>
@@ -51,4 +99,11 @@
     <color name="shadow_light">#1A000000</color>
     <color name="divider">#E5E5EA</color>
     <color name="border_light">#F2F2F7</color>
+
+    <!-- 누락된 iOS 색상들 추가 (중복 제거) -->
+    <color name="ios_blue_light">#B5DFFF</color>
+    <color name="ios_gray3">#C7C7CC</color>
+    <color name="ios_gray5">#E5E5EA</color>
+    <color name="ios_gray6">#F2F2F7</color>
+    <color name="background_card">#FFFFFF</color>
 </resources>

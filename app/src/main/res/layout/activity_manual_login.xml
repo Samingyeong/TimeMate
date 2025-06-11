@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- 로그인 버튼 -->
     <Button
         android:id="@+id/btnLogin"
         android:text="로그인"
@@ -24,11 +25,49 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp" />
 
-    <Button
-        android:id="@+id/btnGoSignup"
-        android:text="회원가입하러가기"
+    <!-- 비밀번호 찾기 링크 -->
+    <TextView
+        android:id="@+id/textForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔐 비밀번호를 잊으셨나요?"
+        android:textSize="14sp"
+        android:textColor="@color/ios_blue"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- 하단 버튼 영역 -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp" />
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <!-- 취소 버튼 -->
+        <Button
+            android:id="@+id/btnCancel"
+            android:text="취소"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:textColor="@color/text_secondary" />
+
+        <!-- 회원가입 버튼 -->
+        <Button
+            android:id="@+id/btnGoSignup"
+            android:text="회원가입"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.Material3.Button.OutlinedButton" />
+
+    </LinearLayout>
 
 </LinearLayout>

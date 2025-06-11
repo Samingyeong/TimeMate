@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.Executors;
 public class NaverDirectionsService {
     
     private static final String TAG = "NaverDirections";
-    private static final String BASE_URL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
+    private static final String BASE_URL = "https://maps.apigw.ntruss.com/map-direction/v1/driving";
     
     // 네이버 클라우드 플랫폼에서 발급받은 API 키
     private static final String CLIENT_ID = "dnnydofmgg";
@@ -82,19 +83,26 @@ public class NaverDirectionsService {
                     return;
                 }
                 
-                String urlString = BASE_URL + 
-                    "?start=" + startCoords + 
-                    "&goal=" + goalCoords +
+                // URL 인코딩 적용
+                String encodedStart = URLEncoder.encode(startCoords, "UTF-8");
+                String encodedGoal = URLEncoder.encode(goalCoords, "UTF-8");
+
+                String urlString = BASE_URL +
+                    "?start=" + encodedStart +
+                    "&goal=" + encodedGoal +
                     "&option=trafast"; // 실시간 빠른길
-                
+
+                Log.d(TAG, "Request URL: " + urlString);
+
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                
-                // 헤더 설정
+
+                // 헤더 설정 (한글 지원)
                 connection.setRequestMethod("GET");
                 connection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", CLIENT_ID);
                 connection.setRequestProperty("X-NCP-APIGW-API-KEY", CLIENT_SECRET);
-                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept-Language", "ko");
+                connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
                 
@@ -102,28 +110,30 @@ public class NaverDirectionsService {
                 Log.d(TAG, "Directions Response Code: " + responseCode);
                 
                 if (responseCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                     StringBuilder response = new StringBuilder();
                     String line;
-                    
+
                     while ((line = reader.readLine()) != null) {
                         response.append(line);
                     }
                     reader.close();
-                    
+
+                    Log.d(TAG, "API Response: " + response.toString());
+
                     DirectionsResult result = parseDirectionsResponse(response.toString(), start, goal);
                     callback.onSuccess(result);
-                    
+
                 } else {
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream(), "UTF-8"));
                     StringBuilder errorResponse = new StringBuilder();
                     String line;
-                    
+
                     while ((line = errorReader.readLine()) != null) {
                         errorResponse.append(line);
                     }
                     errorReader.close();
-                    
+
                     Log.e(TAG, "API Error: " + errorResponse.toString());
                     callback.onError("경로 조회 실패: " + responseCode);
                 }
@@ -138,11 +148,61 @@ public class NaverDirectionsService {
     }
     
     /**
-     * 주소를 좌표로 변환 (더미 구현)
-     * 실제로는 네이버 Geocoding API를 사용해야 합니다.
+     * 네이버 Geocoding API를 사용하여 주소를 좌표로 변환
      */
     private String getCoordinatesFromAddress(String address) {
-        // 더미 좌표 반환 (실제 구현에서는 Geocoding API 사용)
+        try {
+            // 주소 인코딩
+            String encodedAddress = URLEncoder.encode(address, "UTF-8");
+            String geocodingUrl = "https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query=" + encodedAddress;
+
+            Log.d(TAG, "Geocoding URL: " + geocodingUrl);
+
+            URL url = new URL(geocodingUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("X-NCP-APIGW-API-KEY-ID", CLIENT_ID);
+            connection.setRequestProperty("X-NCP-APIGW-API-KEY", CLIENT_SECRET);
+            connection.setRequestProperty("Accept-Language", "ko");
+            connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+            int responseCode = connection.getResponseCode();
+            Log.d(TAG, "Geocoding Response Code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                Log.d(TAG, "Geocoding Response: " + response.toString());
+
+                // JSON 파싱하여 좌표 추출
+                JSONObject json = new JSONObject(response.toString());
+                JSONArray addresses = json.getJSONArray("addresses");
+
+                if (addresses.length() > 0) {
+                    JSONObject firstAddress = addresses.getJSONObject(0);
+                    String longitude = firstAddress.getString("x");
+                    String latitude = firstAddress.getString("y");
+
+                    return longitude + "," + latitude;
+                }
+            } else {
+                Log.e(TAG, "Geocoding API Error: " + responseCode);
+            }
+
+            connection.disconnect();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Exception in getCoordinatesFromAddress", e);
+        }
+
+        // 실패 시 더미 좌표 반환
         if (address.contains("서울") || address.contains("강남")) {
             return "127.0276,37.4979"; // 강남역 좌표
         } else if (address.contains("부산") || address.contains("해운대")) {

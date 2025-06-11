@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E0E0E0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:minHeight="64dp">
+
+        <!-- 프로필 아이콘 -->
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="👤"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:background="@drawable/circle_background"
+            android:backgroundTint="#F0F0F0"
+            android:layout_marginEnd="16dp" />
+
+        <!-- 친구 정보 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textFriendName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="친구 이름"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="2dp" />
+
+            <TextView
+                android:id="@+id/textFriendId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@friend_id"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- 체크박스 -->
+        <CheckBox
+            android:id="@+id/checkboxFriend"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:buttonTint="@color/accent"
+            android:scaleX="1.2"
+            android:scaleY="1.2" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

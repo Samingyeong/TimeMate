@@ -6,14 +6,62 @@
     android:orientation="vertical"
     android:background="#f5f5f5">
 
-    <!-- 헤더 -->
+    <!-- 헤더 (뒤로가기 버튼 포함) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:paddingTop="56dp"
+        android:gravity="center_vertical"
+        android:background="@android:color/white"
+        android:elevation="2dp">
 
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center">
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_arrow_back"
+            android:background="@drawable/ios_button_background"
+            android:contentDescription="뒤로가기"
+            app:tint="@color/text_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="프로필"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center" />
+
+        <!-- 균형을 위한 빈 공간 -->
+        <View
+            android:layout_width="44dp"
+            android:layout_height="44dp" />
+
+    </LinearLayout>
+
+    <!-- 스크롤 가능한 컨텐츠 영역 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 프로필 헤더 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center">
 
         <ImageView
             android:layout_width="80dp"
@@ -22,13 +70,13 @@
             android:background="@drawable/circle_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
-            app:tint="@android:color/white" />
+            app:tint="@android:color/holo_blue_light" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="개인정보"
-            android:textColor="@android:color/white"
+            android:textColor="@android:color/holo_blue_light"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -178,18 +226,104 @@
 
     </LinearLayout>
 
-    <!-- 여백 -->
-    <View
+    <!-- 경로 설정 섹션 -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="경로 설정"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 우선순위 설정 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="우선순위:"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupPriority"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioTimePriority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="시간 우선"
+                    android:textSize="14sp"
+                    android:checked="true"
+                    android:layout_marginEnd="16dp" />
+
+                <RadioButton
+                    android:id="@+id/radioCostPriority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="비용 우선"
+                    android:textSize="14sp" />
+
+            </RadioGroup>
+
+        </LinearLayout>
+
+        <!-- 실시간 데이터 설정 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:text="실시간 정보:"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical" />
+
+            <Switch
+                android:id="@+id/switchRealtimeData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="교통상황 반영"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
     <!-- 바텀 네비게이션 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
+        style="@style/TimeMateBottomNavigation"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>

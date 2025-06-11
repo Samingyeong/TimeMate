@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="80dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- iOS 스타일 헤더 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:paddingTop="60dp"
+                android:elevation="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🗺️ 추천 장소"
+                    style="@style/iOSTitle"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="주변의 인기 장소를 찾아보세요"
+                    style="@style/iOSCallout"
+                    android:textColor="@color/text_secondary"
+                    android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
+
+            <!-- 검색 및 필터 -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                <!-- 위치 검색 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍 검색 위치"
+                    style="@style/iOSSubheadline"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/editSearchLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:hint="지역을 선택하세요 (예: 강남, 해운대, 전주, 제주)"
+                    android:background="@drawable/timemate_edittext_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawableStart="@drawable/ic_location"
+                    android:drawablePadding="8dp"
+                    style="@style/iOSBody"
+                    android:textColorHint="@color/text_hint"
+                    android:completionThreshold="1"
+                    android:dropDownHeight="200dp" />
+
+                <!-- 카테고리 선택 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🏷️ 카테고리"
+                    style="@style/iOSSubheadline"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- 첫 번째 줄 카테고리 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <Button
+                        android:id="@+id/btnCategoryRestaurant"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="🍽️ 맛집"
+                        android:textSize="13sp"
+                        android:maxLines="1"
+                        android:ellipsize="none"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnCategoryCafe"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="☕ 카페"
+                        android:textSize="13sp"
+                        android:maxLines="1"
+                        android:ellipsize="none"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btnCategoryAttraction"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="🎯 놀거리"
+                        android:textSize="13sp"
+                        android:maxLines="1"
+                        android:ellipsize="none"
+                        style="@style/Widget.Material3.Button.OutlinedButton" />
+
+                </LinearLayout>
+
+                <!-- 두 번째 줄 카테고리 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <Button
+                        android:id="@+id/btnCategoryAccommodation"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_weight="1"
+                        android:text="🏨 숙소"
+                        android:textSize="13sp"
+                        android:maxLines="1"
+                        android:ellipsize="none"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- 균형을 위한 빈 공간 -->
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="2" />
+
+                </LinearLayout>
+
+                <!-- 검색 버튼 -->
+                <Button
+                    android:id="@+id/btnSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="🔍 주변 장소 검색"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
+                    style="@style/TimeMateButton"
+                    app:cornerRadius="16dp" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 동적 지도 영역 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layoutMapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🗺️ 지도 보기"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/text_primary" />
+
+                        <Button
+                            android:id="@+id/btnExpandMap"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:text="확대"
+                            android:textSize="14sp"
+                            android:fontFamily="sans-serif-medium"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            app:cornerRadius="18dp" />
+
+                    </LinearLayout>
+
+                    <!-- 네이버 지도 뷰 -->
+                    <FrameLayout
+                        android:id="@+id/frameMapView"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/timemate_edittext_background"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <!-- 지도 로딩 상태 -->
+                        <LinearLayout
+                            android:id="@+id/layoutMapLoading"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:background="@color/background">
+
+                            <ProgressBar
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_marginBottom="16dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="지도 로딩 중..."
+                                android:textSize="14sp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="@color/text_secondary" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 추천 결과 리스트 -->
+            <LinearLayout
+                android:id="@+id/layoutResultsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="🎯 추천 결과"
+                        style="@style/TimeMateTextSubtitle"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/textResultCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0개 장소"
+                        style="@style/TimeMateTextCaption"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerRecommendations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </LinearLayout>
+
+            <!-- 빈 상태 -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_margin="16dp"
+                android:background="@drawable/ios_card_background"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔍"
+                    android:textSize="48sp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="위치를 입력하고 검색해보세요!"
+                    style="@style/TimeMateTextBody"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="주변의 맛집, 카페, 놀거리를 찾아드려요"
+                    style="@style/TimeMateTextCaption"
+                    android:textColor="@color/text_secondary" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- 바텀 네비게이션 -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        style="@style/TimeMateBottomNavigation"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

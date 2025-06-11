@@ -60,10 +60,14 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
             textCreatedDate = itemView.findViewById(R.id.textCreatedDate);
         }
 
+        private SimpleDateFormat dateFormat; // 재사용을 위한 인스턴스 변수
+
         public void bind(com.example.timemate.data.model.User user) {
+            // 기본 정보 설정
             textNickname.setText(user.nickname);
             textUserId.setText("ID: " + user.userId);
 
+            // 이메일 표시
             if (user.email != null && !user.email.isEmpty()) {
                 textEmail.setText(user.email);
                 textEmail.setVisibility(View.VISIBLE);
@@ -71,28 +75,35 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
                 textEmail.setVisibility(View.GONE);
             }
 
-            // 계정 생성일 표시
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.KOREAN);
+            // 계정 생성일 표시 (DateFormat 재사용)
+            if (dateFormat == null) {
+                dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.KOREAN);
+            }
             String createdDate = dateFormat.format(new Date(user.createdAt));
             textCreatedDate.setText("가입일: " + createdDate);
 
-            // 계정 아이콘 설정 (닉네임 첫 글자)
-            if (user.nickname != null && !user.nickname.isEmpty()) {
-                String firstChar = user.nickname.substring(0, 1).toUpperCase();
-                // 실제로는 아이콘 대신 텍스트로 표시하거나 이미지 설정
-                iconAccount.setImageResource(R.drawable.ic_person);
+            // 계정 아이콘 설정 (한 번만 설정)
+            iconAccount.setImageResource(R.drawable.ic_person);
+
+            // 클릭 리스너 (한 번만 설정)
+            if (itemView.getTag() == null) {
+                itemView.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onAccountClick(user);
+                    }
+                });
+                itemView.setTag("listener_set");
             }
 
-            // 클릭 리스너
-            itemView.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onAccountClick(user);
-                }
-            });
+            // 현재 로그인된 계정 스타일 (성능 최적화)
+            updateAccountStyle(user);
+        }
 
-            // 현재 로그인된 계정인지 확인하여 스타일 변경
+        private void updateAccountStyle(com.example.timemate.data.model.User user) {
             com.example.timemate.util.UserSession userSession = com.example.timemate.util.UserSession.getInstance(itemView.getContext());
-            if (userSession.isLoggedIn() && user.userId.equals(userSession.getCurrentUserId())) {
+            boolean isCurrentUser = userSession.isLoggedIn() && user.userId.equals(userSession.getCurrentUserId());
+
+            if (isCurrentUser) {
                 // 현재 계정 강조 표시
                 itemView.setBackgroundColor(itemView.getContext().getColor(R.color.pastel_blue));
                 textNickname.setTextColor(itemView.getContext().getColor(R.color.sky_blue_accent));

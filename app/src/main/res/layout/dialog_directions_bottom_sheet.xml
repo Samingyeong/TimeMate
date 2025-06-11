@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="@dimen/modal_handle_margin">
+
+    <!-- iOS 스타일 핸들 -->
+    <View
+        android:layout_width="@dimen/modal_handle_width"
+        android:layout_height="@dimen/modal_handle_height"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/modal_handle"
+        android:layout_marginBottom="@dimen/route_section_spacing" />
+
+    <!-- 헤더 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/route_card_padding"
+        android:layout_marginBottom="@dimen/route_section_spacing">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="경로 선택"
+            android:textSize="22sp"
+            android:textColor="@color/route_text_primary"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium" />
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_close"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:contentDescription="닫기" />
+
+    </LinearLayout>
+
+    <!-- 경로 정보 헤더 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="@dimen/route_card_padding"
+        android:layout_marginBottom="@dimen/route_item_spacing">
+
+        <TextView
+            android:id="@+id/textRouteHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="서울역 → 강남역"
+            android:textSize="18sp"
+            android:textColor="@color/route_text_primary"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/textRouteCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3개 경로"
+            android:textSize="14sp"
+            android:textColor="@color/route_text_secondary"
+            android:fontFamily="sans-serif-light" />
+
+    </LinearLayout>
+
+    <!-- 경로 목록 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerRoutes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="400dp"
+        android:paddingHorizontal="4dp"
+        android:clipToPadding="false"
+        android:nestedScrollingEnabled="false"
+        android:overScrollMode="never" />
+
+    <!-- 하단 버튼 영역 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="@dimen/route_card_padding"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/route_section_spacing">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/route_button_height"
+            android:layout_weight="1"
+            android:text="취소"
+            android:textSize="16sp"
+            android:textColor="@color/route_text_secondary"
+            android:background="@drawable/button_secondary_ios"
+            android:layout_marginEnd="@dimen/route_content_spacing"
+            android:fontFamily="sans-serif-medium" />
+
+        <Button
+            android:id="@+id/btnSaveToSchedule"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/route_button_height"
+            android:layout_weight="2"
+            android:text="일정에 저장"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:background="@drawable/button_primary_ios"
+            android:fontFamily="sans-serif-medium"
+            android:enabled="false" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -44,7 +44,7 @@ public class NotificationService {
     }
     
     public void sendFriendInviteNotification(String fromUser, String scheduleTitle, int notificationId) {
-        Intent intent = new Intent(context, NotificationActivity.class);
+        Intent intent = new Intent(context, com.example.timemate.features.notification.NotificationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -71,7 +71,7 @@ public class NotificationService {
     }
     
     public void sendDepartureReminderNotification(String scheduleTitle, int notificationId) {
-        Intent intent = new Intent(context, HomeActivity.class);
+        Intent intent = new Intent(context, com.example.timemate.features.home.HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(

@@ -58,6 +58,39 @@ public class Friend {
         return isAccepted && !isBlocked;
     }
 
+    // 호환성을 위한 메서드들
+    public String getStatus() {
+        if (isBlocked) return "blocked";
+        if (isAccepted) return "accepted";
+        return "pending";
+    }
+
+    public void setStatus(String status) {
+        switch (status) {
+            case "accepted":
+                this.isAccepted = true;
+                this.isBlocked = false;
+                break;
+            case "blocked":
+                this.isAccepted = false;
+                this.isBlocked = true;
+                break;
+            case "pending":
+            default:
+                this.isAccepted = false;
+                this.isBlocked = false;
+                break;
+        }
+    }
+
+    public String getFriendName() {
+        return friendNickname;
+    }
+
+    public void setFriendName(String friendName) {
+        this.friendNickname = friendName;
+    }
+
     @Override
     public String toString() {
         return "Friend{" +

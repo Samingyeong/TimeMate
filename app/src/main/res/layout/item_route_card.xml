@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/card_height"
+    android:layout_margin="@dimen/card_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardBackgroundColor="@color/card_background"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/card_stroke"
+    android:stateListAnimator="@animator/card_elevation_animator">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/route_card_padding">
+
+        <!-- 헤더: 체크박스 + 추천 라벨 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/route_content_spacing">
+
+            <CheckBox
+                android:id="@+id/checkboxRoute"
+                android:layout_width="@dimen/route_checkbox_size"
+                android:layout_height="@dimen/route_checkbox_size"
+                android:layout_marginEnd="@dimen/route_content_spacing"
+                android:buttonTint="@color/route_accent" />
+
+            <TextView
+                android:id="@+id/textRouteLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="추천 최적 경로"
+                android:textSize="@dimen/route_detail_text_size"
+                android:textColor="@color/route_accent"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <ImageView
+                android:id="@+id/iconRouteType"
+                android:layout_width="@dimen/route_icon_size"
+                android:layout_height="@dimen/route_icon_size"
+                android:src="@drawable/ic_route_car"
+                android:contentDescription="교통수단" />
+
+        </LinearLayout>
+
+        <!-- 경로 정보 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/route_content_spacing">
+
+            <TextView
+                android:id="@+id/textDeparture"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="출발지"
+                android:textSize="@dimen/route_title_text_size"
+                android:textColor="@color/route_text_primary"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" → "
+                android:textSize="@dimen/route_subtitle_text_size"
+                android:textColor="@color/route_text_secondary"
+                android:layout_marginHorizontal="@dimen/route_content_spacing" />
+
+            <TextView
+                android:id="@+id/textDestination"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="도착지"
+                android:textSize="@dimen/route_title_text_size"
+                android:textColor="@color/route_text_primary"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- 거리 및 시간 정보 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/route_content_spacing">
+
+            <TextView
+                android:id="@+id/textDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3.2 km"
+                android:textSize="@dimen/route_subtitle_text_size"
+                android:textColor="@color/route_text_secondary"
+                android:fontFamily="sans-serif-light" />
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_marginHorizontal="@dimen/route_content_spacing"
+                android:background="@drawable/circle_dot"
+                android:backgroundTint="@color/route_text_secondary" />
+
+            <TextView
+                android:id="@+id/textDuration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="25분"
+                android:textSize="@dimen/route_time_text_size"
+                android:textColor="@color/route_text_primary"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textCost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3,200원"
+                android:textSize="@dimen/route_subtitle_text_size"
+                android:textColor="@color/route_success"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
+
+        <!-- 교통수단 상세 정보 -->
+        <LinearLayout
+            android:id="@+id/layoutTransportDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="@dimen/route_icon_small"
+                android:layout_height="@dimen/route_icon_small"
+                android:src="@drawable/ic_route_car"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15분"
+                android:textSize="@dimen/route_detail_text_size"
+                android:textColor="@color/route_text_secondary"
+                android:layout_marginEnd="@dimen/route_content_spacing" />
+
+            <ImageView
+                android:layout_width="@dimen/route_icon_small"
+                android:layout_height="@dimen/route_icon_small"
+                android:src="@drawable/ic_route_walk"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10분"
+                android:textSize="@dimen/route_detail_text_size"
+                android:textColor="@color/route_text_secondary" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
