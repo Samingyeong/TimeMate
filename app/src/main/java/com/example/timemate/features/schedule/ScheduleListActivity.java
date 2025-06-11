@@ -571,9 +571,40 @@ public class ScheduleListActivity extends AppCompatActivity {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String todayDate = dateFormat.format(new java.util.Date());
 
-                // 오늘 이후 일정만 조회 (과거 일정 숨김)
-                List<Schedule> schedules = database.scheduleDao().getSchedulesByUserIdFromToday(currentUserId, todayDate);
-                Log.d(TAG, "📊 조회된 내 일정 수 (오늘 이후): " + (schedules != null ? schedules.size() : "null"));
+                // 먼저 데이터베이스 전체 일정 수 확인
+                List<Schedule> allSchedulesInDB = database.scheduleDao().getAllSchedules();
+                Log.d(TAG, "🗄️ 데이터베이스 전체 일정 수: " + (allSchedulesInDB != null ? allSchedulesInDB.size() : "null"));
+
+                // 현재 사용자의 일정만 조회
+                List<Schedule> schedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
+                Log.d(TAG, "📊 현재 사용자(" + currentUserId + ")의 일정 수: " + (schedules != null ? schedules.size() : "null"));
+
+                // 전체 일정 상세 정보 로그 (디버깅용)
+                if (allSchedulesInDB != null && !allSchedulesInDB.isEmpty()) {
+                    Log.d(TAG, "=== 데이터베이스 전체 일정 목록 ===");
+                    for (Schedule s : allSchedulesInDB) {
+                        Log.d(TAG, String.format("전체일정: ID=%d, 제목=%s, 사용자ID=%s, 날짜=%s",
+                            s.id, s.title, s.userId, s.date));
+                    }
+                    Log.d(TAG, "=== 전체 일정 목록 끝 ===");
+                }
+
+                // 현재 사용자 일정 상세 정보 로그 (NULL 안전 처리)
+                if (schedules != null && !schedules.isEmpty()) {
+                    Log.d(TAG, "=== 현재 사용자 일정 목록 ===");
+                    for (Schedule s : schedules) {
+                        // NULL 안전 처리
+                        String safeTitle = (s.title != null) ? s.title : "제목없음";
+                        String safeUserId = (s.userId != null) ? s.userId : "사용자ID없음";
+                        String safeDate = (s.date != null) ? s.date : "날짜없음";
+
+                        Log.d(TAG, String.format("내일정: ID=%d, 제목=%s, 사용자ID=%s, 날짜=%s",
+                            s.id, safeTitle, safeUserId, safeDate));
+                    }
+                    Log.d(TAG, "=== 현재 사용자 일정 목록 끝 ===");
+                } else {
+                    Log.w(TAG, "⚠️ 현재 사용자의 일정이 없습니다!");
+                }
 
                 // 공유된 일정도 추가 (수락된 것만)
                 try {
@@ -1048,10 +1079,15 @@ public class ScheduleListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadSchedules(); // 화면 복귀 시 새로고침
-        
+        Log.d(TAG, "🔄 onResume - 화면 복귀, 일정 새로고침 시작");
+
+        // 강제로 일정 새로고침
+        loadSchedules();
+
         // 일정 탭 선택 상태 유지
         bottomNavigation.setSelectedItemId(R.id.nav_schedule);
+
+        Log.d(TAG, "✅ onResume 완료");
     }
 
     /**
@@ -1082,9 +1118,18 @@ public class ScheduleListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Log.d(TAG, "📱 onActivityResult - requestCode: " + requestCode + ", resultCode: " + resultCode);
+
         if (requestCode == REQUEST_ADD_SCHEDULE && resultCode == RESULT_OK) {
-            Log.d(TAG, "✅ 일정 추가 완료, 목록 새로고침");
-            // 일정 추가 완료 후 목록 새로고침
+            Log.d(TAG, "✅ 일정 추가/수정 완료, 목록 새로고침 시작");
+
+            // 약간의 딜레이 후 새로고침 (데이터베이스 저장 완료 대기)
+            new android.os.Handler().postDelayed(() -> {
+                Log.d(TAG, "🔄 딜레이 후 일정 새로고침 실행");
+                loadSchedules();
+            }, 500); // 0.5초 딜레이
+
+            // 즉시 새로고침도 실행
             loadSchedules();
         }
     }

@@ -158,21 +158,40 @@ public class ScheduleAddPresenter {
                     return;
                 }
 
-                // 일정에 사용자 ID 설정
-                schedule.userId = currentUserId;
+                // 일정에 사용자 ID 설정 (NULL 안전 처리)
+                schedule.userId = currentUserId != null ? currentUserId : "";
                 schedule.createdAt = System.currentTimeMillis();
+
+                // 필수 필드 NULL 체크
+                if (schedule.title == null) schedule.title = "";
+                if (schedule.date == null) schedule.date = "";
+                if (schedule.time == null) schedule.time = "";
+
+                android.util.Log.d("ScheduleAddPresenter", "💾 일정 저장 시작 - 제목: " + schedule.title + ", 사용자: " + schedule.userId);
 
                 // 일정 저장
                 long scheduleId = database.scheduleDao().insert(schedule);
 
+                android.util.Log.d("ScheduleAddPresenter", "✅ 일정 저장 완료 - ID: " + scheduleId);
+
+                // 저장된 일정 확인
+                Schedule savedSchedule = database.scheduleDao().getScheduleById((int)scheduleId);
+                if (savedSchedule != null) {
+                    android.util.Log.d("ScheduleAddPresenter", "✅ 저장 확인 성공 - 제목: " + savedSchedule.title + ", 사용자: " + savedSchedule.userId);
+                } else {
+                    android.util.Log.e("ScheduleAddPresenter", "❌ 저장 확인 실패 - 일정을 다시 조회할 수 없음");
+                }
+
                 // 친구 초대 처리
                 if (selectedFriends != null && !selectedFriends.isEmpty()) {
+                    android.util.Log.d("ScheduleAddPresenter", "👥 공유 일정 저장 시작 - 친구 수: " + selectedFriends.size());
                     saveSharedSchedules(scheduleId, schedule, selectedFriends);
                 }
 
                 // 알림 설정
                 createScheduleReminder(schedule);
 
+                android.util.Log.d("ScheduleAddPresenter", "🎉 일정 저장 프로세스 완료");
                 view.onScheduleSaved();
 
             } catch (Exception e) {
