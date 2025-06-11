@@ -5,53 +5,30 @@
     android:layout_height="match_parent"
     android:background="#f5f5f5">
 
-    <!-- 헤더 -->
+    <!-- 프로필과 같은 헤더 스타일 -->
     <LinearLayout
         android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:paddingTop="60dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:paddingTop="56dp"
+        android:gravity="center_vertical"
+        android:background="@android:color/white"
+        android:elevation="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="친구 목록"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:gravity="center" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="함께 일정을 공유할 친구들"
-                    android:textSize="16sp"
-                    android:textColor="#E1BEE7"
-                    android:gravity="center"
-                    android:layout_marginTop="4dp" />
-
-            </LinearLayout>
-
-            <!-- 친구 추가 버튼은 FAB으로 통합됨 -->
-
-        </LinearLayout>
+            android:text="친구 목록"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:fontFamily="@font/pretendard_bold"
+            android:gravity="center" />
 
     </LinearLayout>
 

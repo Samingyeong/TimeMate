@@ -10,34 +10,26 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- 💙 블루 톤 헤더 -->
+        <!-- 프로필과 같은 헤더 스타일 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:paddingTop="60dp">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:paddingTop="56dp"
+            android:gravity="center_vertical"
+            android:background="@android:color/white"
+            android:elevation="2dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="일정 관리"
-                android:textColor="@color/text_primary"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="일정을 추가하고 관리해보세요"
-                android:textColor="@color/text_secondary"
-                android:textSize="16sp"
-                android:fontFamily="sans-serif-light" />
+                android:textColor="@color/text_primary"
+                android:fontFamily="@font/pretendard_bold"
+                android:gravity="center" />
 
         </LinearLayout>
 

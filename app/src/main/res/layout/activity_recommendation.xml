@@ -15,31 +15,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- iOS 스타일 헤더 -->
+            <!-- 프로필과 같은 헤더 스타일 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:paddingTop="56dp"
+                android:gravity="center_vertical"
                 android:background="@android:color/white"
-                android:orientation="vertical"
-                android:padding="24dp"
-                android:paddingTop="60dp"
                 android:elevation="2dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🗺️ 추천 장소"
-                    style="@style/iOSTitle"
+                    android:text="추천 장소"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="주변의 인기 장소를 찾아보세요"
-                    style="@style/iOSCallout"
-                    android:textColor="@color/text_secondary"
-                    android:layout_marginBottom="16dp" />
+                    android:fontFamily="@font/pretendard_bold"
+                    android:gravity="center" />
 
             </LinearLayout>
 
