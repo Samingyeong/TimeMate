@@ -83,7 +83,7 @@ public class RecommendationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         try {
-            Log.d("RecommendationActivity", "🚀 RecommendationActivity 시작");
+            Log.d("RecommendationActivity", "🚀 RecommendationActivity 시작 - 바텀 네비게이션에서 호출됨");
 
             // 레이아웃 설정
             setContentView(R.layout.activity_recommendation);
@@ -93,7 +93,10 @@ public class RecommendationActivity extends AppCompatActivity {
             initBasicViews();
             setupBasicBottomNavigation();
 
-            Log.d("RecommendationActivity", "🎉 RecommendationActivity 초기화 완료!");
+            Log.d("RecommendationActivity", "🎉 RecommendationActivity 초기화 완료! 바텀 네비게이션 연동 성공");
+
+            // 성공 메시지 표시
+            Toast.makeText(this, "🎯 추천 페이지에 오신 것을 환영합니다!", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "❌ RecommendationActivity 초기화 오류", e);
@@ -203,37 +206,16 @@ public class RecommendationActivity extends AppCompatActivity {
     }
 
     /**
-     * 기본 바텀 네비게이션 설정
+     * 바텀 네비게이션 설정 (NavigationHelper 사용)
      */
     private void setupBasicBottomNavigation() {
         try {
-            if (bottomNavigationView != null) {
-                bottomNavigationView.setSelectedItemId(R.id.nav_recommendation);
-                bottomNavigationView.setOnItemSelectedListener(item -> {
-                    try {
-                        int itemId = item.getItemId();
-                        if (itemId == R.id.nav_home) {
-                            Intent intent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else if (itemId == R.id.nav_friends) {
-                            Intent intent = new Intent(this, com.example.timemate.features.friend.FriendListActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else if (itemId == R.id.nav_profile) {
-                            Intent intent = new Intent(this, com.example.timemate.features.profile.ProfileActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                        return true;
-                    } catch (Exception e) {
-                        Log.e("RecommendationActivity", "네비게이션 오류", e);
-                        return false;
-                    }
-                });
-            }
+            Log.d("RecommendationActivity", "🔧 NavigationHelper를 사용한 바텀 네비게이션 설정");
+            NavigationHelper.setupBottomNavigation(this, R.id.nav_recommendation);
+            Log.d("RecommendationActivity", "✅ 바텀 네비게이션 설정 완료");
         } catch (Exception e) {
-            Log.e("RecommendationActivity", "바텀 네비게이션 설정 오류", e);
+            Log.e("RecommendationActivity", "❌ 바텀 네비게이션 설정 오류", e);
+            e.printStackTrace();
         }
     }
 
@@ -406,9 +388,12 @@ public class RecommendationActivity extends AppCompatActivity {
                 btnCategoryAccommodation.setOnClickListener(v -> selectCategory("accommodation"));
             }
 
-            // 검색 버튼 - 안전하게
+            // 검색 버튼 - 이미지 검색으로 변경
             if (btnSearch != null) {
-                btnSearch.setOnClickListener(v -> performSearch());
+                btnSearch.setOnClickListener(v -> {
+                    Log.d("RecommendationActivity", "🔍 검색 버튼 클릭 - 이미지 검색 시작");
+                    performImageSearch();
+                });
             } else {
                 Log.w("RecommendationActivity", "btnSearch가 null이므로 클릭 리스너 설정 건너뜀");
             }
@@ -432,35 +417,31 @@ public class RecommendationActivity extends AppCompatActivity {
                 Log.w("RecommendationActivity", "버튼 초기화 실패", resetException);
             }
 
-            // 선택된 카테고리 버튼 활성화 - 안전하게
+            // 선택된 카테고리 버튼 활성화 - iOS 스타일
             try {
                 switch (category) {
                     case "restaurant":
                         if (btnCategoryRestaurant != null) {
                             btnCategoryRestaurant.setSelected(true);
-                            btnCategoryRestaurant.setBackgroundColor(getColor(R.color.ios_blue));
-                            btnCategoryRestaurant.setTextColor(getColor(android.R.color.white));
+                            addCategoryHoverEffect(btnCategoryRestaurant);
                         }
                         break;
                     case "cafe":
                         if (btnCategoryCafe != null) {
                             btnCategoryCafe.setSelected(true);
-                            btnCategoryCafe.setBackgroundColor(getColor(R.color.ios_blue));
-                            btnCategoryCafe.setTextColor(getColor(android.R.color.white));
+                            addCategoryHoverEffect(btnCategoryCafe);
                         }
                         break;
                     case "attraction":
                         if (btnCategoryAttraction != null) {
                             btnCategoryAttraction.setSelected(true);
-                            btnCategoryAttraction.setBackgroundColor(getColor(R.color.ios_blue));
-                            btnCategoryAttraction.setTextColor(getColor(android.R.color.white));
+                            addCategoryHoverEffect(btnCategoryAttraction);
                         }
                         break;
                     case "accommodation":
                         if (btnCategoryAccommodation != null) {
                             btnCategoryAccommodation.setSelected(true);
-                            btnCategoryAccommodation.setBackgroundColor(getColor(R.color.ios_blue));
-                            btnCategoryAccommodation.setTextColor(getColor(android.R.color.white));
+                            addCategoryHoverEffect(btnCategoryAccommodation);
                         }
                         break;
                 }
@@ -477,34 +458,59 @@ public class RecommendationActivity extends AppCompatActivity {
 
     private void resetCategoryButtons() {
         try {
-            int defaultColor = getColor(android.R.color.transparent);
-            int defaultTextColor = getColor(R.color.text_primary);
-
             if (btnCategoryRestaurant != null) {
                 btnCategoryRestaurant.setSelected(false);
-                btnCategoryRestaurant.setBackgroundColor(defaultColor);
-                btnCategoryRestaurant.setTextColor(defaultTextColor);
+                removeCategoryHoverEffect(btnCategoryRestaurant);
             }
 
             if (btnCategoryCafe != null) {
                 btnCategoryCafe.setSelected(false);
-                btnCategoryCafe.setBackgroundColor(defaultColor);
-                btnCategoryCafe.setTextColor(defaultTextColor);
+                removeCategoryHoverEffect(btnCategoryCafe);
             }
 
             if (btnCategoryAttraction != null) {
                 btnCategoryAttraction.setSelected(false);
-                btnCategoryAttraction.setBackgroundColor(defaultColor);
-                btnCategoryAttraction.setTextColor(defaultTextColor);
+                removeCategoryHoverEffect(btnCategoryAttraction);
             }
 
             if (btnCategoryAccommodation != null) {
                 btnCategoryAccommodation.setSelected(false);
-                btnCategoryAccommodation.setBackgroundColor(defaultColor);
-                btnCategoryAccommodation.setTextColor(defaultTextColor);
+                removeCategoryHoverEffect(btnCategoryAccommodation);
             }
         } catch (Exception e) {
             Log.e("RecommendationActivity", "카테고리 버튼 초기화 오류", e);
+        }
+    }
+
+    /**
+     * iOS 스타일 카테고리 버튼 호버 효과 추가
+     */
+    private void addCategoryHoverEffect(Button button) {
+        try {
+            // 선택된 상태의 애니메이션 효과
+            button.animate()
+                .scaleX(1.05f)
+                .scaleY(1.05f)
+                .setDuration(150)
+                .start();
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "호버 효과 추가 오류", e);
+        }
+    }
+
+    /**
+     * iOS 스타일 카테고리 버튼 호버 효과 제거
+     */
+    private void removeCategoryHoverEffect(Button button) {
+        try {
+            // 기본 상태로 복원
+            button.animate()
+                .scaleX(1.0f)
+                .scaleY(1.0f)
+                .setDuration(150)
+                .start();
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "호버 효과 제거 오류", e);
         }
     }
 
@@ -1184,12 +1190,46 @@ public class RecommendationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 오류 상태 표시 (iOS 스타일)
+     */
     private void showErrorState(String error) {
-        layoutEmptyState.setVisibility(View.VISIBLE);
-        layoutResultsContainer.setVisibility(View.GONE);
-        layoutMapContainer.setVisibility(View.GONE);
+        try {
+            if (layoutEmptyState != null) {
+                layoutEmptyState.setVisibility(View.VISIBLE);
+            }
+            if (layoutResultsContainer != null) {
+                layoutResultsContainer.setVisibility(View.GONE);
+            }
+            if (layoutMapContainer != null) {
+                layoutMapContainer.setVisibility(View.GONE);
+            }
 
-        Toast.makeText(this, "검색 실패: " + error, Toast.LENGTH_LONG).show();
+            // iOS 스타일 토스트 메시지
+            Toast.makeText(this, "🔍 " + error, Toast.LENGTH_LONG).show();
+
+            Log.d("RecommendationActivity", "❌ 오류 상태 표시: " + error);
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "오류 상태 표시 중 오류", e);
+        }
+    }
+
+    /**
+     * 빈 상태 표시 (iOS 스타일)
+     */
+    private void showEmptyState(boolean show) {
+        try {
+            if (layoutEmptyState != null) {
+                layoutEmptyState.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+            if (layoutResultsContainer != null) {
+                layoutResultsContainer.setVisibility(show ? View.GONE : View.VISIBLE);
+            }
+
+            Log.d("RecommendationActivity", "📋 빈 상태 표시: " + show);
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "빈 상태 표시 중 오류", e);
+        }
     }
 
     private void setupRecyclerView() {
@@ -1360,70 +1400,8 @@ public class RecommendationActivity extends AppCompatActivity {
                 return;
             }
 
-            // 현재 메뉴 선택
-            bottomNavigationView.setSelectedItemId(R.id.nav_recommendation);
-            Log.d("RecommendationActivity", "✅ 추천 메뉴 선택됨");
-
-            // 네비게이션 리스너 설정
-            bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    try {
-                        int itemId = item.getItemId();
-                        Log.d("RecommendationActivity", "🔄 네비게이션 클릭: " + item.getTitle() + " (ID: " + itemId + ")");
-
-                        // 현재 화면과 같은 메뉴 클릭 시 무시
-                        if (itemId == R.id.nav_recommendation) {
-                            Log.d("RecommendationActivity", "현재 화면과 동일한 메뉴 클릭, 무시");
-                            return true;
-                        }
-
-                        // 액티비티 상태 확인
-                        if (isFinishing() || isDestroyed()) {
-                            Log.w("RecommendationActivity", "액티비티가 종료 중이므로 네비게이션 무시");
-                            return false;
-                        }
-
-                        // 각 메뉴별 네비게이션 처리
-                        Intent intent = null;
-                        if (itemId == R.id.nav_home) {
-                            intent = new Intent(RecommendationActivity.this, HomeActivity.class);
-                        } else if (itemId == R.id.nav_schedule) {
-                            intent = new Intent(RecommendationActivity.this, ScheduleListActivity.class);
-                        } else if (itemId == R.id.nav_friends) {
-                            intent = new Intent(RecommendationActivity.this, FriendListActivity.class);
-                        } else if (itemId == R.id.nav_profile) {
-                            intent = new Intent(RecommendationActivity.this, ProfileActivity.class);
-                        }
-
-                        if (intent != null) {
-                            Log.d("RecommendationActivity", "🚀 네비게이션 실행: " + intent.getComponent().getClassName());
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            startActivity(intent);
-                            finish();
-
-                            // 전환 애니메이션
-                            try {
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                            } catch (Exception animException) {
-                                Log.w("RecommendationActivity", "애니메이션 적용 실패: " + animException.getMessage());
-                            }
-
-                            return true;
-                        } else {
-                            Log.w("RecommendationActivity", "알 수 없는 메뉴 ID: " + itemId);
-                            return false;
-                        }
-
-                    } catch (Exception e) {
-                        Log.e("RecommendationActivity", "네비게이션 처리 오류", e);
-                        e.printStackTrace();
-                        return false;
-                    }
-                }
-            });
-
-            Log.d("RecommendationActivity", "✅ 바텀 네비게이션 설정 완료");
+            // NavigationHelper를 사용한 바텀 네비게이션 설정으로 대체됨
+            Log.d("RecommendationActivity", "🔧 중복된 바텀 네비게이션 설정 제거됨 - NavigationHelper 사용");
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "❌ 바텀 네비게이션 설정 오류", e);
@@ -1603,6 +1581,11 @@ public class RecommendationActivity extends AppCompatActivity {
             Log.d("RecommendationActivity", "🖼️ 이미지 어댑터 설정 시작");
 
             if (recyclerRecommendations != null) {
+                // RecyclerView 레이아웃 매니저 설정
+                recyclerRecommendations.setLayoutManager(new LinearLayoutManager(this));
+                recyclerRecommendations.setHasFixedSize(true);
+
+                // 어댑터 생성 및 설정
                 imageAdapter = new PlaceWithImageAdapter(this);
                 imageAdapter.setOnPlaceClickListener(place -> {
                     // 장소 클릭 시 상세 페이지로 이동
@@ -1617,6 +1600,8 @@ public class RecommendationActivity extends AppCompatActivity {
 
                 recyclerRecommendations.setAdapter(imageAdapter);
                 Log.d("RecommendationActivity", "✅ 이미지 어댑터 설정 완료");
+            } else {
+                Log.e("RecommendationActivity", "❌ RecyclerView가 null입니다");
             }
 
         } catch (Exception e) {
@@ -1720,35 +1705,68 @@ public class RecommendationActivity extends AppCompatActivity {
     }
 
     /**
-     * 이미지 검색 결과 표시
+     * 이미지 검색 결과 표시 (개선된 버전)
      */
     private void showImageSearchResults(List<PlaceWithImage> places) {
         try {
+            Log.d("RecommendationActivity", "🎯 검색 결과 표시 시작: " + (places != null ? places.size() : "null") + "개");
+
             if (places == null || places.isEmpty()) {
                 showImageSearchError("검색 결과가 없습니다");
                 return;
             }
 
-            // 결과 컨테이너 표시
-            if (layoutResultsContainer != null) {
-                layoutResultsContainer.setVisibility(View.VISIBLE);
-            }
-            if (layoutEmptyState != null) {
-                layoutEmptyState.setVisibility(View.GONE);
-            }
+            // UI 상태 업데이트
+            runOnUiThread(() -> {
+                try {
+                    // 빈 상태 숨기기
+                    if (layoutEmptyState != null) {
+                        layoutEmptyState.setVisibility(View.GONE);
+                        Log.d("RecommendationActivity", "📋 빈 상태 숨김");
+                    }
 
-            // 결과 개수 표시
-            if (textResultCount != null) {
-                textResultCount.setText(places.size() + "개 장소");
-            }
+                    // 결과 컨테이너 표시
+                    if (layoutResultsContainer != null) {
+                        layoutResultsContainer.setVisibility(View.VISIBLE);
+                        Log.d("RecommendationActivity", "📋 결과 컨테이너 표시");
+                    }
 
-            // 어댑터에 데이터 설정
-            if (imageAdapter != null) {
-                imageAdapter.updatePlaces(places);
-            }
+                    // 결과 개수 표시
+                    if (textResultCount != null) {
+                        textResultCount.setText(places.size() + "개 장소");
+                        Log.d("RecommendationActivity", "📊 결과 개수 업데이트: " + places.size());
+                    }
 
-            Log.d("RecommendationActivity", "✅ 이미지 검색 결과 표시 완료: " + places.size() + "개");
-            Toast.makeText(this, "✅ " + places.size() + "개 장소를 찾았습니다!", Toast.LENGTH_SHORT).show();
+                    // 어댑터 데이터 업데이트
+                    if (imageAdapter != null) {
+                        Log.d("RecommendationActivity", "🔄 어댑터 데이터 업데이트 시작");
+                        imageAdapter.updatePlaces(places);
+
+                        // 어댑터 변경 알림 (강제)
+                        imageAdapter.notifyDataSetChanged();
+                        Log.d("RecommendationActivity", "✅ 어댑터 데이터 업데이트 완료");
+                    } else {
+                        Log.e("RecommendationActivity", "❌ imageAdapter가 null입니다");
+                        // 어댑터 재초기화 시도
+                        setupImageAdapter();
+                        if (imageAdapter != null) {
+                            imageAdapter.updatePlaces(places);
+                            imageAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                    // RecyclerView 스크롤을 맨 위로
+                    if (recyclerRecommendations != null) {
+                        recyclerRecommendations.scrollToPosition(0);
+                    }
+
+                    Log.d("RecommendationActivity", "✅ 이미지 검색 결과 표시 완료: " + places.size() + "개");
+                    Toast.makeText(this, "✅ " + places.size() + "개 장소를 찾았습니다!", Toast.LENGTH_SHORT).show();
+
+                } catch (Exception uiException) {
+                    Log.e("RecommendationActivity", "UI 업데이트 중 오류", uiException);
+                }
+            });
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "❌ 이미지 검색 결과 표시 오류", e);

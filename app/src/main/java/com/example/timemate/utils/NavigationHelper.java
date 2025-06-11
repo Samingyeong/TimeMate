@@ -141,7 +141,9 @@ public class NavigationHelper {
 
             // RecommendationActivity 특별 처리
             if (targetActivity == RecommendationActivity.class) {
-                Log.d(TAG, "🎯 RecommendationActivity로 네비게이션 시작");
+                Log.d(TAG, "🎯 RecommendationActivity로 네비게이션 시작 - 바텀 네비게이션에서 추천 메뉴 클릭됨");
+                Log.d(TAG, "📍 현재 액티비티: " + currentActivity.getClass().getSimpleName());
+                Log.d(TAG, "📍 목표 액티비티: " + targetActivity.getSimpleName());
             }
 
             Intent intent = new Intent(currentActivity, targetActivity);

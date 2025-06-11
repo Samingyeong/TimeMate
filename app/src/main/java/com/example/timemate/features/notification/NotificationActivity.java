@@ -38,6 +38,7 @@ public class NotificationActivity extends AppCompatActivity {
     private TextView textEmptyNotifications;
     private NotificationAdapter adapter;
     private UserSession userSession;
+    private List<SharedSchedule> notificationList;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,11 @@ public class NotificationActivity extends AppCompatActivity {
 
             // RecyclerView 기본 설정
             recyclerNotifications.setLayoutManager(new LinearLayoutManager(this));
+
+            // 어댑터 초기화
+            notificationList = new ArrayList<>();
+            adapter = new NotificationAdapter(notificationList, this::handleNotificationAction);
+            recyclerNotifications.setAdapter(adapter);
 
             Log.d(TAG, "기본 뷰 초기화 완료");
 
@@ -203,8 +209,10 @@ public class NotificationActivity extends AppCompatActivity {
     private void showNotifications(List<SharedSchedule> notifications) {
         recyclerNotifications.setVisibility(View.VISIBLE);
         textEmptyNotifications.setVisibility(View.GONE);
-        
-        adapter.updateNotifications(notifications);
+
+        if (adapter != null) {
+            adapter.updateNotifications(notifications);
+        }
     }
     
     /**

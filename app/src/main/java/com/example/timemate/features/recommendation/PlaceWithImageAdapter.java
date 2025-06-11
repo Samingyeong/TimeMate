@@ -40,11 +40,16 @@ public class PlaceWithImageAdapter extends RecyclerView.Adapter<PlaceWithImageAd
     }
     
     public void updatePlaces(List<PlaceWithImage> newPlaces) {
+        android.util.Log.d("PlaceWithImageAdapter", "🔄 updatePlaces 호출: " +
+            (newPlaces != null ? newPlaces.size() : "null") + "개 장소");
+
         this.places.clear();
         if (newPlaces != null) {
             this.places.addAll(newPlaces);
+            android.util.Log.d("PlaceWithImageAdapter", "✅ 장소 데이터 추가 완료: " + this.places.size() + "개");
         }
         notifyDataSetChanged();
+        android.util.Log.d("PlaceWithImageAdapter", "📢 notifyDataSetChanged 호출 완료");
     }
     
     public void updatePlaceImage(String placeId, String imageUrl) {

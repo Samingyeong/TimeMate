@@ -27,6 +27,7 @@ import com.example.timemate.features.profile.ProfileActivity;
 import com.example.timemate.features.home.service.WeatherService;
 import com.example.timemate.ui.recommendation.RecommendationActivity;
 import com.example.timemate.features.home.adapter.TodayScheduleAdapter;
+import com.example.timemate.utils.NavigationHelper;
 import com.example.timemate.features.home.adapter.TomorrowReminderAdapter;
 import com.example.timemate.ScheduleReminder;
 import com.example.timemate.ScheduleReminderDao;
@@ -187,46 +188,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        if (bottomNav != null) {
-            bottomNav.setSelectedItemId(R.id.nav_home);
-
-            bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    try {
-                        int id = item.getItemId();
-                        Log.d("HomeActivity", "🧭 BottomNavigation 클릭: " + item.getTitle());
-
-                        if (id == R.id.nav_home) {
-                            return true; // 현재 화면
-                        } else if (id == R.id.nav_schedule) {
-                            Log.d("HomeActivity", "📅 일정 화면으로 이동");
-                            safeStartActivity(com.example.timemate.features.schedule.ScheduleListActivity.class);
-                            return true;
-                        } else if (id == R.id.nav_friends) {
-                            Log.d("HomeActivity", "👥 친구 화면으로 이동");
-                            safeStartActivity(com.example.timemate.features.friend.FriendListActivity.class);
-                            return true;
-                        } else if (id == R.id.nav_recommendation) {
-                            Log.d("HomeActivity", "🎯 추천 화면으로 이동");
-                            safeStartActivity(RecommendationActivity.class);
-                            return true;
-                        } else if (id == R.id.nav_profile) {
-                            Log.d("HomeActivity", "👤 프로필 화면으로 이동");
-                            safeStartActivity(com.example.timemate.features.profile.ProfileActivity.class);
-                            return true;
-                        }
-                        return false;
-
-                    } catch (Exception e) {
-                        Log.e("HomeActivity", "❌ BottomNavigation 클릭 오류", e);
-                        e.printStackTrace();
-                        Toast.makeText(HomeActivity.this, "화면 전환 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                }
-            });
+        try {
+            Log.d("HomeActivity", "🔧 NavigationHelper를 사용한 바텀 네비게이션 설정");
+            NavigationHelper.setupBottomNavigation(this, R.id.nav_home);
+            Log.d("HomeActivity", "✅ 바텀 네비게이션 설정 완료");
+        } catch (Exception e) {
+            Log.e("HomeActivity", "❌ 바텀 네비게이션 설정 오류", e);
+            e.printStackTrace();
         }
     }
 
