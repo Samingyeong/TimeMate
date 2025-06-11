@@ -28,10 +28,10 @@ import com.example.timemate.features.recommendation.PlaceWithImageAdapter;
 import com.example.timemate.network.service.DummyPlaceSearchService;
 import com.example.timemate.utils.NavigationHelper;
 import com.example.timemate.NaverLocalSearchService;
-import com.example.timemate.ui.friend.FriendListActivity;
-import com.example.timemate.ui.home.HomeActivity;
+import com.example.timemate.features.friend.FriendListActivity;
+import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.profile.ProfileActivity;
-import com.example.timemate.ui.schedule.ScheduleListActivity;
+import com.example.timemate.features.schedule.ScheduleListActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -128,7 +128,7 @@ public class RecommendationActivity extends AppCompatActivity {
                 Toast.makeText(this, "추천 화면을 준비 중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show();
 
                 try {
-                    Intent homeIntent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
+                    Intent homeIntent = new Intent(this, com.example.timemate.features.home.HomeActivity.class);
                     startActivity(homeIntent);
                     finish();
                 } catch (Exception fallbackException) {

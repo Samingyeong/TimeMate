@@ -19,13 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.friend.FriendListActivity;
 import com.example.timemate.features.profile.ProfileActivity;
 import com.example.timemate.features.schedule.adapter.ScheduleListAdapter;
 import com.example.timemate.ui.recommendation.RecommendationActivity;
-import com.example.timemate.ui.home.CalendarView;
+import com.example.timemate.features.home.CalendarView;
 import com.example.timemate.utils.NavigationHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -71,61 +71,137 @@ public class ScheduleListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         try {
-            Log.d(TAG, "ScheduleListActivity onCreate 시작");
-            setContentView(R.layout.activity_schedule_list);
+            Log.d(TAG, "🚀 ScheduleListActivity onCreate 시작");
 
+            // 레이아웃 설정
+            Log.d(TAG, "📱 레이아웃 설정 중...");
+            setContentView(R.layout.activity_schedule_list);
+            Log.d(TAG, "✅ 레이아웃 설정 완료");
+
+            // 뷰 초기화
+            Log.d(TAG, "🔧 뷰 초기화 중...");
             initViews();
+            Log.d(TAG, "✅ 뷰 초기화 완료");
+
+            // 서비스 초기화
+            Log.d(TAG, "⚙️ 서비스 초기화 중...");
             initServices();
+            Log.d(TAG, "✅ 서비스 초기화 완료");
 
             // UserSession 안전성 확인
             if (userSession == null) {
-                Log.e(TAG, "UserSession 초기화 실패");
+                Log.e(TAG, "❌ UserSession 초기화 실패");
                 Toast.makeText(this, "사용자 세션을 불러올 수 없습니다", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             }
+            Log.d(TAG, "✅ UserSession 확인 완료");
 
+            // RecyclerView 설정
+            Log.d(TAG, "📋 RecyclerView 설정 중...");
             setupRecyclerView();
+            Log.d(TAG, "✅ RecyclerView 설정 완료");
+
+            // 캘린더 설정
+            Log.d(TAG, "🗓️ 캘린더 설정 중...");
             setupCalendar();
+            Log.d(TAG, "✅ 캘린더 설정 완료");
+
+            // 바텀 네비게이션 설정
+            Log.d(TAG, "🧭 바텀 네비게이션 설정 중...");
             setupBottomNavigation();
+            Log.d(TAG, "✅ 바텀 네비게이션 설정 완료");
+
+            // 클릭 리스너 설정
+            Log.d(TAG, "👆 클릭 리스너 설정 중...");
             setupClickListeners();
+            Log.d(TAG, "✅ 클릭 리스너 설정 완료");
 
             // 로그인 상태 확인
             if (!userSession.isLoggedIn()) {
-                Log.w(TAG, "사용자가 로그인되지 않음");
+                Log.w(TAG, "⚠️ 사용자가 로그인되지 않음");
                 Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
                 finish();
                 return;
             }
+            Log.d(TAG, "✅ 로그인 상태 확인 완료");
 
             // 데이터베이스 테이블 상태 확인
+            Log.d(TAG, "🗄️ 데이터베이스 확인 중...");
             verifyDatabaseTables();
 
             // 테스트 일정 생성 (개발용)
+            Log.d(TAG, "🧪 테스트 데이터 확인 중...");
             createTestScheduleIfEmpty();
 
+            // 일정 로드
+            Log.d(TAG, "📊 일정 로드 중...");
             loadSchedules();
-            Log.d(TAG, "ScheduleListActivity onCreate 완료");
+
+            Log.d(TAG, "🎉 ScheduleListActivity onCreate 완료");
 
         } catch (Exception e) {
-            Log.e(TAG, "ScheduleListActivity onCreate 오류", e);
+            Log.e(TAG, "❌ ScheduleListActivity onCreate 오류", e);
             e.printStackTrace();
-            Toast.makeText(this, "일정 화면을 불러오는 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
-            finish();
+
+            // 사용자에게 구체적인 오류 정보 제공
+            String errorMessage = "일정 화면을 불러오는 중 오류가 발생했습니다";
+            if (e.getMessage() != null) {
+                errorMessage += ": " + e.getMessage();
+            }
+
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+
+            // 안전하게 종료
+            try {
+                finish();
+            } catch (Exception finishException) {
+                Log.e(TAG, "finish() 호출 중 오류", finishException);
+            }
         }
     }
 
     private void initViews() {
-        recyclerSchedules = findViewById(R.id.recyclerSchedules);
-        bottomNavigation = findViewById(R.id.bottomNavigationView);
-        fabAddSchedule = findViewById(R.id.fabAddSchedule);
-        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        try {
+            Log.d(TAG, "🔧 뷰 초기화 시작");
 
-        // 캘린더 뷰들
-        calendarView = findViewById(R.id.calendarView);
-        textCurrentMonth = findViewById(R.id.textCurrentMonth);
-        btnPrevMonth = findViewById(R.id.btnPrevMonth);
-        btnNextMonth = findViewById(R.id.btnNextMonth);
+            // 필수 뷰들
+            recyclerSchedules = findViewById(R.id.recyclerSchedules);
+            if (recyclerSchedules == null) {
+                throw new RuntimeException("recyclerSchedules를 찾을 수 없습니다");
+            }
+
+            bottomNavigation = findViewById(R.id.bottomNavigationView);
+            if (bottomNavigation == null) {
+                throw new RuntimeException("bottomNavigationView를 찾을 수 없습니다");
+            }
+
+            fabAddSchedule = findViewById(R.id.fabAddSchedule);
+            if (fabAddSchedule == null) {
+                throw new RuntimeException("fabAddSchedule를 찾을 수 없습니다");
+            }
+
+            layoutEmptyState = findViewById(R.id.layoutEmptyState);
+            // layoutEmptyState는 선택사항이므로 null 체크만
+
+            // 캘린더 뷰들 (안전하게 초기화)
+            try {
+                calendarView = findViewById(R.id.calendarView);
+                textCurrentMonth = findViewById(R.id.textCurrentMonth);
+                btnPrevMonth = findViewById(R.id.btnPrevMonth);
+                btnNextMonth = findViewById(R.id.btnNextMonth);
+                Log.d(TAG, "✅ 캘린더 뷰 초기화 완료");
+            } catch (Exception e) {
+                Log.w(TAG, "⚠️ 캘린더 뷰 초기화 실패 (선택사항)", e);
+                // 캘린더 뷰는 선택사항이므로 계속 진행
+            }
+
+            Log.d(TAG, "✅ 뷰 초기화 완료");
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ 뷰 초기화 오류", e);
+            throw e; // 상위로 예외 전파
+        }
     }
 
     private void initServices() {
@@ -158,34 +234,69 @@ public class ScheduleListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        scheduleAdapter = new ScheduleListAdapter(scheduleList, new ScheduleListAdapter.OnScheduleClickListener() {
-            @Override
-            public void onScheduleClick(Schedule schedule) {
-                // 일정 상세보기
-                openScheduleDetail(schedule);
+        try {
+            Log.d(TAG, "📋 RecyclerView 설정 시작");
+
+            if (recyclerSchedules == null) {
+                throw new RuntimeException("recyclerSchedules가 null입니다");
             }
 
-            @Override
-            public void onEditClick(Schedule schedule) {
-                // 일정 수정
-                editSchedule(schedule);
+            if (scheduleList == null) {
+                scheduleList = new ArrayList<>();
+                Log.d(TAG, "scheduleList 초기화 완료");
             }
 
-            @Override
-            public void onDeleteClick(Schedule schedule) {
-                // 일정 삭제
-                deleteSchedule(schedule);
-            }
+            scheduleAdapter = new ScheduleListAdapter(scheduleList, new ScheduleListAdapter.OnScheduleClickListener() {
+                @Override
+                public void onScheduleClick(Schedule schedule) {
+                    try {
+                        Log.d(TAG, "일정 클릭: " + schedule.title);
+                        openScheduleDetail(schedule);
+                    } catch (Exception e) {
+                        Log.e(TAG, "일정 클릭 처리 오류", e);
+                    }
+                }
 
-            @Override
-            public void onCompleteToggle(Schedule schedule) {
-                // 완료 상태 토글
-                toggleScheduleCompletion(schedule);
-            }
-        });
-        
-        recyclerSchedules.setLayoutManager(new LinearLayoutManager(this));
-        recyclerSchedules.setAdapter(scheduleAdapter);
+                @Override
+                public void onEditClick(Schedule schedule) {
+                    try {
+                        Log.d(TAG, "일정 수정 클릭: " + schedule.title);
+                        editSchedule(schedule);
+                    } catch (Exception e) {
+                        Log.e(TAG, "일정 수정 처리 오류", e);
+                    }
+                }
+
+                @Override
+                public void onDeleteClick(Schedule schedule) {
+                    try {
+                        Log.d(TAG, "일정 삭제 클릭: " + schedule.title);
+                        deleteSchedule(schedule);
+                    } catch (Exception e) {
+                        Log.e(TAG, "일정 삭제 처리 오류", e);
+                    }
+                }
+
+                @Override
+                public void onCompleteToggle(Schedule schedule) {
+                    try {
+                        Log.d(TAG, "일정 완료 토글: " + schedule.title);
+                        toggleScheduleCompletion(schedule);
+                    } catch (Exception e) {
+                        Log.e(TAG, "일정 완료 토글 처리 오류", e);
+                    }
+                }
+            });
+
+            recyclerSchedules.setLayoutManager(new LinearLayoutManager(this));
+            recyclerSchedules.setAdapter(scheduleAdapter);
+
+            Log.d(TAG, "✅ RecyclerView 설정 완료");
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ RecyclerView 설정 오류", e);
+            throw e; // 상위로 예외 전파
+        }
     }
 
     /**
@@ -193,6 +304,14 @@ public class ScheduleListActivity extends AppCompatActivity {
      */
     private void setupCalendar() {
         try {
+            Log.d(TAG, "🗓️ 캘린더 설정 시작");
+
+            // 캘린더 뷰가 있는지 확인
+            if (calendarView == null) {
+                Log.w(TAG, "⚠️ CalendarView가 null입니다. 캘린더 기능을 건너뜁니다.");
+                return;
+            }
+
             // 현재 월 표시 업데이트
             updateCurrentMonthDisplay();
 
@@ -206,23 +325,32 @@ public class ScheduleListActivity extends AppCompatActivity {
                 }
             });
 
-            // 이전/다음 월 버튼
-            btnPrevMonth.setOnClickListener(v -> {
-                calendarView.previousMonth();
-                updateCurrentMonthDisplay();
-                updateCalendarSchedules();
-            });
+            // 이전/다음 월 버튼 (null 체크)
+            if (btnPrevMonth != null) {
+                btnPrevMonth.setOnClickListener(v -> {
+                    if (calendarView != null) {
+                        calendarView.previousMonth();
+                        updateCurrentMonthDisplay();
+                        updateCalendarSchedules();
+                    }
+                });
+            }
 
-            btnNextMonth.setOnClickListener(v -> {
-                calendarView.nextMonth();
-                updateCurrentMonthDisplay();
-                updateCalendarSchedules();
-            });
+            if (btnNextMonth != null) {
+                btnNextMonth.setOnClickListener(v -> {
+                    if (calendarView != null) {
+                        calendarView.nextMonth();
+                        updateCurrentMonthDisplay();
+                        updateCalendarSchedules();
+                    }
+                });
+            }
 
-            Log.d(TAG, "캘린더 설정 완료");
+            Log.d(TAG, "✅ 캘린더 설정 완료");
 
         } catch (Exception e) {
-            Log.e(TAG, "캘린더 설정 오류", e);
+            Log.e(TAG, "❌ 캘린더 설정 오류", e);
+            // 캘린더 설정 실패는 치명적이지 않으므로 계속 진행
         }
     }
 

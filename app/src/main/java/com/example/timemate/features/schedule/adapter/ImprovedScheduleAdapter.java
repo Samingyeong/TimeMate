@@ -1,8 +1,9 @@
-package com.example.timemate;
+package com.example.timemate.features.schedule.adapter;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.timemate.R;
 import com.example.timemate.data.model.Schedule;
 
 import java.text.ParseException;
@@ -22,6 +24,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * 개선된 일정 어댑터
+ * - 일정 목록 표시
+ * - 길찾기 기능 연동
+ * - 공유 일정 표시
+ * - 날짜/시간 포맷팅
+ */
 public class ImprovedScheduleAdapter extends RecyclerView.Adapter<ImprovedScheduleAdapter.ScheduleViewHolder> {
 
     private List<Schedule> schedules;
@@ -71,19 +80,31 @@ public class ImprovedScheduleAdapter extends RecyclerView.Adapter<ImprovedSchedu
         public void bind(Schedule schedule) {
             textTitle.setText(schedule.title);
             
-            // 날짜 시간 포맷팅
+            // 날짜 시간 포맷팅 (새로운 데이터 구조에 맞게 수정)
+            String displayDateTime = schedule.date + " " + schedule.time;
             try {
                 SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.KOREAN);
                 SimpleDateFormat outputFormat = new SimpleDateFormat("MM월 dd일 (E) HH:mm", Locale.KOREAN);
-                String dateTimeStr = schedule.getFullDateTime();
-                Date date = inputFormat.parse(dateTimeStr);
+                Date date = inputFormat.parse(displayDateTime);
                 textDateTime.setText(outputFormat.format(date));
             } catch (ParseException e) {
-                textDateTime.setText(schedule.getFullDateTime());
+                textDateTime.setText(displayDateTime);
             }
             
-            textDeparture.setText(schedule.departure);
-            textDestination.setText(schedule.destination);
+            // 출발지/도착지 표시
+            if (schedule.departure != null && !schedule.departure.isEmpty()) {
+                textDeparture.setText(schedule.departure);
+                textDeparture.setVisibility(View.VISIBLE);
+            } else {
+                textDeparture.setVisibility(View.GONE);
+            }
+            
+            if (schedule.destination != null && !schedule.destination.isEmpty()) {
+                textDestination.setText(schedule.destination);
+                textDestination.setVisibility(View.VISIBLE);
+            } else {
+                textDestination.setVisibility(View.GONE);
+            }
             
             // 메모 표시
             if (schedule.memo != null && !schedule.memo.trim().isEmpty()) {
@@ -92,30 +113,85 @@ public class ImprovedScheduleAdapter extends RecyclerView.Adapter<ImprovedSchedu
             } else {
                 textMemo.setVisibility(View.GONE);
             }
-            
-            // 공유 상태 표시
-            // isShared 필드가 없으므로 기본값으로 처리
-            if (false) { // 임시로 false 처리
-                iconShared.setVisibility(View.VISIBLE);
-                textFriends.setText("공유 일정");
-                textFriends.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_friends, 0, 0, 0);
-            } else {
-                iconShared.setVisibility(View.GONE);
-                textFriends.setText("개인 일정");
-                textFriends.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person, 0, 0, 0);
-            }
+
+            // 경로 정보 표시 (새로 추가)
+            displayRouteInfo(schedule);
+
+            // 공유 상태 표시 (향후 구현)
+            iconShared.setVisibility(View.GONE);
+            textFriends.setText("개인 일정");
+            textFriends.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person, 0, 0, 0);
             
             // 길찾기 버튼 클릭 리스너
             btnDirections.setOnClickListener(v -> openNavigation(schedule));
             
             // 카드 전체 클릭 리스너 (상세 보기)
             itemView.setOnClickListener(v -> {
-                // 일정 상세 보기 또는 편집 화면으로 이동
                 Toast.makeText(context, schedule.title + " 일정", Toast.LENGTH_SHORT).show();
             });
         }
 
+        /**
+         * 저장된 경로 정보를 표시
+         */
+        private void displayRouteInfo(Schedule schedule) {
+            try {
+                // 선택된 교통수단 정보가 있는지 확인
+                if (schedule.selectedTransportModes != null && !schedule.selectedTransportModes.isEmpty()) {
+                    String[] transportModes = schedule.selectedTransportModes.split(",");
+                    StringBuilder routeDisplay = new StringBuilder();
+                    routeDisplay.append("🗺️ 선택된 경로: ");
+
+                    for (int i = 0; i < transportModes.length; i++) {
+                        if (i > 0) routeDisplay.append(", ");
+
+                        String mode = transportModes[i].trim();
+                        switch (mode) {
+                            case "대중교통":
+                                routeDisplay.append("🚌 대중교통");
+                                break;
+                            case "자동차":
+                                routeDisplay.append("🚗 자동차");
+                                break;
+                            case "자전거":
+                                routeDisplay.append("🚴 자전거");
+                                break;
+                            case "도보":
+                                routeDisplay.append("🚶 도보");
+                                break;
+                            case "택시":
+                                routeDisplay.append("🚕 택시");
+                                break;
+                            default:
+                                routeDisplay.append(mode);
+                                break;
+                        }
+                    }
+
+                    // 메모 아래에 경로 정보 추가 표시
+                    if (textMemo.getVisibility() == View.VISIBLE) {
+                        String currentMemo = textMemo.getText().toString();
+                        textMemo.setText(currentMemo + "\n\n" + routeDisplay.toString());
+                    } else {
+                        textMemo.setText(routeDisplay.toString());
+                        textMemo.setVisibility(View.VISIBLE);
+                    }
+
+                    Log.d("ScheduleAdapter", "✅ 경로 정보 표시: " + routeDisplay.toString());
+                }
+
+            } catch (Exception e) {
+                Log.e("ScheduleAdapter", "경로 정보 표시 오류", e);
+            }
+        }
+
         private void openNavigation(Schedule schedule) {
+            if (schedule.departure == null || schedule.destination == null ||
+                schedule.departure.isEmpty() || schedule.destination.isEmpty()) {
+                Toast.makeText(context, "출발지 또는 도착지 정보가 없습니다", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             try {
                 // 네이버 지도 앱으로 길찾기
                 String departure = schedule.departure;

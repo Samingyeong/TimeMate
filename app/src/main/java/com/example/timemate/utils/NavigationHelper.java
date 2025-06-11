@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import com.example.timemate.R;
 import com.example.timemate.features.friend.FriendListActivity;
 import com.example.timemate.features.schedule.ScheduleListActivity;
-import com.example.timemate.ui.home.HomeActivity;
+import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.ui.recommendation.RecommendationActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -27,27 +27,48 @@ public class NavigationHelper {
      */
     public static void setupBottomNavigation(Activity activity, int currentMenuId) {
         try {
+            Log.d(TAG, "🔧 바텀 네비게이션 설정 시작");
+            Log.d(TAG, "📱 액티비티: " + activity.getClass().getSimpleName());
+            Log.d(TAG, "🎯 현재 메뉴 ID: " + currentMenuId);
+
             BottomNavigationView bottomNav = activity.findViewById(R.id.bottomNavigationView);
             if (bottomNav == null) {
-                Log.e(TAG, "BottomNavigationView를 찾을 수 없습니다");
+                Log.e(TAG, "❌ BottomNavigationView를 찾을 수 없습니다!");
+                Log.e(TAG, "📋 레이아웃에 R.id.bottomNavigationView가 있는지 확인하세요");
                 return;
             }
 
+            Log.d(TAG, "✅ BottomNavigationView 찾기 성공");
+
             // 현재 메뉴 선택
             bottomNav.setSelectedItemId(currentMenuId);
-            
+            Log.d(TAG, "✅ 현재 메뉴 선택 완료: " + getCurrentActivityName(currentMenuId));
+
             // 네비게이션 리스너 설정
             bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    Log.d(TAG, "🔥 바텀 네비게이션 아이템 선택됨: " + item.getTitle());
+
+                    // 사용자에게 클릭 피드백 제공
+                    try {
+                        android.widget.Toast.makeText(activity,
+                            item.getTitle() + " 메뉴 클릭됨",
+                            android.widget.Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.e(TAG, "Toast 표시 오류", e);
+                    }
+
                     return handleNavigationItemSelected(activity, item, currentMenuId);
                 }
             });
-            
-            Log.d(TAG, "바텀 네비게이션 설정 완료: " + activity.getClass().getSimpleName());
-            
+
+            Log.d(TAG, "✅ 바텀 네비게이션 리스너 설정 완료");
+            Log.d(TAG, "🎉 바텀 네비게이션 설정 완료: " + activity.getClass().getSimpleName());
+
         } catch (Exception e) {
-            Log.e(TAG, "바텀 네비게이션 설정 오류", e);
+            Log.e(TAG, "❌ 바텀 네비게이션 설정 오류", e);
+            e.printStackTrace();
         }
     }
     
@@ -61,29 +82,40 @@ public class NavigationHelper {
                 Log.w(TAG, "액티비티가 종료 중이므로 네비게이션 무시");
                 return false;
             }
-            
+
             int itemId = item.getItemId();
-            Log.d(TAG, "네비게이션 클릭: " + item.getTitle() + " (현재: " + getCurrentActivityName(currentMenuId) + ")");
-            
+            Log.d(TAG, "🔥 네비게이션 클릭 감지!");
+            Log.d(TAG, "📱 클릭된 메뉴: " + item.getTitle() + " (ID: " + itemId + ")");
+            Log.d(TAG, "📍 현재 화면: " + getCurrentActivityName(currentMenuId) + " (ID: " + currentMenuId + ")");
+            Log.d(TAG, "🏠 현재 액티비티: " + activity.getClass().getSimpleName());
+
+            // 일정 메뉴 클릭 특별 로그
+            if (itemId == R.id.nav_schedule) {
+                Log.d(TAG, "🗓️ 일정 메뉴 클릭됨! ScheduleListActivity로 이동 예정");
+            }
+
             // 현재 화면과 같은 메뉴 클릭 시 무시
             if (itemId == currentMenuId) {
-                Log.d(TAG, "현재 화면과 동일한 메뉴 클릭, 무시");
+                Log.d(TAG, "⚠️ 현재 화면과 동일한 메뉴 클릭, 무시");
                 return true;
             }
-            
+
             // 목적지 액티비티 결정
             Class<?> targetActivity = getTargetActivity(itemId);
             if (targetActivity == null) {
-                Log.w(TAG, "알 수 없는 메뉴 ID: " + itemId);
+                Log.e(TAG, "❌ 알 수 없는 메뉴 ID: " + itemId);
                 return false;
             }
-            
+
+            Log.d(TAG, "🎯 목표 액티비티: " + targetActivity.getSimpleName());
+
             // 안전한 네비게이션 실행
             navigateToActivity(activity, targetActivity);
             return true;
-            
+
         } catch (Exception e) {
-            Log.e(TAG, "네비게이션 처리 오류", e);
+            Log.e(TAG, "❌ 네비게이션 처리 오류", e);
+            e.printStackTrace();
             return false;
         }
     }
@@ -92,17 +124,31 @@ public class NavigationHelper {
      * 메뉴 ID에 따른 목적지 액티비티 반환
      */
     private static Class<?> getTargetActivity(int menuId) {
+        Log.d(TAG, "🎯 getTargetActivity 호출됨, menuId: " + menuId);
+
         if (menuId == R.id.nav_home) {
+            Log.d(TAG, "🏠 홈 메뉴 선택됨 → HomeActivity");
             return HomeActivity.class;
         } else if (menuId == R.id.nav_schedule) {
+            Log.d(TAG, "🗓️ 일정 메뉴 선택됨 → ScheduleListActivity");
             return ScheduleListActivity.class;
         } else if (menuId == R.id.nav_friends) {
+            Log.d(TAG, "👥 친구 메뉴 선택됨 → FriendListActivity");
             return FriendListActivity.class;
         } else if (menuId == R.id.nav_recommendation) {
+            Log.d(TAG, "📍 추천 메뉴 선택됨 → RecommendationActivity");
             return RecommendationActivity.class;
         } else if (menuId == R.id.nav_profile) {
+            Log.d(TAG, "👤 프로필 메뉴 선택됨 → ProfileActivity");
             return com.example.timemate.features.profile.ProfileActivity.class;
         } else {
+            Log.e(TAG, "❌ 알 수 없는 메뉴 ID: " + menuId);
+            Log.e(TAG, "📋 사용 가능한 메뉴 ID들:");
+            Log.e(TAG, "  - nav_home: " + R.id.nav_home);
+            Log.e(TAG, "  - nav_schedule: " + R.id.nav_schedule);
+            Log.e(TAG, "  - nav_friends: " + R.id.nav_friends);
+            Log.e(TAG, "  - nav_recommendation: " + R.id.nav_recommendation);
+            Log.e(TAG, "  - nav_profile: " + R.id.nav_profile);
             return null;
         }
     }

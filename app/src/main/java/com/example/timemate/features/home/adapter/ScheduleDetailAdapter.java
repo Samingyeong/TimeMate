@@ -1,4 +1,4 @@
-package com.example.timemate.ui.home;
+package com.example.timemate.features.home.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

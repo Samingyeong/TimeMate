@@ -1,4 +1,4 @@
-package com.example.timemate;
+package com.example.timemate.utils;
 
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;

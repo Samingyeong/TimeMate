@@ -1,4 +1,4 @@
-package com.example.timemate.ui.home;
+package com.example.timemate.features.home;
 
 import android.content.Context;
 import android.graphics.Canvas;

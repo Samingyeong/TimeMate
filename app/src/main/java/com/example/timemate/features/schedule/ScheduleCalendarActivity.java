@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.friend.FriendListActivity;
 import com.example.timemate.features.profile.ProfileActivity;

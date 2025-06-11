@@ -31,7 +31,7 @@ import com.example.timemate.utils.NavigationHelper;
 import com.example.timemate.features.home.adapter.TomorrowReminderAdapter;
 import com.example.timemate.ScheduleReminder;
 import com.example.timemate.ScheduleReminderDao;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -93,8 +93,9 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        // textWeatherInfo = findViewById(R.id.textWeatherInfo);
-        // textGreeting = findViewById(R.id.textGreeting);
+        // 레이아웃에 존재하지 않는 뷰들은 null로 설정
+        textWeatherInfo = null; // 레이아웃에 없음
+        textGreeting = null; // 레이아웃에 없음
         recyclerTodaySchedule = findViewById(R.id.recyclerTodaySchedule);
         recyclerTomorrowSchedule = findViewById(R.id.recyclerTomorrowSchedule);
 
@@ -207,37 +208,57 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void loadGreeting() {
-        UserSession userSession = UserSession.getInstance(this);
-        String userName = userSession.getCurrentUserName();
-        if (userName != null && !userName.isEmpty()) {
-            textGreeting.setText("안녕하세요, " + userName + "님!");
-        } else {
-            textGreeting.setText("안녕하세요!");
+        try {
+            UserSession userSession = UserSession.getInstance(this);
+            String userName = userSession.getCurrentUserName();
+
+            // textGreeting이 없으므로 textCityName을 활용하여 사용자 정보 표시
+            if (textCityName != null) {
+                String greeting = (userName != null && !userName.isEmpty()) ?
+                    userName + "님의 TimeMate" : "TimeMate";
+                // 도시명 대신 사용자 인사말 표시는 하지 않고, 로그만 남김
+                Log.d("HomeActivity", "사용자 인사: " + greeting);
+            }
+        } catch (Exception e) {
+            Log.e("HomeActivity", "인사말 로드 오류", e);
         }
     }
 
     private void loadWeatherInfo() {
-        weatherService.getCurrentWeather("Seoul", new WeatherService.WeatherCallback() {
-            @Override
-            public void onSuccess(WeatherService.WeatherInfo weather) {
-                runOnUiThread(() -> {
-                    // 기본 텍스트 업데이트
-                    textWeatherInfo.setText(weather.getDisplayText());
+        try {
+            weatherService.getCurrentWeather("Seoul", new WeatherService.WeatherCallback() {
+                @Override
+                public void onSuccess(WeatherService.WeatherInfo weather) {
+                    runOnUiThread(() -> {
+                        try {
+                            // textWeatherInfo는 없으므로 로그만 남김
+                            Log.d("HomeActivity", "날씨 정보 로드 성공: " + weather.getDisplayText());
 
-                    // 날씨 섹션 세부 정보 업데이트
-                    updateWeatherSection(weather);
-                });
-            }
+                            // 날씨 섹션 세부 정보 업데이트
+                            updateWeatherSection(weather);
+                        } catch (Exception e) {
+                            Log.e("HomeActivity", "날씨 정보 UI 업데이트 오류", e);
+                        }
+                    });
+                }
 
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    textWeatherInfo.setText("날씨 정보를 불러올 수 없습니다");
-                    // 오류 시 기본값 표시
-                    showWeatherError();
-                });
-            }
-        });
+                @Override
+                public void onError(String error) {
+                    runOnUiThread(() -> {
+                        try {
+                            Log.e("HomeActivity", "날씨 정보를 불러올 수 없습니다");
+                            // 오류 시 기본값 표시
+                            showWeatherError();
+                        } catch (Exception e) {
+                            Log.e("HomeActivity", "날씨 오류 UI 업데이트 오류", e);
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+            Log.e("HomeActivity", "날씨 서비스 호출 오류", e);
+            showWeatherError();
+        }
     }
 
     private void updateWeatherSection(WeatherService.WeatherInfo weather) {

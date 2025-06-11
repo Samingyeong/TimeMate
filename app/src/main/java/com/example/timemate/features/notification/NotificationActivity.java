@@ -112,7 +112,7 @@ public class NotificationActivity extends AppCompatActivity {
             if (btnBack != null) {
                 btnBack.setOnClickListener(v -> {
                     try {
-                        Intent homeIntent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
+                        Intent homeIntent = new Intent(this, com.example.timemate.features.home.HomeActivity.class);
                         startActivity(homeIntent);
                         finish();
                     } catch (Exception e) {

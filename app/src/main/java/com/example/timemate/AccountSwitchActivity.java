@@ -17,7 +17,7 @@ import androidx.room.Room;
 
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.User;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 
 import java.util.ArrayList;
@@ -307,7 +307,7 @@ public class AccountSwitchActivity extends AppCompatActivity {
         userSession.logout();
 
         // 새 계정으로 로그인
-        userSession.login(user.userId, user.nickname, user.email, true);
+        userSession.login(user.userId, user.nickname, user.email);
 
         // 디버그 정보 출력
         Log.d("AccountSwitch", "Login successful: " + user.userId);
@@ -325,7 +325,7 @@ public class AccountSwitchActivity extends AppCompatActivity {
         try {
             Log.d("AccountSwitch", "홈화면으로 안전한 이동 시작");
 
-            Intent intent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
+            Intent intent = new Intent(this, com.example.timemate.features.home.HomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
             // Activity 존재 여부 확인

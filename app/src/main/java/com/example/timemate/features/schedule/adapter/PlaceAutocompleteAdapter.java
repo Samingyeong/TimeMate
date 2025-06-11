@@ -1,4 +1,4 @@
-package com.example.timemate.ui.schedule;
+package com.example.timemate.features.schedule.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

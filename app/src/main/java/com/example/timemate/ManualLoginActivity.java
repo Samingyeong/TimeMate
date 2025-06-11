@@ -71,7 +71,7 @@ public class ManualLoginActivity extends AppCompatActivity {
                                 Toast.makeText(this, "로그인 성공! " + user.nickname + "님 환영합니다.", Toast.LENGTH_SHORT).show();
 
                                 // 홈화면으로 이동
-                                Intent intent = new Intent(ManualLoginActivity.this, com.example.timemate.ui.home.HomeActivity.class);
+                                Intent intent = new Intent(ManualLoginActivity.this, com.example.timemate.features.home.HomeActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 finish();
@@ -204,7 +204,7 @@ public class ManualLoginActivity extends AppCompatActivity {
                     Toast.makeText(this, "✅ 자동 로그인 성공!", Toast.LENGTH_SHORT).show();
 
                     // 홈 화면으로 이동
-                    Intent intent = new Intent(ManualLoginActivity.this, com.example.timemate.ui.home.HomeActivity.class);
+                    Intent intent = new Intent(ManualLoginActivity.this, com.example.timemate.features.home.HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();

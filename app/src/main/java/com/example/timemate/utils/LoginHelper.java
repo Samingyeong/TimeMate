@@ -1,4 +1,4 @@
-package com.example.timemate;
+package com.example.timemate.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -56,8 +56,8 @@ public class LoginHelper {
                     db.userDao().insert(newUser);
                 });
 
-                // ✅ 로그인 성공 시 홈 화면으로 이동
-                Intent intent = new Intent(context, com.example.timemate.ui.home.HomeActivity.class);
+                // ✅ 로그인 성공 시 홈 화면으로 이동 (수정된 경로)
+                Intent intent = new Intent(context, HomeActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(intent);
             }
