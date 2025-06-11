@@ -114,12 +114,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- iOS 스타일 FAB 친구 추가 버튼 -->
+    <!-- iOS 스타일 FAB 친구 추가 버튼 (바텀 네비게이션과 충분한 간격) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddFriend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/card_margin"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add"
         android:contentDescription="친구 추가"
         app:backgroundTint="@color/accent"

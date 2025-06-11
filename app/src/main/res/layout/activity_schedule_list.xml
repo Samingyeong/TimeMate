@@ -163,14 +163,14 @@
 
     </LinearLayout>
 
-    <!-- iOS 스타일 FAB 일정 추가 버튼 (바텀 네비게이션 위쪽 우하단) -->
+    <!-- iOS 스타일 FAB 일정 추가 버튼 (위치 조정: 위로 올리고 왼쪽으로) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/card_margin"
-        android:layout_marginBottom="80dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="100dp"
         android:src="@drawable/ic_add"
         android:contentDescription="일정 추가"
         app:backgroundTint="@color/accent"
