@@ -27,6 +27,7 @@ import com.example.timemate.ui.recommendation.RecommendationActivity;
 import com.example.timemate.util.UserSession;
 import com.example.timemate.ui.home.CalendarView;
 import com.example.timemate.ui.home.ScheduleDetailAdapter;
+import com.example.timemate.utils.NavigationHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -109,35 +110,14 @@ public class ScheduleListActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.nav_schedule); // 일정관리 화면
-
-        bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-                    startActivity(new Intent(ScheduleListActivity.this, HomeActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_schedule) {
-                    return true; // 현재 화면
-                } else if (id == R.id.nav_friends) {
-                    startActivity(new Intent(ScheduleListActivity.this, FriendListActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_recommendation) {
-                    startActivity(new Intent(ScheduleListActivity.this, RecommendationActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    startActivity(new Intent(ScheduleListActivity.this, ProfileActivity.class));
-                    finish();
-                    return true;
-                }
-                return false;
-            }
-        });
+        try {
+            Log.d("ScheduleListActivity", "🔧 NavigationHelper를 사용한 바텀 네비게이션 설정");
+            NavigationHelper.setupBottomNavigation(this, R.id.nav_schedule);
+            Log.d("ScheduleListActivity", "✅ 바텀 네비게이션 설정 완료");
+        } catch (Exception e) {
+            Log.e("ScheduleListActivity", "❌ 바텀 네비게이션 설정 오류", e);
+            e.printStackTrace();
+        }
     }
 
     private void loadSchedules() {

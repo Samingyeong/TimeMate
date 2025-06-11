@@ -102,17 +102,39 @@ public class RecommendationActivity extends AppCompatActivity {
             Log.e("RecommendationActivity", "❌ RecommendationActivity 초기화 오류", e);
             e.printStackTrace();
 
-            // 오류 발생 시 사용자에게 알림
-            Toast.makeText(this, "추천 화면을 준비 중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show();
+            // 오류 상세 정보 로그
+            Log.e("RecommendationActivity", "오류 메시지: " + e.getMessage());
+            Log.e("RecommendationActivity", "오류 원인: " + (e.getCause() != null ? e.getCause().getMessage() : "알 수 없음"));
 
-            // 홈 화면으로 이동
+            // 기본 UI라도 표시하려고 시도
             try {
-                Intent homeIntent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
-                startActivity(homeIntent);
-                finish();
-            } catch (Exception fallbackException) {
-                Log.e("RecommendationActivity", "홈 화면 이동 실패", fallbackException);
-                finish();
+                Log.d("RecommendationActivity", "🔧 기본 UI 복구 시도");
+
+                // 최소한의 UI 설정
+                bottomNavigationView = findViewById(R.id.bottomNavigationView);
+                if (bottomNavigationView != null) {
+                    NavigationHelper.setupBottomNavigation(this, R.id.nav_recommendation);
+                    Log.d("RecommendationActivity", "✅ 바텀 네비게이션 복구 성공");
+                }
+
+                // 성공 메시지로 변경
+                Toast.makeText(this, "🎯 추천 페이지가 준비되었습니다!", Toast.LENGTH_SHORT).show();
+                Log.d("RecommendationActivity", "✅ 기본 UI 복구 완료");
+
+            } catch (Exception recoveryException) {
+                Log.e("RecommendationActivity", "❌ UI 복구도 실패", recoveryException);
+
+                // 최종 폴백: 사용자에게 알림 후 홈으로 이동
+                Toast.makeText(this, "추천 화면을 준비 중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show();
+
+                try {
+                    Intent homeIntent = new Intent(this, com.example.timemate.ui.home.HomeActivity.class);
+                    startActivity(homeIntent);
+                    finish();
+                } catch (Exception fallbackException) {
+                    Log.e("RecommendationActivity", "홈 화면 이동 실패", fallbackException);
+                    finish();
+                }
             }
         }
     }
@@ -140,13 +162,24 @@ public class RecommendationActivity extends AppCompatActivity {
             layoutResultsContainer = findViewById(R.id.layoutResultsContainer);
             layoutEmptyState = findViewById(R.id.layoutEmptyState);
 
+            // RecyclerView와 기타 필수 뷰들
+            recyclerRecommendations = findViewById(R.id.recyclerRecommendations);
+            textResultCount = findViewById(R.id.textResultCount);
+
+            // SharedPreferences 초기화
+            sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+
             // 기본 클릭 리스너 설정
             if (btnSearch != null) {
                 btnSearch.setOnClickListener(v -> performImageSearch());
             }
 
-            // 이미지 포함 어댑터 초기화
-            setupImageAdapter();
+            // 이미지 포함 어댑터 초기화 (RecyclerView가 있을 때만)
+            if (recyclerRecommendations != null) {
+                setupImageAdapter();
+            } else {
+                Log.w("RecommendationActivity", "⚠️ recyclerRecommendations가 null이므로 어댑터 설정 건너뜀");
+            }
 
             // 카테고리 버튼 클릭 리스너
             if (btnCategoryRestaurant != null) {
@@ -178,6 +211,11 @@ public class RecommendationActivity extends AppCompatActivity {
      */
     private void selectBasicCategory(String category) {
         try {
+            Log.d("RecommendationActivity", "🏷️ 기본 카테고리 선택: " + category);
+
+            // selectedCategory 변수 설정 (중요!)
+            selectedCategory = category;
+
             // 모든 버튼 초기화
             if (btnCategoryRestaurant != null) btnCategoryRestaurant.setSelected(false);
             if (btnCategoryCafe != null) btnCategoryCafe.setSelected(false);
@@ -199,6 +237,8 @@ public class RecommendationActivity extends AppCompatActivity {
                     if (btnCategoryAccommodation != null) btnCategoryAccommodation.setSelected(true);
                     break;
             }
+
+            Log.d("RecommendationActivity", "✅ 기본 카테고리 선택 완료: " + selectedCategory);
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "카테고리 선택 오류", e);
@@ -1390,24 +1430,7 @@ public class RecommendationActivity extends AppCompatActivity {
         }
     }
 
-    private void setupBottomNavigation() {
-        try {
-            Log.d("RecommendationActivity", "🧭 바텀 네비게이션 설정 시작");
-
-            // BottomNavigationView 존재 확인
-            if (bottomNavigationView == null) {
-                Log.e("RecommendationActivity", "❌ BottomNavigationView가 null입니다");
-                return;
-            }
-
-            // NavigationHelper를 사용한 바텀 네비게이션 설정으로 대체됨
-            Log.d("RecommendationActivity", "🔧 중복된 바텀 네비게이션 설정 제거됨 - NavigationHelper 사용");
-
-        } catch (Exception e) {
-            Log.e("RecommendationActivity", "❌ 바텀 네비게이션 설정 오류", e);
-            e.printStackTrace();
-        }
-    }
+    // 중복된 setupBottomNavigation 메서드 제거됨 - setupBasicBottomNavigation()에서 NavigationHelper 사용
 
     /**
      * 최근 검색 지역 목록 가져오기

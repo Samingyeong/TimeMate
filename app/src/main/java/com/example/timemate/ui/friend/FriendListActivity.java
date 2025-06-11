@@ -21,6 +21,7 @@ import com.example.timemate.ui.recommendation.RecommendationActivity;
 import com.example.timemate.features.profile.ProfileActivity;
 import com.example.timemate.util.UserSession;
 import com.example.timemate.features.friend.FriendAddActivity;
+import com.example.timemate.utils.NavigationHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -87,35 +88,14 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
-        bottomNav.setSelectedItemId(R.id.nav_friends);
-
-        bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_home) {
-                    startActivity(new Intent(FriendListActivity.this, HomeActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_schedule) {
-                    startActivity(new Intent(FriendListActivity.this, com.example.timemate.ui.schedule.ScheduleListActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_friends) {
-                    return true; // 현재 화면
-                } else if (id == R.id.nav_recommendation) {
-                    startActivity(new Intent(FriendListActivity.this, RecommendationActivity.class));
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    startActivity(new Intent(FriendListActivity.this, ProfileActivity.class));
-                    finish();
-                    return true;
-                }
-                return false;
-            }
-        });
+        try {
+            Log.d("FriendListActivity", "🔧 NavigationHelper를 사용한 바텀 네비게이션 설정");
+            NavigationHelper.setupBottomNavigation(this, R.id.nav_friends);
+            Log.d("FriendListActivity", "✅ 바텀 네비게이션 설정 완료");
+        } catch (Exception e) {
+            Log.e("FriendListActivity", "❌ 바텀 네비게이션 설정 오류", e);
+            e.printStackTrace();
+        }
     }
 
     private void loadFriends() {
