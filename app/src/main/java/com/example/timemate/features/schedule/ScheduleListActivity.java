@@ -131,9 +131,7 @@ public class ScheduleListActivity extends AppCompatActivity {
             Log.d(TAG, "🗄️ 데이터베이스 확인 중...");
             verifyDatabaseTables();
 
-            // 테스트 일정 생성 (개발용)
-            Log.d(TAG, "🧪 테스트 데이터 확인 중...");
-            createTestScheduleIfEmpty();
+            // 테스트 데이터 생성 제거됨
 
             // 일정 로드
             Log.d(TAG, "📊 일정 로드 중...");
@@ -463,11 +461,7 @@ public class ScheduleListActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_ADD_SCHEDULE);
         });
 
-        // 디버깅용: FAB 길게 누르면 테스트 사용자 생성
-        fabAddSchedule.setOnLongClickListener(v -> {
-            createTestUsers();
-            return true;
-        });
+        // 테스트 사용자 생성 기능 제거됨
 
         // 디버깅용 강제 새로고침 (헤더 더블 탭)
         if (findViewById(R.id.layoutHeader) != null) {
@@ -521,49 +515,7 @@ public class ScheduleListActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 테스트 일정 생성 (개발용)
-     */
-    private void createTestScheduleIfEmpty() {
-        executor.execute(() -> {
-            try {
-                String currentUserId = userSession.getCurrentUserId();
-                if (currentUserId == null) return;
-
-                // 기존 일정 수 확인
-                List<Schedule> existingSchedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
-
-                if (existingSchedules.isEmpty()) {
-                    Log.d(TAG, "🔧 일정이 없어서 테스트 일정 생성");
-
-                    // 테스트 일정 생성
-                    Schedule testSchedule = new Schedule();
-                    testSchedule.userId = currentUserId;
-                    testSchedule.title = "테스트 일정";
-                    testSchedule.date = "2024-12-20";
-                    testSchedule.time = "14:00";
-                    testSchedule.departure = "서울역";
-                    testSchedule.destination = "강남역";
-                    testSchedule.memo = "테스트용 일정입니다";
-                    testSchedule.isCompleted = false;
-                    testSchedule.createdAt = System.currentTimeMillis();
-                    testSchedule.updatedAt = System.currentTimeMillis();
-
-                    long insertedId = database.scheduleDao().insert(testSchedule);
-                    Log.d(TAG, "✅ 테스트 일정 생성 완료: ID=" + insertedId);
-
-                    runOnUiThread(() -> {
-                        Toast.makeText(this, "테스트 일정이 생성되었습니다", Toast.LENGTH_SHORT).show();
-                    });
-                } else {
-                    Log.d(TAG, "📋 기존 일정이 " + existingSchedules.size() + "개 있어서 테스트 일정 생성 안함");
-                }
-
-            } catch (Exception e) {
-                Log.e(TAG, "❌ 테스트 일정 생성 오류", e);
-            }
-        });
-    }
+    // 테스트 일정 생성 메서드 제거됨
 
     private void loadSchedules() {
         Log.d(TAG, "🔄 일정 로드 시작");
@@ -678,8 +630,7 @@ public class ScheduleListActivity extends AppCompatActivity {
                         // 캘린더에 일정 날짜 업데이트
                         updateCalendarSchedules();
 
-                        // 디버깅: 화면에 사용자 정보 표시
-                        showDebugInfo(currentUserId, schedules, allSchedulesInDB);
+                        // 디버깅 정보 표시 제거됨
 
                         // Empty State 처리
                         if (schedules == null || schedules.isEmpty()) {
@@ -1324,109 +1275,7 @@ public class ScheduleListActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 디버깅 정보를 화면에 표시
-     */
-    private void showDebugInfo(String currentUserId, List<Schedule> userSchedules, List<Schedule> allSchedules) {
-        try {
-            // 먼저 데이터베이스의 모든 사용자 확인
-            executor.execute(() -> {
-                try {
-                    List<com.example.timemate.data.model.User> allUsers = database.userDao().getAllUsers();
+    // 디버깅 정보 표시 메서드 제거됨
 
-                    runOnUiThread(() -> {
-                        StringBuilder debugInfo = new StringBuilder();
-                        debugInfo.append("🔍 디버깅 정보\n");
-                        debugInfo.append("현재 사용자: ").append(currentUserId).append("\n");
-                        debugInfo.append("내 일정 수: ").append(userSchedules != null ? userSchedules.size() : 0).append("\n");
-                        debugInfo.append("전체 일정 수: ").append(allSchedules != null ? allSchedules.size() : 0).append("\n");
-                        debugInfo.append("등록된 사용자 수: ").append(allUsers != null ? allUsers.size() : 0).append("\n\n");
-
-                        if (allUsers != null && !allUsers.isEmpty()) {
-                            debugInfo.append("등록된 사용자들:\n");
-                            for (com.example.timemate.data.model.User user : allUsers) {
-                                debugInfo.append("- ").append(user.nickname).append(" (").append(user.userId).append(")\n");
-                            }
-                            debugInfo.append("\n");
-                        }
-
-                        if (allSchedules != null && !allSchedules.isEmpty()) {
-                            debugInfo.append("전체 일정 목록:\n");
-                            for (Schedule s : allSchedules) {
-                                debugInfo.append("- ").append(s.title).append(" (").append(s.userId).append(")\n");
-                            }
-                        }
-
-                        // Toast로 표시 (길면 여러 번 나눠서)
-                        String debugText = debugInfo.toString();
-                        if (debugText.length() > 300) {
-                            // 첫 번째 부분만 표시
-                            String firstPart = debugText.substring(0, Math.min(300, debugText.length()));
-                            Toast.makeText(this, firstPart + "...", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(this, debugText, Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                } catch (Exception e) {
-                    Log.e(TAG, "사용자 정보 조회 오류", e);
-                }
-            });
-
-        } catch (Exception e) {
-            Log.e(TAG, "디버깅 정보 표시 오류", e);
-        }
-    }
-
-    /**
-     * 테스트 사용자들 생성 (디버깅용)
-     */
-    private void createTestUsers() {
-        executor.execute(() -> {
-            try {
-                // 테스트 사용자 1
-                com.example.timemate.data.model.User user1 = database.userDao().getUserById("test_user_1");
-                if (user1 == null) {
-                    user1 = new com.example.timemate.data.model.User();
-                    user1.userId = "test_user_1";
-                    user1.nickname = "테스트사용자1";
-                    user1.email = "test1@example.com";
-                    user1.password = "password";
-                    database.userDao().insert(user1);
-                    Log.d(TAG, "테스트 사용자 1 생성 완료");
-                }
-
-                // 테스트 사용자 2
-                com.example.timemate.data.model.User user2 = database.userDao().getUserById("test_user_2");
-                if (user2 == null) {
-                    user2 = new com.example.timemate.data.model.User();
-                    user2.userId = "test_user_2";
-                    user2.nickname = "테스트사용자2";
-                    user2.email = "test2@example.com";
-                    user2.password = "password";
-                    database.userDao().insert(user2);
-                    Log.d(TAG, "테스트 사용자 2 생성 완료");
-                }
-
-                // 테스트 사용자 3
-                com.example.timemate.data.model.User user3 = database.userDao().getUserById("test_user_3");
-                if (user3 == null) {
-                    user3 = new com.example.timemate.data.model.User();
-                    user3.userId = "test_user_3";
-                    user3.nickname = "테스트사용자3";
-                    user3.email = "test3@example.com";
-                    user3.password = "password";
-                    database.userDao().insert(user3);
-                    Log.d(TAG, "테스트 사용자 3 생성 완료");
-                }
-
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "테스트 사용자들이 생성되었습니다\ntest_user_1, test_user_2, test_user_3\n비밀번호: password", Toast.LENGTH_LONG).show();
-                });
-
-            } catch (Exception e) {
-                Log.e(TAG, "테스트 사용자 생성 오류", e);
-            }
-        });
-    }
+    // 테스트 사용자 생성 메서드 제거됨
 }

@@ -5,6 +5,7 @@ import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
 import com.example.timemate.core.util.UserSession;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -46,24 +47,21 @@ public class HomePresenter {
                     return;
                 }
 
-                // 오늘 날짜 범위 계산
-                Calendar today = Calendar.getInstance();
-                today.set(Calendar.HOUR_OF_DAY, 0);
-                today.set(Calendar.MINUTE, 0);
-                today.set(Calendar.SECOND, 0);
-                today.set(Calendar.MILLISECOND, 0);
-                Date startOfDay = today.getTime();
-
-                today.add(Calendar.DAY_OF_MONTH, 1);
-                Date startOfNextDay = today.getTime();
-
-                // 오늘 일정 조회 - Date를 String으로 변환
+                // 오늘 날짜 문자열 생성
                 java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                String startDateStr = dateFormat.format(startOfDay);
-                String endDateStr = dateFormat.format(startOfNextDay);
+                String todayStr = dateFormat.format(new Date());
 
-                List<Schedule> schedules = database.scheduleDao()
-                    .getSchedulesByUserAndDateRange(userId, startDateStr, endDateStr);
+                // 오늘 일정 조회 - 정확한 날짜 매칭
+                List<Schedule> allSchedules = database.scheduleDao().getSchedulesByUserId(userId);
+                List<Schedule> schedules = new ArrayList<>();
+
+                for (Schedule schedule : allSchedules) {
+                    if (todayStr.equals(schedule.date)) {
+                        schedules.add(schedule);
+                    }
+                }
+
+                android.util.Log.d("HomePresenter", "오늘(" + todayStr + ") 일정 조회 결과: " + schedules.size() + "개");
 
                 callback.onSchedulesLoaded(schedules);
 
@@ -87,25 +85,23 @@ public class HomePresenter {
                     return;
                 }
 
-                // 내일 날짜 범위 계산
+                // 내일 날짜 문자열 생성
                 Calendar tomorrow = Calendar.getInstance();
                 tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-                tomorrow.set(Calendar.HOUR_OF_DAY, 0);
-                tomorrow.set(Calendar.MINUTE, 0);
-                tomorrow.set(Calendar.SECOND, 0);
-                tomorrow.set(Calendar.MILLISECOND, 0);
-                Date startOfTomorrow = tomorrow.getTime();
-
-                tomorrow.add(Calendar.DAY_OF_MONTH, 1);
-                Date startOfDayAfterTomorrow = tomorrow.getTime();
-
-                // 내일 일정 조회 - Date를 String으로 변환
                 java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
-                String startTomorrowStr = dateFormat.format(startOfTomorrow);
-                String endTomorrowStr = dateFormat.format(startOfDayAfterTomorrow);
+                String tomorrowStr = dateFormat.format(tomorrow.getTime());
 
-                List<Schedule> schedules = database.scheduleDao()
-                    .getSchedulesByUserAndDateRange(userId, startTomorrowStr, endTomorrowStr);
+                // 내일 일정 조회 - 정확한 날짜 매칭
+                List<Schedule> allSchedules = database.scheduleDao().getSchedulesByUserId(userId);
+                List<Schedule> schedules = new ArrayList<>();
+
+                for (Schedule schedule : allSchedules) {
+                    if (tomorrowStr.equals(schedule.date)) {
+                        schedules.add(schedule);
+                    }
+                }
+
+                android.util.Log.d("HomePresenter", "내일(" + tomorrowStr + ") 일정 조회 결과: " + schedules.size() + "개");
 
                 callback.onSchedulesLoaded(schedules);
 

@@ -129,7 +129,6 @@ public class FriendAddActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     userSession.login(finalTestUserId, finalTestUserName);
                     Log.d(TAG, "테스트 사용자 자동 로그인 완료: " + finalTestUserId);
-                    Toast.makeText(this, "테스트 사용자로 자동 로그인되었습니다", Toast.LENGTH_SHORT).show();
                 });
 
             } catch (Exception e) {
@@ -204,9 +203,7 @@ public class FriendAddActivity extends AppCompatActivity {
 
                     if (userId > 0) {
                         Log.d(TAG, "테스트용 사용자 생성 성공: " + friendId);
-                        runOnUiThread(() -> {
-                            Toast.makeText(this, "테스트용 사용자 '" + friendId + "'를 생성했습니다", Toast.LENGTH_SHORT).show();
-                        });
+                        // 테스트 사용자 생성 완료
                     } else {
                         Log.e(TAG, "테스트용 사용자 생성 실패");
                         runOnUiThread(() -> {
@@ -328,7 +325,7 @@ public class FriendAddActivity extends AppCompatActivity {
                 if (friendId1 > 0 && friendId2 > 0) {
                     Log.d(TAG, "✅ 친구 추가 성공: " + friendNickname + " (DB ID: " + friendId1 + ", " + friendId2 + ")");
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_SHORT).show();
                         clearInputFields();
 
                         // 성공 결과를 부모 Activity에 전달

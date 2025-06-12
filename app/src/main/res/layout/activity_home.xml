@@ -140,13 +140,12 @@
 
             </LinearLayout>
 
-            <!-- 오늘 일정 박스 -->
+            <!-- 일정 미리보기 섹션 -->
             <LinearLayout
-                android:id="@+id/layoutTodayScheduleBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/ios_card_background"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -157,12 +156,12 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="오늘의 일정"
+                        android:text="일정 미리보기"
                         style="@style/iOSHeadline"
                         android:textColor="@color/text_primary" />
 
@@ -175,31 +174,78 @@
                         android:id="@+id/textTodayDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="12월 25일 (수)"
+                        android:text="오늘 · 내일"
                         style="@style/iOSCallout"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
 
-                <!-- 오늘 일정 리스트 -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerTodayScheduleBox"
+                <!-- 오늘 일정 섹션 -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="12dp">
 
-                <!-- 일정 없을 때 메시지 -->
-                <TextView
-                    android:id="@+id/textNoScheduleToday"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="오늘"
+                        style="@style/iOSSubheadline"
+                        android:textColor="@color/ios_blue"
+                        android:layout_marginBottom="8dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerTodaySchedule"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <TextView
+                        android:id="@+id/textNoScheduleToday"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="오늘 예정된 일정이 없습니다"
+                        style="@style/iOSCallout"
+                        android:textColor="@color/text_secondary"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- 내일 일정 섹션 -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="오늘 예정된 일정이 없습니다 ✨"
-                    style="@style/iOSCallout"
-                    android:textColor="@color/text_secondary"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:visibility="gone" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="내일"
+                        style="@style/iOSSubheadline"
+                        android:textColor="@color/ios_green"
+                        android:layout_marginBottom="8dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerTomorrowSchedule"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false" />
+
+                    <TextView
+                        android:id="@+id/textNoScheduleTomorrow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="내일 예정된 일정이 없습니다"
+                        style="@style/iOSCallout"
+                        android:textColor="@color/text_secondary"
+                        android:gravity="center"
+                        android:padding="12dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
@@ -207,7 +253,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
 
@@ -215,23 +261,23 @@
                 <LinearLayout
                     android:id="@+id/btnQuickAddSchedule"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
+                    android:layout_marginEnd="8dp"
                     android:background="@drawable/ios_card_background"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_add"
                         app:tint="@color/pastel_pink"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="6dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -246,23 +292,23 @@
                 <LinearLayout
                     android:id="@+id/btnViewAllSchedules"
                     android:layout_width="0dp"
-                    android:layout_height="100dp"
+                    android:layout_height="80dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="8dp"
                     android:background="@drawable/ios_card_background"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:foreground="?android:attr/selectableItemBackground">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
                         android:src="@drawable/ic_calendar"
                         app:tint="@color/pastel_pink"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="6dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -275,23 +321,7 @@
 
             </LinearLayout>
 
-            <!-- 오늘 일정 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTodaySchedule"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="20dp"
-                android:visibility="gone" />
-
-            <!-- 내일 일정 -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerTomorrowSchedule"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="10dp"
-                android:visibility="gone" />
+            <!-- 중복된 RecyclerView 제거됨 -->
 
             <!-- 내일 일정 미리보기 카드 -->
             <com.google.android.material.card.MaterialCardView

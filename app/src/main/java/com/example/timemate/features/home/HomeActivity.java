@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +56,8 @@ public class HomeActivity extends AppCompatActivity {
     private TextView textGreeting;
     private RecyclerView recyclerTodaySchedule;
     private RecyclerView recyclerTomorrowSchedule;
+    private TextView textNoScheduleToday;
+    private TextView textNoScheduleTomorrow;
 
     // 날씨 정보 UI 컴포넌트들
     private TextView textTemperature;
@@ -144,6 +147,8 @@ public class HomeActivity extends AppCompatActivity {
         textGreeting = null; // 레이아웃에 없음
         recyclerTodaySchedule = findViewById(R.id.recyclerTodaySchedule);
         recyclerTomorrowSchedule = findViewById(R.id.recyclerTomorrowSchedule);
+        textNoScheduleToday = findViewById(R.id.textNoScheduleToday);
+        textNoScheduleTomorrow = findViewById(R.id.textNoScheduleTomorrow);
 
         // 내일 출발 추천 카드 RecyclerView (현재 레이아웃에 없으므로 null로 설정)
         recyclerTomorrowReminders = null; // 향후 레이아웃에 추가될 예정
@@ -202,31 +207,24 @@ public class HomeActivity extends AppCompatActivity {
         if (btnViewAllSchedules != null) {
             btnViewAllSchedules.setOnClickListener(v -> {
                 try {
-                    Log.d("HomeActivity", "🔍 일정보기 버튼 클릭됨");
-
                     // Activity 상태 확인
                     if (isFinishing() || isDestroyed()) {
-                        Log.w("HomeActivity", "❌ Activity가 종료 중이므로 화면 전환을 건너뜁니다");
                         return;
                     }
 
                     // UserSession 상태 확인
                     UserSession userSession = UserSession.getInstance(this);
                     if (userSession == null || !userSession.isLoggedIn()) {
-                        Log.w("HomeActivity", "❌ 사용자가 로그인되지 않음");
                         Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
-                    Log.d("HomeActivity", "✅ 사용자 로그인 상태 확인 완료");
 
                     // 안전한 Activity 전환
                     safeStartActivity(ScheduleListActivity.class);
 
                 } catch (Exception e) {
-                    Log.e("HomeActivity", "❌ 일정보기 버튼 클릭 오류", e);
-                    e.printStackTrace();
-                    Toast.makeText(this, "일정 화면을 열 수 없습니다: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("HomeActivity", "일정보기 버튼 클릭 오류", e);
+                    Toast.makeText(this, "일정 화면을 열 수 없습니다", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -236,12 +234,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         try {
-            Log.d("HomeActivity", "🔧 NavigationHelper를 사용한 바텀 네비게이션 설정");
             NavigationHelper.setupBottomNavigation(this, R.id.nav_home);
-            Log.d("HomeActivity", "✅ 바텀 네비게이션 설정 완료");
         } catch (Exception e) {
-            Log.e("HomeActivity", "❌ 바텀 네비게이션 설정 오류", e);
-            e.printStackTrace();
+            Log.e("HomeActivity", "바텀 네비게이션 설정 오류", e);
         }
     }
 
@@ -330,7 +325,22 @@ public class HomeActivity extends AppCompatActivity {
     private void loadTodaySchedules() {
         presenter.loadTodaySchedules(schedules -> {
             runOnUiThread(() -> {
-                todayAdapter.updateSchedules(schedules);
+                if (todayAdapter != null) {
+                    todayAdapter.updateSchedules(schedules);
+
+                    // RecyclerView 표시/숨김 처리
+                    if (recyclerTodaySchedule != null && textNoScheduleToday != null) {
+                        if (schedules != null && !schedules.isEmpty()) {
+                            recyclerTodaySchedule.setVisibility(View.VISIBLE);
+                            textNoScheduleToday.setVisibility(View.GONE);
+                            Log.d("HomeActivity", "오늘 일정 표시: " + schedules.size() + "개");
+                        } else {
+                            recyclerTodaySchedule.setVisibility(View.GONE);
+                            textNoScheduleToday.setVisibility(View.VISIBLE);
+                            Log.d("HomeActivity", "오늘 일정 없음");
+                        }
+                    }
+                }
             });
         });
     }
@@ -338,7 +348,22 @@ public class HomeActivity extends AppCompatActivity {
     private void loadTomorrowSchedules() {
         presenter.loadTomorrowSchedules(schedules -> {
             runOnUiThread(() -> {
-                tomorrowAdapter.updateSchedules(schedules);
+                if (tomorrowAdapter != null) {
+                    tomorrowAdapter.updateSchedules(schedules);
+
+                    // RecyclerView 표시/숨김 처리
+                    if (recyclerTomorrowSchedule != null && textNoScheduleTomorrow != null) {
+                        if (schedules != null && !schedules.isEmpty()) {
+                            recyclerTomorrowSchedule.setVisibility(View.VISIBLE);
+                            textNoScheduleTomorrow.setVisibility(View.GONE);
+                            Log.d("HomeActivity", "내일 일정 표시: " + schedules.size() + "개");
+                        } else {
+                            recyclerTomorrowSchedule.setVisibility(View.GONE);
+                            textNoScheduleTomorrow.setVisibility(View.VISIBLE);
+                            Log.d("HomeActivity", "내일 일정 없음");
+                        }
+                    }
+                }
             });
         });
     }

@@ -273,8 +273,6 @@ public class FriendListActivity extends AppCompatActivity {
                         // 친구 목록이 비어있으면 안내 메시지
                         if (friendList.isEmpty()) {
                             Toast.makeText(this, "등록된 친구가 없습니다. 친구를 추가해보세요!", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(this, "친구 목록이 업데이트되었습니다 (" + friendList.size() + "명)", Toast.LENGTH_SHORT).show();
                         }
 
                     } catch (Exception uiException) {
@@ -382,7 +380,6 @@ public class FriendListActivity extends AppCompatActivity {
                 }
 
                 Log.d(TAG, "🔄 친구 추가 성공 - 즉시 목록 새로고침 시작");
-                Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_SHORT).show();
 
                 // 즉시 새로고침 (약간의 지연 후)
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {

@@ -36,6 +36,12 @@
             </intent-filter>
         </activity>
 
+        <!-- 스플래시 화면 (나중에 활성화) -->
+        <activity
+            android:name=".SplashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
         <activity android:name=".SignupFormActivity" />
         <activity android:name=".ManualLoginActivity" />
         <activity android:name=".PasswordResetActivity" />
