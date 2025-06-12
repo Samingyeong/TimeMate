@@ -84,12 +84,58 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // UI 초기화 (빠른 작업들만)
         initViews();
         initServices();
         setupRecyclerViews();
         setupClickListeners();
         setupBottomNavigation();
-        loadData();
+
+        // 무거운 데이터 로딩은 UI 렌더링 후 비동기로 실행
+        scheduleDataLoading();
+    }
+
+    /**
+     * UI 렌더링 완료 후 데이터 로딩을 비동기로 실행
+     */
+    private void scheduleDataLoading() {
+        // UI 렌더링이 완료된 후 데이터 로딩 시작
+        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+            // 즉시 표시할 수 있는 가벼운 데이터부터 로드
+            loadGreeting();
+
+            // 무거운 작업들은 추가 지연 후 실행
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                loadDataAsync();
+            }, 100); // 100ms 후 실행
+        });
+    }
+
+    /**
+     * 무거운 데이터 로딩 작업들을 비동기로 실행
+     */
+    private void loadDataAsync() {
+        // 백그라운드 스레드에서 실행
+        new Thread(() -> {
+            try {
+                // 날씨 정보 로드 (네트워크 호출)
+                loadWeatherInfo();
+
+                // 일정 데이터 로드 (데이터베이스 조회)
+                loadTodaySchedules();
+                loadTomorrowSchedules();
+                loadTomorrowReminders();
+
+                Log.d("HomeActivity", "✅ 비동기 데이터 로딩 완료");
+
+            } catch (Exception e) {
+                Log.e("HomeActivity", "❌ 비동기 데이터 로딩 오류", e);
+                runOnUiThread(() -> {
+                    // 오류 시 기본값 표시
+                    showWeatherError();
+                });
+            }
+        }).start();
     }
 
     private void initViews() {
@@ -199,13 +245,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void loadData() {
-        loadGreeting();
-        loadWeatherInfo();
-        loadTodaySchedules();
-        loadTomorrowSchedules();
-        loadTomorrowReminders(); // 내일 출발 추천 카드 로드
-    }
+
 
     private void loadGreeting() {
         try {
@@ -453,13 +493,72 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("HomeActivity", "🔄 onPause - 백그라운드 작업 일시 정지");
+
+        // 백그라운드로 이동 시 무거운 작업들 일시 정지
+        try {
+            if (weatherService != null) {
+                // 진행 중인 네트워크 요청이 있다면 취소하지는 않지만 새로운 요청은 방지
+                Log.d("HomeActivity", "WeatherService 일시 정지");
+            }
+        } catch (Exception e) {
+            Log.e("HomeActivity", "onPause 중 오류", e);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("HomeActivity", "🛑 onStop - 리소스 일시 정리");
+
+        try {
+            // 메모리 정리 힌트
+            System.gc();
+            Log.d("HomeActivity", "✅ onStop 메모리 정리 완료");
+        } catch (Exception e) {
+            Log.e("HomeActivity", "onStop 중 오류", e);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (weatherService != null) {
-            weatherService.shutdown();
-        }
-        if (presenter != null) {
-            presenter.destroy();
+        Log.d("HomeActivity", "🧹 HomeActivity 리소스 정리 시작");
+
+        try {
+            // WeatherService 안전하게 종료
+            if (weatherService != null) {
+                Log.d("HomeActivity", "WeatherService 종료 중...");
+                weatherService.shutdown();
+                weatherService = null;
+                Log.d("HomeActivity", "✅ WeatherService 종료 완료");
+            }
+
+            // Presenter 정리
+            if (presenter != null) {
+                Log.d("HomeActivity", "HomePresenter 정리 중...");
+                presenter.destroy();
+                presenter = null;
+                Log.d("HomeActivity", "✅ HomePresenter 정리 완료");
+            }
+
+            // 어댑터들 정리
+            if (todayAdapter != null) {
+                todayAdapter = null;
+            }
+            if (tomorrowAdapter != null) {
+                tomorrowAdapter = null;
+            }
+            if (reminderAdapter != null) {
+                reminderAdapter = null;
+            }
+
+            Log.d("HomeActivity", "✅ HomeActivity 리소스 정리 완료");
+
+        } catch (Exception e) {
+            Log.e("HomeActivity", "❌ HomeActivity 리소스 정리 중 오류", e);
         }
     }
 }

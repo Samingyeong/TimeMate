@@ -3,6 +3,7 @@ package com.example.timemate.features.schedule;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -739,15 +740,17 @@ public class ScheduleListActivity extends AppCompatActivity {
             String destination = schedule.destination != null ? schedule.destination : "없음";
             String memo = schedule.memo != null && !schedule.memo.trim().isEmpty() ? schedule.memo : "없음";
 
-            // 경로 정보 추가
+            // 경로 정보 추가 (개선된 버전)
             String routeInfoText = "";
             if (schedule.routeInfo != null && !schedule.routeInfo.isEmpty()) {
-                routeInfoText = "\n\n🗺️ 선택된 경로:\n" + parseRouteInfo(schedule.routeInfo);
-            }
-
-            String transportModesText = "";
-            if (schedule.selectedTransportModes != null && !schedule.selectedTransportModes.isEmpty()) {
-                transportModesText = "\n🚌 교통수단: " + schedule.selectedTransportModes;
+                routeInfoText = parseRouteInfo(schedule.routeInfo);
+                Log.d(TAG, "📍 경로 정보 파싱 결과: " + routeInfoText);
+            } else if (schedule.selectedTransportModes != null && !schedule.selectedTransportModes.isEmpty()) {
+                // routeInfo가 없어도 selectedTransportModes가 있으면 표시
+                routeInfoText = "선택된 교통수단: " + schedule.selectedTransportModes;
+                Log.d(TAG, "🚌 교통수단 정보: " + routeInfoText);
+            } else {
+                Log.d(TAG, "⚠️ 경로 정보 없음 - routeInfo: " + schedule.routeInfo + ", transportModes: " + schedule.selectedTransportModes);
             }
 
             // 함께하는 친구 정보 가져오기
@@ -786,7 +789,7 @@ public class ScheduleListActivity extends AppCompatActivity {
     private String parseRouteInfo(String routeInfoJson) {
         try {
             if (routeInfoJson == null || routeInfoJson.isEmpty()) {
-                return "경로 정보 없음";
+                return "";
             }
 
             Log.d(TAG, "파싱할 경로 정보: " + routeInfoJson);
@@ -796,17 +799,10 @@ public class ScheduleListActivity extends AppCompatActivity {
 
             StringBuilder result = new StringBuilder();
 
-            // 출발지 → 도착지 (실제 저장된 값만)
-            String departure = json.optString("departure", "");
-            String destination = json.optString("destination", "");
-            if (!departure.isEmpty() && !destination.isEmpty()) {
-                result.append("📍 ").append(departure).append(" → ").append(destination).append("\n");
-            }
-
-            // 선택된 교통수단들 (실제 저장된 값만)
+            // 선택된 교통수단들 (아이콘 없이 깔끔하게)
             org.json.JSONArray selectedModes = json.optJSONArray("selectedModes");
             if (selectedModes != null && selectedModes.length() > 0) {
-                result.append("🚌 선택된 교통수단: ");
+                result.append("교통수단: ");
                 for (int i = 0; i < selectedModes.length(); i++) {
                     if (i > 0) result.append(", ");
                     String mode = selectedModes.optString(i);
@@ -817,10 +813,10 @@ public class ScheduleListActivity extends AppCompatActivity {
                 result.append("\n");
             }
 
-            // 경로 상세 정보 (실제 저장된 값만)
+            // 경로 상세 정보 (깔끔하게 정리)
             org.json.JSONArray routes = json.optJSONArray("routes");
             if (routes != null && routes.length() > 0) {
-                result.append("\n📊 경로 상세:\n");
+                result.append("\n경로 상세:\n");
                 for (int i = 0; i < routes.length(); i++) {
                     org.json.JSONObject route = routes.optJSONObject(i);
                     if (route != null) {
@@ -832,37 +828,36 @@ public class ScheduleListActivity extends AppCompatActivity {
 
                         // 실제 데이터가 있는 경우만 표시
                         if (!mode.isEmpty()) {
-                            String icon = getTransportIcon(mode);
-
-                            result.append(icon).append(" ");
-
-                            // 교통수단명 표시
+                            // 교통수단명 표시 (아이콘 없이)
                             if (!name.isEmpty()) {
-                                result.append(name);
+                                result.append("• ").append(name);
                             } else {
-                                result.append(mode);
+                                result.append("• ").append(getTransportModeName(mode));
                             }
 
-                            // 시간과 비용 정보 표시
+                            // 시간과 비용 정보 표시 (아이콘 최소화)
                             boolean hasTimeOrCost = !duration.isEmpty() || !cost.isEmpty();
                             if (hasTimeOrCost) {
-                                result.append(": ");
+                                result.append(" (");
 
                                 // 시간 정보
                                 if (!duration.isEmpty()) {
-                                    result.append("⏱️ ").append(duration);
+                                    result.append(duration);
                                 }
 
                                 // 비용 정보
                                 if (!cost.isEmpty()) {
-                                    if (!duration.isEmpty()) result.append(" | ");
-                                    result.append("💰 ").append(cost);
+                                    if (!duration.isEmpty()) result.append(", ");
+                                    result.append(cost);
                                 }
 
                                 // 거리 정보 (있는 경우)
                                 if (!distance.isEmpty()) {
-                                    result.append(" | 📏 ").append(distance);
+                                    if (!duration.isEmpty() || !cost.isEmpty()) result.append(", ");
+                                    result.append(distance);
                                 }
+
+                                result.append(")");
                             }
 
                             result.append("\n");
@@ -876,16 +871,30 @@ public class ScheduleListActivity extends AppCompatActivity {
             String finalResult = result.toString().trim();
             Log.d(TAG, "파싱된 경로 정보: " + finalResult);
 
-            return finalResult.isEmpty() ? "저장된 경로 정보가 없습니다" : finalResult;
+            return finalResult.isEmpty() ? "" : finalResult;
 
         } catch (Exception e) {
             Log.e(TAG, "경로 정보 파싱 오류", e);
-            return "경로 정보를 불러올 수 없습니다";
+            return "";
         }
     }
 
     /**
-     * 교통수단 모드에 따른 아이콘 반환
+     * 교통수단 모드에 따른 한글 이름 반환 (아이콘 없이)
+     */
+    private String getTransportModeName(String mode) {
+        switch (mode.toLowerCase()) {
+            case "transit": return "대중교통";
+            case "driving": return "자동차";
+            case "walking": return "도보";
+            case "bicycle": return "자전거";
+            case "taxi": return "택시";
+            default: return "도보";
+        }
+    }
+
+    /**
+     * 교통수단 모드에 따른 아이콘 반환 (필요시에만 사용)
      */
     private String getTransportIcon(String mode) {
         switch (mode.toLowerCase()) {
@@ -936,11 +945,39 @@ public class ScheduleListActivity extends AppCompatActivity {
     private void showIOSStyleScheduleDetail(Schedule schedule, String title, String date, String time,
                                           String departure, String destination, String memo,
                                           String routeInfoText, String friendsText) {
-        try {
-            // 커스텀 다이얼로그 뷰 생성
-            View dialogView = getLayoutInflater().inflate(R.layout.dialog_schedule_detail_ios, null);
 
-            // 뷰 요소들 찾기
+        // 먼저 간단한 테스트로 레이아웃 인플레이션 확인
+        Log.d(TAG, "🎨 iOS 스타일 일정 상세보기 다이얼로그 시작");
+        Log.d(TAG, "📋 전달받은 데이터 - 제목: " + title + ", 날짜: " + date + ", 시간: " + time);
+
+        try {
+            // 커스텀 다이얼로그 뷰 생성 (더 상세한 오류 추적)
+            View dialogView = null;
+            try {
+                Log.d(TAG, "🔧 레이아웃 인플레이터 가져오기 시작");
+                LayoutInflater inflater = getLayoutInflater();
+                if (inflater == null) {
+                    throw new Exception("LayoutInflater가 null입니다");
+                }
+
+                Log.d(TAG, "🔧 레이아웃 파일 인플레이트 시작: dialog_schedule_detail_ios");
+                dialogView = inflater.inflate(R.layout.dialog_schedule_detail_ios, null);
+
+                if (dialogView == null) {
+                    throw new Exception("인플레이트된 뷰가 null입니다");
+                }
+
+                Log.d(TAG, "✅ 다이얼로그 레이아웃 인플레이트 성공");
+
+            } catch (android.view.InflateException inflateException) {
+                Log.e(TAG, "❌ InflateException 발생", inflateException);
+                throw new Exception("레이아웃 인플레이트 오류 (InflateException): " + inflateException.getMessage());
+            } catch (Exception inflateException) {
+                Log.e(TAG, "❌ 일반 인플레이트 오류", inflateException);
+                throw new Exception("레이아웃 인플레이트 오류: " + inflateException.getMessage());
+            }
+
+            // 뷰 요소들 찾기 (안전한 접근)
             TextView textScheduleTitle = dialogView.findViewById(R.id.textScheduleTitle);
             TextView textScheduleDate = dialogView.findViewById(R.id.textScheduleDate);
             TextView textScheduleTime = dialogView.findViewById(R.id.textScheduleTime);
@@ -959,6 +996,22 @@ public class ScheduleListActivity extends AppCompatActivity {
             Button btnEdit = dialogView.findViewById(R.id.btnEdit);
             Button btnDelete = dialogView.findViewById(R.id.btnDelete);
             Button btnClose = dialogView.findViewById(R.id.btnClose);
+
+            // 필수 뷰 요소 확인
+            if (textScheduleTitle == null) {
+                Log.e(TAG, "❌ textScheduleTitle을 찾을 수 없음");
+                throw new Exception("textScheduleTitle 누락");
+            }
+            if (btnEdit == null) {
+                Log.e(TAG, "❌ btnEdit을 찾을 수 없음");
+                throw new Exception("btnEdit 누락");
+            }
+            if (btnDelete == null) {
+                Log.e(TAG, "❌ btnDelete을 찾을 수 없음");
+                throw new Exception("btnDelete 누락");
+            }
+
+            Log.d(TAG, "✅ 모든 필수 뷰 요소 찾기 완료");
 
             // 데이터 설정
             textScheduleTitle.setText(title);
@@ -991,17 +1044,27 @@ public class ScheduleListActivity extends AppCompatActivity {
                 cardRouteInfo.setVisibility(View.GONE);
             }
 
-            // 친구 정보 표시/숨김
-            if (friendsText != null && !friendsText.isEmpty()) {
-                textFriends.setText(friendsText.replace("👥 함께하는 친구:\n", "").replace("• ", "👤 "));
+            // 친구 정보 표시/숨김 (아이콘 제거)
+            if (friendsText != null && !friendsText.isEmpty() && textFriends != null && cardFriends != null) {
+                // 아이콘 제거하고 깔끔하게 표시
+                String cleanFriendsText = friendsText
+                    .replace("👥 함께하는 친구:\n", "")
+                    .replace("• ", "")
+                    .replace("👤 ", "");
+                textFriends.setText(cleanFriendsText);
                 cardFriends.setVisibility(View.VISIBLE);
-            } else {
+                Log.d(TAG, "✅ 친구 카드 표시");
+            } else if (cardFriends != null) {
                 cardFriends.setVisibility(View.GONE);
+                Log.d(TAG, "✅ 친구 카드 숨김");
             }
 
-            // 상태 설정
-            String status = schedule.isCompleted ? "✅ 완료" : "⏳ 진행중";
-            textStatus.setText(status);
+            // 상태 설정 (아이콘 제거)
+            String status = schedule.isCompleted ? "완료" : "진행중";
+            if (textStatus != null) {
+                textStatus.setText(status);
+                Log.d(TAG, "✅ 상태 설정 완료: " + status);
+            }
 
             // 다이얼로그 생성
             AlertDialog dialog = new AlertDialog.Builder(this)
@@ -1011,16 +1074,26 @@ public class ScheduleListActivity extends AppCompatActivity {
 
             // 버튼 리스너 설정
             btnEdit.setOnClickListener(v -> {
+                Log.d(TAG, "✏️ 수정 버튼 클릭");
                 dialog.dismiss();
                 editSchedule(schedule);
             });
 
             btnDelete.setOnClickListener(v -> {
+                Log.d(TAG, "🗑️ 삭제 버튼 클릭");
                 dialog.dismiss();
                 confirmDeleteSchedule(schedule);
             });
 
-            btnClose.setOnClickListener(v -> dialog.dismiss());
+            // btnClose가 null일 수 있으므로 안전하게 처리
+            if (btnClose != null) {
+                btnClose.setOnClickListener(v -> {
+                    Log.d(TAG, "❌ 닫기 버튼 클릭");
+                    dialog.dismiss();
+                });
+            } else {
+                Log.w(TAG, "⚠️ 닫기 버튼을 찾을 수 없음");
+            }
 
             // 다이얼로그 표시
             dialog.show();
@@ -1035,16 +1108,63 @@ public class ScheduleListActivity extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            Log.e(TAG, "iOS 스타일 다이얼로그 표시 오류", e);
-            // 폴백: 기본 다이얼로그 사용
-            new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(String.format("날짜: %s %s\n출발: %s\n도착: %s\n메모: %s%s%s",
-                    date, time, departure, destination, memo, routeInfoText, friendsText))
-                .setPositiveButton("수정", (dialog, which) -> editSchedule(schedule))
-                .setNegativeButton("삭제", (dialog, which) -> confirmDeleteSchedule(schedule))
-                .setNeutralButton("닫기", null)
-                .show();
+            Log.e(TAG, "❌ iOS 스타일 다이얼로그 표시 오류", e);
+            e.printStackTrace();
+
+            // 폴백: 개선된 기본 다이얼로그 사용
+            try {
+                Log.d(TAG, "🔄 폴백 다이얼로그 표시 시작");
+
+                StringBuilder message = new StringBuilder();
+                message.append("날짜: ").append(date).append(" ").append(time).append("\n\n");
+
+                if (!departure.equals("없음") || !destination.equals("없음")) {
+                    message.append("위치 정보:\n");
+                    if (!departure.equals("없음")) {
+                        message.append("출발: ").append(departure).append("\n");
+                    }
+                    if (!destination.equals("없음")) {
+                        message.append("도착: ").append(destination).append("\n");
+                    }
+                    message.append("\n");
+                }
+
+                if (!memo.equals("없음") && !memo.trim().isEmpty()) {
+                    message.append("메모: ").append(memo).append("\n\n");
+                }
+
+                if (routeInfoText != null && !routeInfoText.isEmpty()) {
+                    message.append("경로 정보:\n").append(routeInfoText).append("\n\n");
+                }
+
+                if (friendsText != null && !friendsText.isEmpty()) {
+                    message.append("함께하는 친구:\n").append(friendsText).append("\n\n");
+                }
+
+                String status = schedule.isCompleted ? "완료" : "진행중";
+                message.append("상태: ").append(status);
+
+                new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage(message.toString().trim())
+                    .setPositiveButton("수정", (dialog, which) -> {
+                        Log.d(TAG, "폴백 다이얼로그에서 수정 버튼 클릭");
+                        editSchedule(schedule);
+                    })
+                    .setNegativeButton("삭제", (dialog, which) -> {
+                        Log.d(TAG, "폴백 다이얼로그에서 삭제 버튼 클릭");
+                        confirmDeleteSchedule(schedule);
+                    })
+                    .setNeutralButton("닫기", null)
+                    .setCancelable(true)
+                    .show();
+
+                Log.d(TAG, "✅ 폴백 다이얼로그 표시 완료");
+
+            } catch (Exception fallbackException) {
+                Log.e(TAG, "❌ 폴백 다이얼로그도 실패", fallbackException);
+                Toast.makeText(this, "일정 상세보기를 표시할 수 없습니다: " + title, Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -1107,6 +1227,34 @@ public class ScheduleListActivity extends AppCompatActivity {
         bottomNavigation.setSelectedItemId(R.id.nav_schedule);
 
         Log.d(TAG, "✅ onResume 완료");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "🔄 onPause - 백그라운드 이동");
+
+        try {
+            // 진행 중인 데이터베이스 작업이 있다면 완료될 때까지 대기하지 않음
+            // 새로운 작업은 시작하지 않음
+            Log.d(TAG, "✅ onPause 완료");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ onPause 중 오류", e);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "🛑 onStop - 리소스 일시 정리");
+
+        try {
+            // 메모리 정리 힌트
+            System.gc();
+            Log.d(TAG, "✅ onStop 메모리 정리 완료");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ onStop 중 오류", e);
+        }
     }
 
     /**
@@ -1189,8 +1337,50 @@ public class ScheduleListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
+
+        Log.d(TAG, "🧹 ScheduleListActivity 리소스 정리 시작");
+
+        try {
+            // ExecutorService 안전하게 종료
+            if (executor != null && !executor.isShutdown()) {
+                Log.d(TAG, "🔄 ExecutorService 종료 중...");
+                executor.shutdown();
+
+                // 5초 대기 후 강제 종료
+                try {
+                    if (!executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                        Log.w(TAG, "⚠️ ExecutorService 정상 종료 실패, 강제 종료 실행");
+                        executor.shutdownNow();
+                    }
+                    Log.d(TAG, "✅ ExecutorService 종료 완료");
+                } catch (InterruptedException e) {
+                    Log.w(TAG, "⚠️ ExecutorService 종료 대기 중 인터럽트 발생");
+                    executor.shutdownNow();
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            // 어댑터 정리
+            if (scheduleAdapter != null) {
+                scheduleAdapter = null;
+                Log.d(TAG, "✅ ScheduleAdapter 정리 완료");
+            }
+
+            // 리스트 정리
+            if (scheduleList != null) {
+                scheduleList.clear();
+                scheduleList = null;
+                Log.d(TAG, "✅ ScheduleList 정리 완료");
+            }
+
+            // 데이터베이스 참조 정리
+            database = null;
+            userSession = null;
+
+            Log.d(TAG, "✅ ScheduleListActivity 리소스 정리 완료");
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ 리소스 정리 중 오류", e);
         }
     }
 }

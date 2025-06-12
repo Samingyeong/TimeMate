@@ -49,7 +49,7 @@ public class RecommendationActivity extends AppCompatActivity {
     private Button btnCategoryRestaurant, btnCategoryCafe, btnCategoryAttraction, btnCategoryAccommodation;
     private Button btnSearch;
     private com.google.android.material.card.MaterialCardView layoutMapContainer;
-    private LinearLayout layoutResultsContainer, layoutEmptyState;
+    private com.google.android.material.card.MaterialCardView layoutResultsContainer, layoutEmptyState;
     private TextView textResultCount;
     private RecyclerView recyclerRecommendations;
     private BottomNavigationView bottomNavigationView;
@@ -370,6 +370,17 @@ public class RecommendationActivity extends AppCompatActivity {
                 editSearchLocation.setAdapter(regionAdapter);
                 editSearchLocation.setThreshold(1); // 1글자부터 자동완성 시작
 
+                // 엔터키 입력 시 검색 실행
+                editSearchLocation.setOnEditorActionListener((v, actionId, event) -> {
+                    String location = editSearchLocation.getText().toString().trim();
+                    if (!location.isEmpty()) {
+                        Log.d("RecommendationActivity", "🔍 엔터키로 검색 실행: " + location);
+                        performImageSearch(); // 이미지 포함 검색 실행
+                        return true;
+                    }
+                    return false;
+                });
+
                 // 드롭다운 스타일 설정 - 안전하게
                 try {
                     editSearchLocation.setDropDownBackgroundResource(R.drawable.ios_card_background);
@@ -490,6 +501,19 @@ public class RecommendationActivity extends AppCompatActivity {
                 Log.e("RecommendationActivity", "카테고리 버튼 색상 설정 오류", colorException);
                 // 색상 설정 실패해도 계속 진행
             }
+
+            // 카테고리 선택 시 자동 검색 (위치가 입력되어 있는 경우)
+            try {
+                String location = editSearchLocation.getText().toString().trim();
+                if (!location.isEmpty()) {
+                    Log.d("RecommendationActivity", "🔍 카테고리 변경으로 자동 검색 실행");
+                    performImageSearch(); // 이미지 포함 검색 실행
+                }
+            } catch (Exception searchException) {
+                Log.w("RecommendationActivity", "자동 검색 실행 실패", searchException);
+                // 자동 검색 실패해도 계속 진행
+            }
+
         } catch (Exception e) {
             Log.e("RecommendationActivity", "❌ 카테고리 선택 오류", e);
             e.printStackTrace();
@@ -558,12 +582,13 @@ public class RecommendationActivity extends AppCompatActivity {
         try {
             String location = editSearchLocation.getText().toString().trim();
             if (location.isEmpty()) {
-                Toast.makeText(this, "검색할 위치를 입력해주세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "🔍 검색할 위치를 입력해주세요", Toast.LENGTH_SHORT).show();
+                editSearchLocation.requestFocus();
                 return;
             }
 
             if (selectedCategory == null || selectedCategory.isEmpty()) {
-                Toast.makeText(this, "카테고리를 선택해주세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "📂 카테고리를 선택해주세요", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -572,6 +597,10 @@ public class RecommendationActivity extends AppCompatActivity {
 
             // 카테고리 한글 변환
             String categoryKorean = getCategoryKorean(selectedCategory);
+
+            // 검색 시작 알림
+            String categoryIcon = getCategoryIcon(selectedCategory);
+            Toast.makeText(this, categoryIcon + " " + location + " " + categoryKorean + " 검색 중...", Toast.LENGTH_SHORT).show();
 
             // 카카오 로컬 API 우선 사용 (더 안정적)
             Log.d("RecommendationActivity", "🔍 검색 시작 - Category: " + categoryKorean + ", Location: " + location);
@@ -1109,19 +1138,16 @@ public class RecommendationActivity extends AppCompatActivity {
 
             // 지도 ImageView 생성
             android.widget.ImageView mapImageView = new android.widget.ImageView(this);
-            android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
                 (int) (300 * getResources().getDisplayMetrics().density) // 300dp를 px로 변환
             );
-            params.setMargins(0, 16, 0, 16); // 상하 여백 추가
+            params.setMargins(16, 16, 16, 16); // 모든 방향 여백 추가
             mapImageView.setLayoutParams(params);
             mapImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
             mapImageView.setImageResource(R.drawable.ic_map_placeholder); // 로딩 중 표시
 
-            // 둥근 모서리 배경 적용
-            mapImageView.setBackground(getResources().getDrawable(R.drawable.ios_card_background));
-            mapImageView.setClipToOutline(true);
-
+            // MaterialCardView에 직접 추가 (배경은 카드에서 처리)
             layoutMapContainer.addView(mapImageView);
 
             // 지도 클릭 이벤트 (전체 지도 보기)
@@ -1516,21 +1542,13 @@ public class RecommendationActivity extends AppCompatActivity {
             // 초기 지도 ImageView 생성 - 안전하게
             try {
                 android.widget.ImageView mapImageView = new android.widget.ImageView(this);
-                android.widget.LinearLayout.LayoutParams params = new android.widget.LinearLayout.LayoutParams(
-                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
                     (int) (250 * getResources().getDisplayMetrics().density) // 250dp를 px로 변환
                 );
-                params.setMargins(0, 16, 0, 16); // 상하 여백 추가
+                params.setMargins(16, 16, 16, 16); // 모든 방향 여백 추가
                 mapImageView.setLayoutParams(params);
                 mapImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
-
-                // 둥근 모서리 배경 적용 - 안전하게
-                try {
-                    mapImageView.setBackground(getResources().getDrawable(R.drawable.ios_card_background));
-                    mapImageView.setClipToOutline(true);
-                } catch (Exception backgroundException) {
-                    Log.w("RecommendationActivity", "지도 배경 설정 실패 (무시)", backgroundException);
-                }
 
                 // 초기 지도 이미지 설정 - 안전하게
                 try {
@@ -1593,6 +1611,89 @@ public class RecommendationActivity extends AppCompatActivity {
             });
         } catch (Exception e) {
             Log.e("RecommendationActivity", "기본 지도 로드 시도 오류", e);
+        }
+    }
+
+    /**
+     * PlaceWithImage 결과와 함께 지도 표시
+     */
+    private void displayMapWithPlaceImages(List<PlaceWithImage> places) {
+        try {
+            if (places == null || places.isEmpty()) {
+                Log.w("RecommendationActivity", "⚠️ 지도 표시할 PlaceWithImage 결과가 없습니다");
+                if (layoutMapContainer != null) {
+                    layoutMapContainer.setVisibility(View.GONE);
+                }
+                return;
+            }
+
+            Log.d("RecommendationActivity", "🗺️ PlaceWithImage 지도 표시 시작: " + places.size() + "개 장소");
+
+            // 지도 컨테이너 표시
+            if (layoutMapContainer != null) {
+                layoutMapContainer.setVisibility(View.VISIBLE);
+                layoutMapContainer.removeAllViews();
+
+                // 지도 ImageView 생성
+                android.widget.ImageView mapImageView = new android.widget.ImageView(this);
+                android.widget.FrameLayout.LayoutParams params = new android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                    (int) (300 * getResources().getDisplayMetrics().density) // 300dp를 px로 변환
+                );
+                params.setMargins(16, 16, 16, 16); // 모든 방향 여백 추가
+                mapImageView.setLayoutParams(params);
+                mapImageView.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP);
+                mapImageView.setImageResource(R.drawable.ic_map_placeholder); // 로딩 중 표시
+
+                // MaterialCardView에 직접 추가 (배경은 카드에서 처리)
+                layoutMapContainer.addView(mapImageView);
+
+                // 지도 클릭 이벤트 (전체 지도 보기)
+                mapImageView.setOnClickListener(v -> {
+                    showMapOptionsForPlaceImages(places);
+                });
+
+                // PlaceWithImage를 SearchResult로 변환하여 지도 API 호출
+                List<com.example.timemate.network.api.NaverSearchApiService.SearchResult> searchResults =
+                    convertPlaceWithImageToSearchResults(places);
+
+                // 네이버 Static Map API로 지도 이미지 생성
+                if (staticMapService != null) {
+                    staticMapService.generateMapWithMarkers(searchResults, new com.example.timemate.network.api.NaverStaticMapService.MapImageCallback() {
+                        @Override
+                        public void onSuccess(android.graphics.Bitmap bitmap) {
+                            runOnUiThread(() -> {
+                                try {
+                                    mapImageView.setImageBitmap(bitmap);
+                                    Log.d("RecommendationActivity", "✅ PlaceWithImage 지도 이미지 로드 성공");
+                                } catch (Exception e) {
+                                    Log.e("RecommendationActivity", "지도 이미지 설정 오류", e);
+                                    mapImageView.setImageResource(R.drawable.ic_map_error);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            runOnUiThread(() -> {
+                                mapImageView.setImageResource(R.drawable.ic_map_error);
+                                Log.e("RecommendationActivity", "❌ PlaceWithImage 지도 로딩 오류: " + error);
+
+                                // 오류 시 대체 지도 표시 옵션 제공
+                                mapImageView.setOnClickListener(v -> {
+                                    showMapOptionsForPlaceImages(places);
+                                });
+                            });
+                        }
+                    });
+                }
+            }
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "❌ PlaceWithImage 지도 표시 중 오류", e);
+            if (layoutMapContainer != null) {
+                layoutMapContainer.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -1783,6 +1884,9 @@ public class RecommendationActivity extends AppCompatActivity {
                         recyclerRecommendations.scrollToPosition(0);
                     }
 
+                    // 지도 표시 (PlaceWithImage용)
+                    displayMapWithPlaceImages(places);
+
                     Log.d("RecommendationActivity", "✅ 이미지 검색 결과 표시 완료: " + places.size() + "개");
                     Toast.makeText(this, "✅ " + places.size() + "개 장소를 찾았습니다!", Toast.LENGTH_SHORT).show();
 
@@ -1813,6 +1917,154 @@ public class RecommendationActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "오류 표시 중 오류", e);
+        }
+    }
+
+    /**
+     * PlaceWithImage를 SearchResult로 변환
+     */
+    private List<com.example.timemate.network.api.NaverSearchApiService.SearchResult> convertPlaceWithImageToSearchResults(
+            List<PlaceWithImage> places) {
+        List<com.example.timemate.network.api.NaverSearchApiService.SearchResult> searchResults = new ArrayList<>();
+
+        for (PlaceWithImage place : places) {
+            try {
+                // 좌표 변환 (카카오 좌표계 -> 네이버 좌표계)
+                double longitude = Double.parseDouble(place.getX());
+                double latitude = Double.parseDouble(place.getY());
+
+                // SearchResult 생성자에 맞게 파라미터 전달
+                com.example.timemate.network.api.NaverSearchApiService.SearchResult result =
+                    new com.example.timemate.network.api.NaverSearchApiService.SearchResult(
+                        place.getPlaceName() != null ? place.getPlaceName() : "장소명 없음",
+                        place.getDisplayCategory() != null ? place.getDisplayCategory() : "카테고리 없음",
+                        "", // description
+                        place.getPhone() != null ? place.getPhone() : "", // telephone
+                        place.getDisplayAddress() != null ? place.getDisplayAddress() : "", // address
+                        "", // roadAddress
+                        (int)(longitude * 10000000), // mapx (네이버 좌표계)
+                        (int)(latitude * 10000000),  // mapy (네이버 좌표계)
+                        place.getPlaceUrl() != null ? place.getPlaceUrl() : "" // link
+                    );
+
+                searchResults.add(result);
+                Log.d("RecommendationActivity", "📍 PlaceWithImage 변환: " + place.getPlaceName() +
+                      " (" + latitude + ", " + longitude + ")");
+
+            } catch (Exception e) {
+                Log.e("RecommendationActivity", "PlaceWithImage 변환 오류: " + place.getPlaceName(), e);
+                // 변환 실패한 장소는 건너뛰고 계속 진행
+            }
+        }
+
+        Log.d("RecommendationActivity", "✅ PlaceWithImage 변환 완료: " + searchResults.size() + "개");
+        return searchResults;
+    }
+
+    /**
+     * PlaceWithImage용 지도 옵션 표시 (클릭 시)
+     */
+    private void showMapOptionsForPlaceImages(List<PlaceWithImage> places) {
+        try {
+            String[] options = {
+                "🗺️ 네이버 지도에서 보기",
+                "🚕 카카오맵에서 보기",
+                "🌍 구글 지도에서 보기"
+            };
+
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("🗺️ 지도에서 보기")
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            openNaverMapWithPlaceImages(places);
+                            break;
+                        case 1:
+                            openKakaoMapWithPlaceImages(places);
+                            break;
+                        case 2:
+                            openGoogleMapWithPlaceImages(places);
+                            break;
+                    }
+                })
+                .setNegativeButton("닫기", null)
+                .show();
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "PlaceWithImage 지도 옵션 표시 오류", e);
+        }
+    }
+
+    /**
+     * PlaceWithImage 결과를 네이버 지도에서 보기
+     */
+    private void openNaverMapWithPlaceImages(List<PlaceWithImage> places) {
+        try {
+            if (places.isEmpty()) return;
+
+            // 첫 번째 장소를 중심으로 지도 열기
+            PlaceWithImage firstPlace = places.get(0);
+            String searchLocation = editSearchLocation.getText().toString().trim();
+            String query = searchLocation + " " + getCategoryKorean(selectedCategory);
+
+            double latitude = Double.parseDouble(firstPlace.getY());
+            double longitude = Double.parseDouble(firstPlace.getX());
+
+            String url = "nmap://search?query=" + Uri.encode(query) +
+                        "&lat=" + latitude + "&lng=" + longitude;
+
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+
+            Log.d("RecommendationActivity", "네이버 지도 열기 (PlaceWithImage): " + query);
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "네이버 지도 열기 오류 (PlaceWithImage)", e);
+            Toast.makeText(this, "네이버 지도 앱이 설치되어 있지 않습니다", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * PlaceWithImage 결과를 카카오맵에서 보기
+     */
+    private void openKakaoMapWithPlaceImages(List<PlaceWithImage> places) {
+        try {
+            if (places.isEmpty()) return;
+
+            String searchLocation = editSearchLocation.getText().toString().trim();
+            String query = searchLocation + " " + getCategoryKorean(selectedCategory);
+
+            String url = "kakaomap://search?q=" + Uri.encode(query);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+
+            Log.d("RecommendationActivity", "카카오맵 열기 (PlaceWithImage): " + query);
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "카카오맵 열기 오류 (PlaceWithImage)", e);
+            Toast.makeText(this, "카카오맵 앱이 설치되어 있지 않습니다", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * PlaceWithImage 결과를 구글 지도에서 보기
+     */
+    private void openGoogleMapWithPlaceImages(List<PlaceWithImage> places) {
+        try {
+            if (places.isEmpty()) return;
+
+            String searchLocation = editSearchLocation.getText().toString().trim();
+            String query = searchLocation + " " + getCategoryKorean(selectedCategory);
+
+            String url = "geo:0,0?q=" + Uri.encode(query);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            startActivity(intent);
+
+            Log.d("RecommendationActivity", "구글 지도 열기 (PlaceWithImage): " + query);
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "구글 지도 열기 오류 (PlaceWithImage)", e);
+            Toast.makeText(this, "구글 지도 앱이 설치되어 있지 않습니다", Toast.LENGTH_SHORT).show();
         }
     }
 

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="@drawable/ios_header_blue_gradient"
+            android:background="@color/ios_blue"
             android:padding="24dp"
             android:paddingTop="28dp"
             android:paddingBottom="20dp">
@@ -57,7 +57,7 @@
             </LinearLayout>
 
             <ImageButton
-                android:id="@+id/btnCloseDialog"
+                android:id="@+id/btnClose"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_close"
@@ -81,114 +81,75 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- 시간 정보 카드 -->
+                <!-- 시간 정보 카드 (아이콘 제거, 블루톤 강조) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical">
+                    android:layout_marginBottom="16dp">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/sky_blue_light"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="⏰"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="일정 시간"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="일정 시간"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/textScheduleTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="오후 2:00"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/pretendard_bold" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/textScheduleTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="오후 2:00"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="@font/pretendard_bold" />
 
                 </LinearLayout>
 
-                <!-- 위치 정보 컨테이너 (자바 호환성) -->
+                <!-- 위치 정보 카드 (출발지 + 도착지 통합) -->
                 <LinearLayout
                     android:id="@+id/cardLocationInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="16dp">
-
-                <!-- 출발지 카드 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
-                    android:layout_marginBottom="12dp"
-                    android:gravity="center_vertical">
+                    android:layout_marginBottom="16dp">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/ios_green_light"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🚀"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="위치 정보"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- 출발지 -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="60dp"
                             android:layout_height="wrap_content"
-                            android:text="출발지"
+                            android:text="출발"
                             android:textSize="14sp"
                             android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="@font/pretendard_regular" />
 
                         <TextView
                             android:id="@+id/textDeparture"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="출발지"
                             android:textSize="16sp"
                             android:textColor="@color/text_primary"
@@ -196,53 +157,25 @@
 
                     </LinearLayout>
 
-                </LinearLayout>
-
-                <!-- 도착지 카드 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:background="@drawable/ios_card_background"
-                    android:padding="20dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical">
-
+                    <!-- 도착지 -->
                     <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/ios_red_light"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🎯"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="60dp"
                             android:layout_height="wrap_content"
-                            android:text="도착지"
+                            android:text="도착"
                             android:textSize="14sp"
                             android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="@font/pretendard_regular" />
 
                         <TextView
                             android:id="@+id/textDestination"
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_weight="1"
                             android:text="도착지"
                             android:textSize="16sp"
                             android:textColor="@color/text_primary"
@@ -252,230 +185,128 @@
 
                 </LinearLayout>
 
-                </LinearLayout> <!-- cardLocationInfo 닫기 -->
-
-                <!-- 상태 카드 -->
+                <!-- 상태 카드 (아이콘 제거) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
-                    android:layout_marginBottom="16dp"
-                    android:gravity="center_vertical">
+                    android:layout_marginBottom="16dp">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/ios_gray5"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📊"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="상태"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="상태"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/textStatus"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="⏳ 진행중"
-                            android:textSize="16sp"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/pretendard_medium" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/textStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="진행중"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="@font/pretendard_medium" />
 
                 </LinearLayout>
 
-                <!-- 메모 카드 -->
+                <!-- 메모 카드 (아이콘 제거) -->
                 <LinearLayout
                     android:id="@+id/cardMemo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
                     android:layout_marginBottom="16dp"
-                    android:gravity="top"
                     android:visibility="gone">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/ios_orange_light"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="📝"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="메모"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="메모"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/textMemo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="메모 내용"
-                            android:textSize="16sp"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/pretendard_medium"
-                            android:lineSpacingExtra="4dp" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/textMemo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="메모 내용"
+                        android:textSize="16sp"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:lineSpacingExtra="4dp" />
 
                 </LinearLayout>
 
-                <!-- 경로 정보 카드 (선택사항) -->
+                <!-- 경로 정보 카드 (아이콘 제거) -->
                 <LinearLayout
                     android:id="@+id/cardRouteInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
                     android:layout_marginBottom="16dp"
-                    android:gravity="top"
                     android:visibility="gone">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/ios_purple_light"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🗺️"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="선택된 경로"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="선택된 경로"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/textRouteInfo"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="경로 정보"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/pretendard_medium"
-                            android:lineSpacingExtra="4dp" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/textRouteInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="경로 정보"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:lineSpacingExtra="4dp" />
 
                 </LinearLayout>
 
-                <!-- 함께하는 친구 카드 (선택사항) -->
+                <!-- 함께하는 친구 카드 (아이콘 제거) -->
                 <LinearLayout
                     android:id="@+id/cardFriends"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:background="@drawable/ios_card_background"
                     android:padding="20dp"
                     android:layout_marginBottom="16dp"
-                    android:gravity="top"
                     android:visibility="gone">
 
-                    <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/circle_background"
-                        android:backgroundTint="@color/pastel_pink"
-                        android:gravity="center"
-                        android:layout_marginEnd="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="👥"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="함께하는 친구"
+                        android:textSize="14sp"
+                        android:textColor="@color/ios_blue"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:layout_marginBottom="8dp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="함께하는 친구"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_secondary"
-                            android:fontFamily="@font/pretendard_regular"
-                            android:layout_marginBottom="4dp" />
-
-                        <TextView
-                            android:id="@+id/textFriends"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="친구 목록"
-                            android:textSize="14sp"
-                            android:textColor="@color/text_primary"
-                            android:fontFamily="@font/pretendard_medium"
-                            android:lineSpacingExtra="4dp" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/textFriends"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="친구 목록"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:fontFamily="@font/pretendard_medium"
+                        android:lineSpacingExtra="4dp" />
 
                 </LinearLayout>
 
