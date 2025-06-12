@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Friend;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.schedule.ScheduleListActivity;
 import com.example.timemate.features.profile.ProfileActivity;
@@ -52,21 +52,49 @@ public class FriendListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend_list);
 
-        initViews();
-        initServices();
-        setupRecyclerView();
-        setupBottomNavigation();
-        setupClickListeners();
-        
-        // 로그인 상태 확인
-        if (!userSession.isLoggedIn()) {
+        try {
+            Log.d(TAG, "🚀 FriendListActivity onCreate 시작");
+            setContentView(R.layout.activity_friend_list);
+
+            initViews();
+            initServices();
+            setupRecyclerView();
+            setupBottomNavigation();
+            setupClickListeners();
+
+            // 로그인 상태 확인
+            Log.d(TAG, "🔍 로그인 상태 확인 중...");
+            if (userSession == null) {
+                Log.e(TAG, "❌ UserSession이 null입니다!");
+                Toast.makeText(this, "사용자 세션 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            boolean isLoggedIn = userSession.isLoggedIn();
+            String currentUserId = userSession.getCurrentUserId();
+
+            Log.d(TAG, "🔍 로그인 상태: " + isLoggedIn);
+            Log.d(TAG, "🔍 현재 사용자 ID: " + currentUserId);
+
+            if (!isLoggedIn || currentUserId == null || currentUserId.trim().isEmpty()) {
+                Log.w(TAG, "⚠️ 로그인되지 않았거나 사용자 ID가 없음");
+                Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            Log.d(TAG, "✅ 로그인 상태 확인 완료");
+            loadFriends();
+
+            Log.d(TAG, "🎉 FriendListActivity onCreate 완료");
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ FriendListActivity onCreate 오류", e);
+            Toast.makeText(this, "친구 목록을 불러오는 중 오류가 발생했습니다: " + e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
-            return;
         }
-        
-        loadFriends();
     }
 
     private void initViews() {
@@ -76,9 +104,33 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void initServices() {
-        database = AppDatabase.getDatabase(this);
-        userSession = UserSession.getInstance(this);
-        executor = Executors.newSingleThreadExecutor();
+        try {
+            Log.d(TAG, "🔧 서비스 초기화 시작");
+
+            database = AppDatabase.getDatabase(this);
+            if (database == null) {
+                throw new RuntimeException("데이터베이스 초기화 실패");
+            }
+            Log.d(TAG, "✅ 데이터베이스 초기화 완료");
+
+            userSession = UserSession.getInstance(this);
+            if (userSession == null) {
+                throw new RuntimeException("UserSession 초기화 실패");
+            }
+            Log.d(TAG, "✅ UserSession 초기화 완료");
+
+            executor = Executors.newSingleThreadExecutor();
+            if (executor == null) {
+                throw new RuntimeException("Executor 초기화 실패");
+            }
+            Log.d(TAG, "✅ Executor 초기화 완료");
+
+            Log.d(TAG, "🎉 모든 서비스 초기화 완료");
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ 서비스 초기화 오류", e);
+            throw new RuntimeException("서비스 초기화 실패: " + e.getMessage(), e);
+        }
     }
 
     private void setupRecyclerView() {
@@ -126,41 +178,83 @@ public class FriendListActivity extends AppCompatActivity {
     }
 
     private void loadFriends() {
+        if (executor == null || executor.isShutdown()) {
+            Log.e(TAG, "❌ Executor가 null이거나 종료됨");
+            Toast.makeText(this, "서비스 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         executor.execute(() -> {
             try {
-                String currentUserId = userSession.getCurrentUserId();
-                if (currentUserId == null || currentUserId.trim().isEmpty()) {
-                    Log.w(TAG, "사용자 ID가 null - 기본 사용자 사용");
-                    currentUserId = "user1"; // 기본 사용자 ID
+                Log.d(TAG, "📊 친구 목록 로드 시작");
 
-                    // UserSession에 기본 사용자 정보 설정
-                    final String finalUserId = currentUserId;
+                // 사용자 세션 재확인
+                if (userSession == null) {
+                    Log.e(TAG, "❌ UserSession이 null입니다!");
                     runOnUiThread(() -> {
-                        userSession.login(finalUserId, "사용자1", "user1@test.com", true);
-                        Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "사용자 세션 오류", Toast.LENGTH_SHORT).show();
+                        finish();
                     });
+                    return;
                 }
 
-                Log.d(TAG, "친구 목록 로드 시작 - 사용자 ID: " + currentUserId);
+                String currentUserId = userSession.getCurrentUserId();
+                if (currentUserId == null || currentUserId.trim().isEmpty()) {
+                    Log.w(TAG, "⚠️ 사용자 ID가 null - 로그인 필요");
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                    return;
+                }
+
+                Log.d(TAG, "👤 현재 사용자 ID: " + currentUserId);
+
+                // 데이터베이스 확인
+                if (database == null || database.friendDao() == null) {
+                    Log.e(TAG, "❌ 데이터베이스 또는 FriendDao가 null입니다!");
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "데이터베이스 오류", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                    return;
+                }
+
                 List<Friend> friends = database.friendDao().getFriendsByUserId(currentUserId);
-                Log.d(TAG, "친구 목록 조회 결과: " + (friends != null ? friends.size() : "null") + "개");
+                Log.d(TAG, "📋 친구 목록 조회 결과: " + (friends != null ? friends.size() : "null") + "개");
 
                 runOnUiThread(() -> {
-                    friendList.clear();
-                    if (friends != null) {
-                        friendList.addAll(friends);
-                        Log.d(TAG, "친구 목록 업데이트 완료: " + friendList.size() + "개");
-                    }
-                    friendAdapter.notifyDataSetChanged();
+                    try {
+                        if (friendList == null) {
+                            Log.e(TAG, "❌ friendList가 null입니다!");
+                            return;
+                        }
 
-                    // 친구 목록이 비어있으면 안내 메시지
-                    if (friendList.isEmpty()) {
-                        Toast.makeText(this, "등록된 친구가 없습니다. 친구를 추가해보세요!", Toast.LENGTH_SHORT).show();
+                        if (friendAdapter == null) {
+                            Log.e(TAG, "❌ friendAdapter가 null입니다!");
+                            return;
+                        }
+
+                        friendList.clear();
+                        if (friends != null) {
+                            friendList.addAll(friends);
+                            Log.d(TAG, "✅ 친구 목록 업데이트 완료: " + friendList.size() + "개");
+                        }
+                        friendAdapter.notifyDataSetChanged();
+
+                        // 친구 목록이 비어있으면 안내 메시지
+                        if (friendList.isEmpty()) {
+                            Toast.makeText(this, "등록된 친구가 없습니다. 친구를 추가해보세요!", Toast.LENGTH_SHORT).show();
+                        }
+
+                    } catch (Exception uiException) {
+                        Log.e(TAG, "❌ UI 업데이트 중 오류", uiException);
+                        Toast.makeText(this, "화면 업데이트 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
                     }
                 });
 
             } catch (Exception e) {
-                Log.e(TAG, "친구 목록 로드 오류", e);
+                Log.e(TAG, "❌ 친구 목록 로드 오류", e);
                 runOnUiThread(() ->
                     Toast.makeText(this, "친구 목록을 불러오는데 실패했습니다: " + e.getMessage(), Toast.LENGTH_LONG).show());
             }

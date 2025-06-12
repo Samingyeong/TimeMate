@@ -46,7 +46,7 @@ import com.example.timemate.data.model.Friend;
 import com.example.timemate.features.schedule.adapter.PlaceSuggestAdapter;
 import com.example.timemate.features.schedule.adapter.RouteOptionAdapter;
 import com.example.timemate.adapters.FriendSelectionAdapter;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.core.util.DistanceCalculator;
 
 import java.text.SimpleDateFormat;
@@ -823,10 +823,8 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
             hideKeyboard();
             showTimePicker();
         });
-        btnSelectFriends.setOnClickListener(v -> {
-            hideKeyboard();
-            showFriendSelector();
-        });
+        // 친구 선택 기능 제거됨 - 개인 일정만 지원
+        btnSelectFriends.setVisibility(View.GONE);
         btnGetDirections.setOnClickListener(v -> {
             try {
                 Log.d("ScheduleAdd", "🗺️ 길찾기 버튼 클릭됨");
@@ -1207,18 +1205,7 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         }
     }
 
-    @Override
-    public void showFriendSelector(List<Friend> friends) {
-        runOnUiThread(() -> {
-            try {
-                Log.d("ScheduleAdd", "친구 선택 다이얼로그 표시 - 친구 수: " + friends.size());
-                showFriendSelectionDialog(friends);
-            } catch (Exception e) {
-                Log.e("ScheduleAdd", "친구 선택 다이얼로그 표시 오류", e);
-                Toast.makeText(this, "친구 목록을 표시할 수 없습니다", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+    // 친구 선택 기능 제거됨 - 개인 일정만 지원
 
     @Override
     public void onScheduleSaved() {
@@ -2434,128 +2421,9 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         }
     }
 
-    private void showFriendSelector() {
-        presenter.loadFriends();
-    }
+    // 친구 선택 기능 제거됨
 
-    /**
-     * 친구 선택 다이얼로그 표시
-     */
-    private void showFriendSelectionDialog(List<Friend> friends) {
-        try {
-            Log.d("ScheduleAdd", "🎨 iOS 스타일 친구 선택 다이얼로그 표시");
-
-            if (friends == null || friends.isEmpty()) {
-                Toast.makeText(this, "친구 목록이 비어있습니다", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // 커스텀 레이아웃 생성
-            View dialogView = getLayoutInflater().inflate(R.layout.dialog_friend_selection, null);
-
-            // 뷰 요소 찾기
-            androidx.recyclerview.widget.RecyclerView recyclerViewFriends = dialogView.findViewById(R.id.recyclerViewFriends);
-            TextView textSelectedCount = dialogView.findViewById(R.id.textSelectedCount);
-            Button btnCancel = dialogView.findViewById(R.id.btnCancel);
-            Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
-
-            // RecyclerView 설정
-            recyclerViewFriends.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
-
-            // 어댑터 생성 및 설정
-            FriendSelectionAdapter adapter = new FriendSelectionAdapter(friends, selectedFriends);
-            adapter.setOnSelectionChangedListener(selectedCount -> {
-                textSelectedCount.setText(selectedCount + "명 선택됨");
-            });
-            recyclerViewFriends.setAdapter(adapter);
-
-            // 초기 선택 수 표시
-            textSelectedCount.setText(selectedFriends.size() + "명 선택됨");
-
-            // 다이얼로그 생성
-            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setView(dialogView)
-                    .setCancelable(true)
-                    .create();
-
-            // 버튼 리스너 설정
-            btnCancel.setOnClickListener(v -> dialog.dismiss());
-
-            btnConfirm.setOnClickListener(v -> {
-                try {
-                    List<Friend> newSelectedFriends = adapter.getSelectedFriends();
-                    Log.d("ScheduleAdd", "🔄 친구 선택 확인 - 새로 선택된 친구 수: " + newSelectedFriends.size());
-
-                    selectedFriends.clear();
-                    selectedFriends.addAll(newSelectedFriends);
-
-                    Log.d("ScheduleAdd", "📝 selectedFriends 업데이트 완료 - 총 " + selectedFriends.size() + "명");
-                    for (Friend friend : selectedFriends) {
-                        Log.d("ScheduleAdd", "  - " + friend.friendNickname + " (" + friend.friendUserId + ")");
-                    }
-
-                    updateSelectedFriendsDisplay();
-                    dialog.dismiss();
-
-                    Toast.makeText(ScheduleAddActivity.this,
-                                 selectedFriends.size() + "명의 친구가 선택되었습니다",
-                                 Toast.LENGTH_SHORT).show();
-
-                } catch (Exception e) {
-                    Log.e("ScheduleAdd", "친구 선택 확인 오류", e);
-                    Toast.makeText(ScheduleAddActivity.this, "친구 선택 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            dialog.show();
-
-        } catch (Exception e) {
-            Log.e("ScheduleAdd", "친구 선택 다이얼로그 생성 오류", e);
-            Toast.makeText(this, "친구 선택 화면을 표시할 수 없습니다", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /**
-     * 선택된 친구 목록 표시 업데이트 (iOS 스타일 태그 형식)
-     */
-    private void updateSelectedFriendsDisplay() {
-        try {
-            Log.d("ScheduleAdd", "🔄 updateSelectedFriendsDisplay 시작 - 친구 수: " + selectedFriends.size());
-
-            // textSelectedFriends가 null인지 확인
-            if (textSelectedFriends == null) {
-                Log.e("ScheduleAdd", "❌ textSelectedFriends가 null입니다!");
-                textSelectedFriends = findViewById(R.id.textSelectedFriends);
-                if (textSelectedFriends == null) {
-                    Log.e("ScheduleAdd", "❌ findViewById로도 textSelectedFriends를 찾을 수 없습니다!");
-                    return;
-                }
-            }
-
-            if (selectedFriends.isEmpty()) {
-                textSelectedFriends.setText("선택된 친구가 없습니다");
-                textSelectedFriends.setTextColor(getResources().getColor(R.color.text_hint, null));
-                Log.d("ScheduleAdd", "✅ 친구 없음 메시지 표시");
-            } else {
-                // iOS 스타일 태그 형식으로 표시
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < selectedFriends.size(); i++) {
-                    if (i > 0) sb.append("  ");
-                    sb.append("👤 ").append(selectedFriends.get(i).friendNickname);
-                }
-
-                // 선택된 친구 수 추가
-                String displayText = sb.toString() + "\n" +
-                    "총 " + selectedFriends.size() + "명의 친구가 선택되었습니다";
-
-                textSelectedFriends.setText(displayText);
-                textSelectedFriends.setTextColor(getResources().getColor(R.color.text_primary, null));
-                Log.d("ScheduleAdd", "✅ 친구 목록 표시 완료: " + displayText);
-            }
-        } catch (Exception e) {
-            Log.e("ScheduleAdd", "친구 목록 표시 업데이트 오류", e);
-        }
-    }
+    // 친구 선택 관련 메서드들 제거됨 - 개인 일정만 지원
 
     private void saveSchedule() {
         try {
@@ -2585,8 +2453,8 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
                 // 편집 모드: 일정 업데이트
                 updateSchedule(schedule);
             } else {
-                // 새 일정 생성 (친구 초대는 presenter에서 처리)
-                presenter.saveSchedule(schedule, selectedFriends);
+                // 새 일정 생성 (개인 일정만)
+                presenter.saveSchedule(schedule, null);
             }
 
         } catch (Exception e) {
@@ -2603,17 +2471,50 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
             try {
                 AppDatabase database = AppDatabase.getInstance(this);
 
+                // 현재 사용자 ID 확인
+                UserSession userSession = UserSession.getInstance(this);
+                String currentUserId = userSession.getCurrentUserId();
+
+                if (currentUserId == null || currentUserId.trim().isEmpty()) {
+                    Log.e("ScheduleAdd", "❌ 편집 시 사용자 ID가 null입니다!");
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                    return;
+                }
+
+                // 일정의 소유자 확인
+                if (!currentUserId.equals(schedule.userId)) {
+                    Log.e("ScheduleAdd", "❌ 다른 사용자의 일정을 수정하려고 시도: 현재=" + currentUserId + ", 일정소유자=" + schedule.userId);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "다른 사용자의 일정은 수정할 수 없습니다", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                    return;
+                }
+
                 // 업데이트 시간 설정
                 schedule.updatedAt = System.currentTimeMillis();
 
-                // 데이터베이스 업데이트
-                database.scheduleDao().update(schedule);
+                Log.d("ScheduleAdd", "📝 일정 수정 - ID: " + schedule.id + ", 사용자: " + schedule.userId + ", 제목: " + schedule.title);
 
-                runOnUiThread(() -> {
-                    Toast.makeText(this, "일정이 수정되었습니다", Toast.LENGTH_SHORT).show();
-                    setResult(RESULT_OK);
-                    finish();
-                });
+                // 데이터베이스 업데이트
+                int updatedRows = database.scheduleDao().update(schedule);
+
+                if (updatedRows > 0) {
+                    Log.d("ScheduleAdd", "✅ 일정 수정 완료");
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "일정이 수정되었습니다", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+                    });
+                } else {
+                    Log.e("ScheduleAdd", "❌ 일정 수정 실패 - 업데이트된 행이 없음");
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "일정 수정에 실패했습니다", Toast.LENGTH_SHORT).show();
+                    });
+                }
 
             } catch (Exception e) {
                 Log.e("ScheduleAdd", "일정 업데이트 오류", e);
@@ -2652,60 +2553,22 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         }
     }
 
-    /**
-     * 친구들에게 일정 초대 알림 전송
-     */
-    private void sendFriendInvitations(Schedule schedule, List<Friend> friends) {
-        try {
-            UserSession userSession = UserSession.getInstance(this);
-            String currentUserId = userSession != null ? userSession.getCurrentUserId() : null;
-            String currentNickname = userSession != null ? userSession.getCurrentUserName() : null;
-            if (currentUserId == null) return;
-
-            AppDatabase database = AppDatabase.getInstance(this);
-
-            for (Friend friend : friends) {
-                // SharedSchedule 모델 사용하여 초대 생성
-                com.example.timemate.data.model.SharedSchedule sharedSchedule =
-                    new com.example.timemate.data.model.SharedSchedule();
-
-                sharedSchedule.originalScheduleId = schedule.id;
-                sharedSchedule.creatorUserId = currentUserId;
-                sharedSchedule.creatorNickname = currentNickname != null ? currentNickname : currentUserId;
-                sharedSchedule.invitedUserId = friend.friendUserId;
-                sharedSchedule.invitedNickname = friend.friendNickname;
-
-                // 일정 정보 캐시
-                sharedSchedule.title = schedule.title;
-                sharedSchedule.date = schedule.date;
-                sharedSchedule.time = schedule.time;
-                sharedSchedule.departure = schedule.departure;
-                sharedSchedule.destination = schedule.destination;
-                sharedSchedule.memo = schedule.memo;
-
-                sharedSchedule.status = "pending"; // 대기 중
-                sharedSchedule.isNotificationSent = false;
-                sharedSchedule.isNotificationRead = false;
-                sharedSchedule.createdAt = System.currentTimeMillis();
-                sharedSchedule.updatedAt = System.currentTimeMillis();
-
-                // 데이터베이스에 저장
-                database.sharedScheduleDao().insert(sharedSchedule);
-
-                Log.d("ScheduleAdd", "친구 초대 알림 전송: " + friend.friendNickname);
-            }
-
-            Toast.makeText(this, "친구들에게 일정 초대를 보냈습니다", Toast.LENGTH_SHORT).show();
-
-        } catch (Exception e) {
-            Log.e("ScheduleAdd", "친구 초대 알림 전송 오류", e);
-        }
-    }
+    // 친구 초대 기능 제거됨 - 개인 일정만 지원
 
 
 
     private Schedule createScheduleFromInput() {
         Schedule schedule = new Schedule();
+
+        // 현재 사용자 ID 설정
+        UserSession userSession = UserSession.getInstance(this);
+        String currentUserId = userSession.getCurrentUserId();
+        if (currentUserId != null) {
+            schedule.userId = currentUserId;
+            Log.d("ScheduleAdd", "👤 사용자 ID 설정: " + currentUserId);
+        } else {
+            Log.e("ScheduleAdd", "❌ 사용자 ID가 null입니다!");
+        }
 
         // 기본 정보 설정 (NULL 안전 처리)
         schedule.title = editTitle.getText().toString().trim();
@@ -2726,7 +2589,7 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         schedule.date = dateFormat.format(selectedDate.getTime());
         schedule.time = timeFormat.format(selectedTime.getTime());
 
-        Log.d("ScheduleAdd", "📅 일정 생성 - 제목: " + schedule.title + ", 날짜: " + schedule.date + ", 시간: " + schedule.time);
+        Log.d("ScheduleAdd", "📅 일정 생성 - 제목: " + schedule.title + ", 사용자: " + schedule.userId + ", 날짜: " + schedule.date + ", 시간: " + schedule.time);
 
         // 선택된 경로 정보 저장
         if (selectedRouteInfo != null && !selectedRouteInfo.isEmpty()) {

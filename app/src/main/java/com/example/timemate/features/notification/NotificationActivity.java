@@ -163,12 +163,10 @@ public class NotificationActivity extends AppCompatActivity {
     private void loadNotifications() {
         String currentUserId = userSession.getCurrentUserId();
         if (currentUserId == null || currentUserId.trim().isEmpty()) {
-            Log.w(TAG, "사용자 ID가 null - 기본 사용자 사용");
-            currentUserId = "user1"; // 기본 사용자 ID
-
-            // UserSession에 기본 사용자 정보 설정
-            userSession.login(currentUserId, "사용자1", "user1@test.com", true);
-            Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
+            Log.w(TAG, "사용자 ID가 null - 로그인 필요");
+            Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
         final String finalCurrentUserId = currentUserId; // final 변수로 복사

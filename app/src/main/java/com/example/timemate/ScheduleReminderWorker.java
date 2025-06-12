@@ -10,6 +10,11 @@ import androidx.work.WorkerParameters;
 
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
+import com.example.timemate.ScheduleReminder;
+import com.example.timemate.ScheduleReminderDao;
+import com.example.timemate.EnhancedDirectionsService;
+import com.example.timemate.NotificationService;
+import com.example.timemate.util.UserSession;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,22 +35,30 @@ public class ScheduleReminderWorker extends Worker {
         Log.d(TAG, "ScheduleReminderWorker started");
         
         try {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(), 
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                     AppDatabase.class, "timeMate-db")
                     .fallbackToDestructiveMigration()
                     .build();
-            
+
+            // 현재 로그인된 사용자 ID 가져오기
+            UserSession userSession = UserSession.getInstance(getApplicationContext());
+            String currentUserId = userSession.getCurrentUserId();
+
+            if (currentUserId == null) {
+                Log.w(TAG, "로그인된 사용자가 없습니다");
+                return Result.success();
+            }
+
             // 내일 날짜 계산
             Calendar tomorrow = Calendar.getInstance();
             tomorrow.add(Calendar.DAY_OF_MONTH, 1);
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN);
             String tomorrowDate = dateFormat.format(tomorrow.getTime());
-            
-            Log.d(TAG, "Processing schedules for tomorrow: " + tomorrowDate);
-            
-            // 내일 일정 조회
-            // getSchedulesByDate 메서드가 없으므로 getSchedulesByUserAndDateRange 사용
-            List<Schedule> tomorrowSchedules = db.scheduleDao().getSchedulesByUserAndDateRange("", tomorrowDate, tomorrowDate);
+
+            Log.d(TAG, "Processing schedules for tomorrow: " + tomorrowDate + ", 사용자: " + currentUserId);
+
+            // 현재 사용자의 내일 일정 조회
+            List<Schedule> tomorrowSchedules = db.scheduleDao().getSchedulesByUserAndDateRange(currentUserId, tomorrowDate, tomorrowDate);
             
             Log.d(TAG, "Found " + tomorrowSchedules.size() + " schedules for tomorrow");
             

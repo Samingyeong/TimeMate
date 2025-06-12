@@ -159,15 +159,13 @@ public class FriendAddActivity extends AppCompatActivity {
                 return;
             }
 
-            // 현재 사용자 ID 확인 (없으면 기본값 사용)
+            // 현재 사용자 ID 확인
             String currentUserId = userSession.getCurrentUserId();
             if (currentUserId == null || currentUserId.trim().isEmpty()) {
-                Log.w(TAG, "사용자 ID가 null - 기본 테스트 사용자 사용");
-                currentUserId = "user1"; // 기본 테스트 사용자 ID
-
-                // UserSession에 기본 사용자 정보 설정
-                userSession.login(currentUserId, "사용자1", "user1@test.com", true);
-                Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
+                Log.w(TAG, "사용자 ID가 null - 로그인 필요");
+                Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
             }
 
             Log.d(TAG, "최종 사용자 ID: " + currentUserId);
@@ -243,19 +241,14 @@ public class FriendAddActivity extends AppCompatActivity {
                 String currentUserId = userSession.getCurrentUserId();
                 String currentUserName = userSession.getCurrentUserName();
 
-                // 사용자 정보가 없으면 기본값 사용
+                // 사용자 정보가 없으면 오류 처리
                 if (currentUserId == null || currentUserId.trim().isEmpty()) {
-                    currentUserId = "user1";
-                    currentUserName = "사용자1";
-                    Log.w(TAG, "사용자 정보가 없어 기본값 사용: " + currentUserId);
-
-                    // UserSession에 기본 정보 설정
-                    final String finalCurrentUserId = currentUserId;
-                    final String finalCurrentUserName = currentUserName;
-
+                    Log.w(TAG, "사용자 정보가 없음 - 로그인 필요");
                     runOnUiThread(() -> {
-                        userSession.login(finalCurrentUserId, finalCurrentUserName, "user1@test.com", true);
+                        Toast.makeText(FriendAddActivity.this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                        finish();
                     });
+                    return;
                 }
 
                 if (currentUserName == null || currentUserName.trim().isEmpty()) {

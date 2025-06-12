@@ -267,20 +267,8 @@ public class ScheduleCalendarActivity extends AppCompatActivity {
                 transportModesText = "\n🚌 교통수단: " + schedule.selectedTransportModes;
             }
 
-            // 함께하는 친구 정보 가져오기
+            // 공유 친구 기능 제거됨 - 개인 일정만 지원
             String friendsText = "";
-            try {
-                List<String> friendNames = getSharedFriends(schedule.id);
-                if (!friendNames.isEmpty()) {
-                    friendsText = "\n\n👥 함께하는 친구:\n";
-                    for (String friendName : friendNames) {
-                        friendsText += "• " + friendName + "\n";
-                    }
-                    friendsText = friendsText.trim();
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "친구 정보 로드 오류", e);
-            }
 
             new AlertDialog.Builder(this)
                 .setTitle(title)
@@ -424,37 +412,7 @@ public class ScheduleCalendarActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 일정에 참여하는 친구들 목록 가져오기
-     */
-    private List<String> getSharedFriends(int scheduleId) {
-        List<String> friendNames = new ArrayList<>();
-        try {
-            AppDatabase database = AppDatabase.getInstance(this);
-
-            // SharedSchedule에서 수락된 친구들 찾기
-            List<com.example.timemate.data.model.SharedSchedule> allSharedSchedules =
-                database.sharedScheduleDao().getSharedSchedulesByScheduleId(scheduleId);
-
-            for (com.example.timemate.data.model.SharedSchedule shared : allSharedSchedules) {
-                // 수락된 상태인 친구들만 포함
-                if ("accepted".equals(shared.status)) {
-                    if (shared.invitedNickname != null && !shared.invitedNickname.isEmpty()) {
-                        friendNames.add(shared.invitedNickname);
-                    } else {
-                        // 닉네임이 없으면 사용자 ID 사용
-                        friendNames.add(shared.invitedUserId);
-                    }
-                }
-            }
-
-            Log.d(TAG, "일정 " + scheduleId + "의 참여 친구 수: " + friendNames.size());
-
-        } catch (Exception e) {
-            Log.e(TAG, "공유 친구 정보 로드 오류", e);
-        }
-        return friendNames;
-    }
+    // 공유 친구 기능 제거됨 - 개인 일정만 지원
 
     /**
      * 일정 삭제 확인

@@ -7,7 +7,7 @@ import com.example.timemate.data.model.Friend;
 import com.example.timemate.network.api.NaverPlaceKeywordService;
 import com.example.timemate.network.api.NaverPlaceSearchRetrofitService;
 import com.example.timemate.network.api.NaverOptimalRouteService;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +22,6 @@ public class ScheduleAddPresenter {
     public interface View {
         void showPlaceSuggestions(List<NaverPlaceKeywordService.PlaceItem> places, boolean isDeparture);
         void showRouteOptions(List<NaverOptimalRouteService.RouteOption> routes);
-        void showFriendSelector(List<Friend> friends);
         void showError(String message);
         void showLoading(boolean show);
         void onScheduleSaved();
@@ -110,37 +109,7 @@ public class ScheduleAddPresenter {
         );
     }
 
-    /**
-     * 친구 목록 로드
-     */
-    public void loadFriends() {
-        executor.execute(() -> {
-            try {
-                String currentUserId = userSession.getCurrentUserId();
-                if (currentUserId == null) {
-                    android.util.Log.w("ScheduleAddPresenter", "현재 사용자 ID가 null입니다");
-                    view.showError("로그인 정보를 확인할 수 없습니다.");
-                    return;
-                }
-
-                android.util.Log.d("ScheduleAddPresenter", "친구 목록 로드 시작 - 사용자: " + currentUserId);
-                List<Friend> friends = database.friendDao().getFriendsByUserId(currentUserId);
-
-                android.util.Log.d("ScheduleAddPresenter", "로드된 친구 수: " + (friends != null ? friends.size() : 0));
-
-                // UI 스레드에서 친구 선택 다이얼로그 표시
-                if (friends != null && !friends.isEmpty()) {
-                    view.showFriendSelector(friends);
-                } else {
-                    view.showError("등록된 친구가 없습니다. 먼저 친구를 추가해주세요.");
-                }
-
-            } catch (Exception e) {
-                android.util.Log.e("ScheduleAddPresenter", "친구 목록 로드 오류", e);
-                view.showError("친구 목록을 불러올 수 없습니다: " + e.getMessage());
-            }
-        });
-    }
+    // 친구 초대 기능 제거됨 - 개인 일정만 지원
 
     /**
      * 일정 저장
@@ -189,18 +158,25 @@ public class ScheduleAddPresenter {
                 android.util.Log.d("ScheduleAddPresenter", "👤 사용자: " + schedule.userId);
                 android.util.Log.d("ScheduleAddPresenter", "📅 날짜: " + schedule.date);
                 android.util.Log.d("ScheduleAddPresenter", "⏰ 시간: " + schedule.time);
+                android.util.Log.d("ScheduleAddPresenter", "🔍 현재 로그인 사용자: " + currentUserId);
+
+                // userId가 null이거나 비어있으면 오류
+                if (schedule.userId == null || schedule.userId.trim().isEmpty()) {
+                    android.util.Log.e("ScheduleAddPresenter", "❌ 일정의 userId가 null 또는 비어있음!");
+                    view.showError("사용자 정보가 올바르지 않습니다. 다시 로그인해주세요.");
+                    return;
+                }
 
                 // 일정 저장
                 long scheduleId = database.scheduleDao().insert(schedule);
 
                 android.util.Log.d("ScheduleAddPresenter", "✅ 일정 저장 완료 - 생성된 ID: " + scheduleId);
 
-                // 저장된 일정 즉시 확인
-                Schedule savedSchedule = database.scheduleDao().getScheduleById((int)scheduleId);
+                // 저장 후 실제 데이터베이스에서 확인
+                Schedule savedSchedule = database.scheduleDao().getScheduleById(scheduleId);
                 if (savedSchedule != null) {
                     android.util.Log.d("ScheduleAddPresenter", "✅ 저장 확인 성공");
-                    android.util.Log.d("ScheduleAddPresenter", "📋 저장된 제목: " + savedSchedule.title);
-                    android.util.Log.d("ScheduleAddPresenter", "👤 저장된 사용자: " + savedSchedule.userId);
+                    android.util.Log.d("ScheduleAddPresenter", "🔍 저장된 일정 - ID: " + savedSchedule.id + ", 사용자: " + savedSchedule.userId + ", 제목: " + savedSchedule.title);
                     android.util.Log.d("ScheduleAddPresenter", "📅 저장된 날짜: " + savedSchedule.date);
                 } else {
                     android.util.Log.e("ScheduleAddPresenter", "❌ 저장 확인 실패 - 일정을 다시 조회할 수 없음");
@@ -212,16 +188,10 @@ public class ScheduleAddPresenter {
                 java.util.List<Schedule> userSchedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
                 android.util.Log.d("ScheduleAddPresenter", "📊 저장 후 사용자 일정 총 개수: " + userSchedules.size());
 
-                // 친구 초대 처리
-                if (selectedFriends != null && !selectedFriends.isEmpty()) {
-                    android.util.Log.d("ScheduleAddPresenter", "👥 공유 일정 저장 시작 - 친구 수: " + selectedFriends.size());
-                    saveSharedSchedules(scheduleId, schedule, selectedFriends);
-                }
-
                 // 알림 설정
                 createScheduleReminder(schedule);
 
-                android.util.Log.d("ScheduleAddPresenter", "🎉 일정 저장 프로세스 완료");
+                android.util.Log.d("ScheduleAddPresenter", "🎉 일정 저장 프로세스 완료 (개인 일정)");
                 view.onScheduleSaved();
 
             } catch (Exception e) {
@@ -254,78 +224,7 @@ public class ScheduleAddPresenter {
         return true;
     }
 
-    /**
-     * 공유 일정 저장
-     */
-    private void saveSharedSchedules(long scheduleId, Schedule schedule, List<Friend> friends) {
-        try {
-            String currentUserId = userSession.getCurrentUserId();
-            String currentNickname = userSession.getCurrentUserName();
-
-            for (Friend friend : friends) {
-                com.example.timemate.data.model.SharedSchedule sharedSchedule =
-                    new com.example.timemate.data.model.SharedSchedule();
-
-                sharedSchedule.originalScheduleId = (int) scheduleId;
-                sharedSchedule.creatorUserId = currentUserId;
-                sharedSchedule.creatorNickname = currentNickname != null ? currentNickname : currentUserId;
-                sharedSchedule.invitedUserId = friend.friendUserId;
-                sharedSchedule.invitedNickname = friend.friendNickname;
-
-                // 일정 정보 캐시
-                sharedSchedule.title = schedule.title;
-                sharedSchedule.date = schedule.date;
-                sharedSchedule.time = schedule.time;
-                sharedSchedule.departure = schedule.departure;
-                sharedSchedule.destination = schedule.destination;
-                sharedSchedule.memo = schedule.memo;
-
-                sharedSchedule.status = "pending"; // 대기 중
-                sharedSchedule.isNotificationSent = false;
-                sharedSchedule.isNotificationRead = false;
-                sharedSchedule.createdAt = System.currentTimeMillis();
-                sharedSchedule.updatedAt = System.currentTimeMillis();
-
-                long sharedScheduleId = database.sharedScheduleDao().insert(sharedSchedule);
-                android.util.Log.d("ScheduleAddPresenter", "공유 일정 저장: " + friend.friendNickname);
-
-                // 친구에게 알림 전송
-                sendInviteNotification(sharedSchedule, (int)sharedScheduleId);
-            }
-        } catch (Exception e) {
-            android.util.Log.e("ScheduleAddPresenter", "Error saving shared schedules", e);
-        }
-    }
-
-    /**
-     * 친구에게 일정 초대 알림 전송
-     */
-    private void sendInviteNotification(com.example.timemate.data.model.SharedSchedule sharedSchedule, int sharedScheduleId) {
-        try {
-            // NotificationService를 사용하여 알림 전송
-            com.example.timemate.NotificationService notificationService =
-                new com.example.timemate.NotificationService(context);
-
-            String title = "일정 초대";
-            String content = sharedSchedule.creatorNickname + "님이 '" + sharedSchedule.title + "' 일정에 초대했습니다";
-
-            // 알림 전송
-            notificationService.sendFriendInviteNotification(
-                title,
-                content,
-                sharedScheduleId
-            );
-
-            // 알림 전송 상태 업데이트
-            sharedSchedule.isNotificationSent = true;
-            database.sharedScheduleDao().update(sharedSchedule);
-
-            android.util.Log.d("ScheduleAddPresenter", "✅ 알림 전송 완료: " + sharedSchedule.invitedNickname);
-
-        } catch (Exception e) {
-            android.util.Log.e("ScheduleAddPresenter", "❌ 알림 전송 오류", e);
-        }
-    }
+    // 공유 일정 기능 제거됨 - 개인 일정만 지원
 
     /**
      * 일정 알림 생성

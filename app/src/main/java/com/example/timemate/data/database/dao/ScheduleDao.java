@@ -47,6 +47,9 @@ public interface ScheduleDao {
     @Query("SELECT * FROM schedules WHERE date = :targetDate ORDER BY date ASC, time ASC")
     List<Schedule> getSchedulesByDate(String targetDate);
 
+    @Query("SELECT * FROM schedules WHERE userId = :userId AND date = :targetDate ORDER BY date ASC, time ASC")
+    List<Schedule> getSchedulesByDate(String userId, String targetDate);
+
     @Query("SELECT * FROM schedules ORDER BY date ASC, time ASC")
     List<Schedule> getAllSchedules();
 

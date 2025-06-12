@@ -358,12 +358,21 @@ public class HomeActivity extends AppCompatActivity {
                     AppDatabase db = AppDatabase.getInstance(this);
                     ScheduleReminderDao reminderDao = db.scheduleReminderDao();
 
-                    // 내일 날짜의 활성 리마인더 조회
+                    // 현재 사용자 ID 가져오기
+                    UserSession userSession = UserSession.getInstance(this);
+                    String currentUserId = userSession.getCurrentUserId();
+
+                    if (currentUserId == null) {
+                        Log.w("HomeActivity", "사용자가 로그인되지 않아 리마인더를 로드할 수 없습니다");
+                        return;
+                    }
+
+                    // 내일 날짜의 현재 사용자 활성 리마인더 조회
                     Calendar tomorrow = Calendar.getInstance();
                     tomorrow.add(Calendar.DAY_OF_MONTH, 1);
                     String tomorrowDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(tomorrow.getTime());
 
-                    List<ScheduleReminder> reminders = reminderDao.getRemindersByDate(tomorrowDate);
+                    List<ScheduleReminder> reminders = reminderDao.getRemindersByUserAndDate(currentUserId, tomorrowDate);
 
                     // UI 스레드에서 어댑터 업데이트
                     runOnUiThread(() -> {

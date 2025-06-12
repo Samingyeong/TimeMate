@@ -267,7 +267,7 @@
 
             </LinearLayout>
 
-            <!-- 친구 선택 -->
+            <!-- 친구 선택 (개인 일정만 지원하므로 숨김) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -275,7 +275,8 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/ios_card_background"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="24dp"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"

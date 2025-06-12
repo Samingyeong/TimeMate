@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.friend.FriendListActivity;
 import com.example.timemate.features.profile.ProfileActivity;
@@ -463,6 +463,12 @@ public class ScheduleListActivity extends AppCompatActivity {
             startActivityForResult(intent, REQUEST_ADD_SCHEDULE);
         });
 
+        // 디버깅용: FAB 길게 누르면 테스트 사용자 생성
+        fabAddSchedule.setOnLongClickListener(v -> {
+            createTestUsers();
+            return true;
+        });
+
         // 디버깅용 강제 새로고침 (헤더 더블 탭)
         if (findViewById(R.id.layoutHeader) != null) {
             findViewById(R.id.layoutHeader).setOnClickListener(new View.OnClickListener() {
@@ -564,19 +570,22 @@ public class ScheduleListActivity extends AppCompatActivity {
 
         executor.execute(() -> {
             try {
+                // 강화된 사용자 세션 디버깅
+                Log.d(TAG, "🔍 === 사용자 세션 디버깅 ===");
+                Log.d(TAG, "🔍 로그인 상태: " + userSession.isLoggedIn());
                 String currentUserId = userSession.getCurrentUserId();
-                Log.d(TAG, "현재 사용자 ID: " + currentUserId);
+                Log.d(TAG, "🔍 현재 사용자 ID: '" + currentUserId + "'");
+                Log.d(TAG, "🔍 현재 사용자 이름: '" + userSession.getCurrentUserName() + "'");
+                Log.d(TAG, "🔍 현재 사용자 이메일: '" + userSession.getCurrentUserEmail() + "'");
+                Log.d(TAG, "🔍 ========================");
 
                 if (currentUserId == null || currentUserId.trim().isEmpty()) {
-                    Log.w(TAG, "⚠️ 사용자 ID가 null - 기본 사용자 사용");
-                    currentUserId = "user1"; // 기본 사용자 ID
-
-                    // UserSession에 기본 사용자 정보 설정
-                    final String finalUserId = currentUserId;
+                    Log.w(TAG, "⚠️ 사용자 ID가 null - 로그인 필요");
                     runOnUiThread(() -> {
-                        userSession.login(finalUserId, "사용자1", "user1@test.com", true);
-                        Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
+                        finish();
                     });
+                    return;
                 }
 
                 // 데이터베이스 연결 확인
@@ -594,9 +603,13 @@ public class ScheduleListActivity extends AppCompatActivity {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String todayDate = dateFormat.format(new java.util.Date());
 
-                // 먼저 데이터베이스 전체 일정 수 확인
+                // 먼저 데이터베이스 전체 일정 수 확인 (디버깅용)
                 List<Schedule> allSchedulesInDB = database.scheduleDao().getAllSchedules();
                 Log.d(TAG, "🗄️ 데이터베이스 전체 일정 수: " + (allSchedulesInDB != null ? allSchedulesInDB.size() : "null"));
+
+                // 사용자별 일정 수도 확인
+                int userScheduleCount = database.scheduleDao().getScheduleCountByUserId(currentUserId);
+                Log.d(TAG, "👤 현재 사용자(" + currentUserId + ")의 일정 수: " + userScheduleCount);
 
                 // 현재 사용자의 일정만 조회
                 List<Schedule> schedules = database.scheduleDao().getSchedulesByUserId(currentUserId);
@@ -629,44 +642,7 @@ public class ScheduleListActivity extends AppCompatActivity {
                     Log.w(TAG, "⚠️ 현재 사용자의 일정이 없습니다!");
                 }
 
-                // 공유된 일정도 추가 (수락된 것만)
-                try {
-                    List<com.example.timemate.data.model.SharedSchedule> sharedSchedules =
-                        database.sharedScheduleDao().getSharedSchedulesByUserId(currentUserId);
-
-                    int acceptedCount = 0;
-                    for (com.example.timemate.data.model.SharedSchedule shared : sharedSchedules) {
-                        if ("accepted".equals(shared.status)) {
-                            try {
-                                // 원본 일정 가져오기
-                                Schedule originalSchedule = database.scheduleDao().getScheduleById(shared.originalScheduleId);
-                                if (originalSchedule != null) {
-                                    // 공유된 일정임을 표시하기 위해 제목에 표시 추가
-                                    Schedule sharedScheduleCopy = new Schedule();
-                                    sharedScheduleCopy.id = originalSchedule.id;
-                                    sharedScheduleCopy.userId = originalSchedule.userId;
-                                    sharedScheduleCopy.title = "👥 " + originalSchedule.title + " (with " + shared.creatorNickname + ")";
-                                    sharedScheduleCopy.date = originalSchedule.date;
-                                    sharedScheduleCopy.time = originalSchedule.time;
-                                    sharedScheduleCopy.departure = originalSchedule.departure;
-                                    sharedScheduleCopy.destination = originalSchedule.destination;
-                                    sharedScheduleCopy.memo = originalSchedule.memo;
-                                    sharedScheduleCopy.isCompleted = originalSchedule.isCompleted;
-                                    sharedScheduleCopy.routeInfo = originalSchedule.routeInfo;
-                                    sharedScheduleCopy.selectedTransportModes = originalSchedule.selectedTransportModes;
-
-                                    schedules.add(sharedScheduleCopy);
-                                    acceptedCount++;
-                                }
-                            } catch (Exception e) {
-                                Log.e(TAG, "공유 일정 처리 오류: " + shared.originalScheduleId, e);
-                            }
-                        }
-                    }
-                    Log.d(TAG, "📊 추가된 공유 일정 수: " + acceptedCount);
-                } catch (Exception e) {
-                    Log.e(TAG, "공유 일정 로드 오류", e);
-                }
+                // 공유 일정 기능 제거됨 - 개인 일정만 지원
 
                 Log.d(TAG, "📊 총 일정 수: " + (schedules != null ? schedules.size() : "null"));
 
@@ -701,6 +677,9 @@ public class ScheduleListActivity extends AppCompatActivity {
 
                         // 캘린더에 일정 날짜 업데이트
                         updateCalendarSchedules();
+
+                        // 디버깅: 화면에 사용자 정보 표시
+                        showDebugInfo(currentUserId, schedules, allSchedulesInDB);
 
                         // Empty State 처리
                         if (schedules == null || schedules.isEmpty()) {
@@ -756,20 +735,8 @@ public class ScheduleListActivity extends AppCompatActivity {
                 Log.d(TAG, "⚠️ 경로 정보 없음 - routeInfo: " + schedule.routeInfo + ", transportModes: " + schedule.selectedTransportModes);
             }
 
-            // 함께하는 친구 정보 가져오기
+            // 공유 친구 기능 제거됨 - 개인 일정만 지원
             String friendsText = "";
-            try {
-                List<String> friendNames = getSharedFriends(schedule.id);
-                if (!friendNames.isEmpty()) {
-                    friendsText = "\n\n👥 함께하는 친구:\n";
-                    for (String friendName : friendNames) {
-                        friendsText += "• " + friendName + "\n";
-                    }
-                    friendsText = friendsText.trim();
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "친구 정보 로드 오류", e);
-            }
 
             // iOS 스타일 다이얼로그로 표시
             showIOSStyleScheduleDetail(schedule, title, date, time, departure, destination, memo, routeInfoText, friendsText);
@@ -910,37 +877,7 @@ public class ScheduleListActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 일정에 참여하는 친구들 목록 가져오기
-     */
-    private List<String> getSharedFriends(int scheduleId) {
-        List<String> friendNames = new ArrayList<>();
-        try {
-            AppDatabase database = AppDatabase.getInstance(this);
-
-            // SharedSchedule에서 수락된 친구들 찾기
-            List<com.example.timemate.data.model.SharedSchedule> allSharedSchedules =
-                database.sharedScheduleDao().getSharedSchedulesByScheduleId(scheduleId);
-
-            for (com.example.timemate.data.model.SharedSchedule shared : allSharedSchedules) {
-                // 수락된 상태인 친구들만 포함
-                if ("accepted".equals(shared.status)) {
-                    if (shared.invitedNickname != null && !shared.invitedNickname.isEmpty()) {
-                        friendNames.add(shared.invitedNickname);
-                    } else {
-                        // 닉네임이 없으면 사용자 ID 사용
-                        friendNames.add(shared.invitedUserId);
-                    }
-                }
-            }
-
-            Log.d(TAG, "일정 " + scheduleId + "의 참여 친구 수: " + friendNames.size());
-
-        } catch (Exception e) {
-            Log.e(TAG, "공유 친구 정보 로드 오류", e);
-        }
-        return friendNames;
-    }
+    // 공유 친구 기능 제거됨 - 개인 일정만 지원
 
     /**
      * iOS 스타일 일정 상세보기 다이얼로그
@@ -1385,5 +1322,111 @@ public class ScheduleListActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, "❌ 리소스 정리 중 오류", e);
         }
+    }
+
+    /**
+     * 디버깅 정보를 화면에 표시
+     */
+    private void showDebugInfo(String currentUserId, List<Schedule> userSchedules, List<Schedule> allSchedules) {
+        try {
+            // 먼저 데이터베이스의 모든 사용자 확인
+            executor.execute(() -> {
+                try {
+                    List<com.example.timemate.data.model.User> allUsers = database.userDao().getAllUsers();
+
+                    runOnUiThread(() -> {
+                        StringBuilder debugInfo = new StringBuilder();
+                        debugInfo.append("🔍 디버깅 정보\n");
+                        debugInfo.append("현재 사용자: ").append(currentUserId).append("\n");
+                        debugInfo.append("내 일정 수: ").append(userSchedules != null ? userSchedules.size() : 0).append("\n");
+                        debugInfo.append("전체 일정 수: ").append(allSchedules != null ? allSchedules.size() : 0).append("\n");
+                        debugInfo.append("등록된 사용자 수: ").append(allUsers != null ? allUsers.size() : 0).append("\n\n");
+
+                        if (allUsers != null && !allUsers.isEmpty()) {
+                            debugInfo.append("등록된 사용자들:\n");
+                            for (com.example.timemate.data.model.User user : allUsers) {
+                                debugInfo.append("- ").append(user.nickname).append(" (").append(user.userId).append(")\n");
+                            }
+                            debugInfo.append("\n");
+                        }
+
+                        if (allSchedules != null && !allSchedules.isEmpty()) {
+                            debugInfo.append("전체 일정 목록:\n");
+                            for (Schedule s : allSchedules) {
+                                debugInfo.append("- ").append(s.title).append(" (").append(s.userId).append(")\n");
+                            }
+                        }
+
+                        // Toast로 표시 (길면 여러 번 나눠서)
+                        String debugText = debugInfo.toString();
+                        if (debugText.length() > 300) {
+                            // 첫 번째 부분만 표시
+                            String firstPart = debugText.substring(0, Math.min(300, debugText.length()));
+                            Toast.makeText(this, firstPart + "...", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, debugText, Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                } catch (Exception e) {
+                    Log.e(TAG, "사용자 정보 조회 오류", e);
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e(TAG, "디버깅 정보 표시 오류", e);
+        }
+    }
+
+    /**
+     * 테스트 사용자들 생성 (디버깅용)
+     */
+    private void createTestUsers() {
+        executor.execute(() -> {
+            try {
+                // 테스트 사용자 1
+                com.example.timemate.data.model.User user1 = database.userDao().getUserById("test_user_1");
+                if (user1 == null) {
+                    user1 = new com.example.timemate.data.model.User();
+                    user1.userId = "test_user_1";
+                    user1.nickname = "테스트사용자1";
+                    user1.email = "test1@example.com";
+                    user1.password = "password";
+                    database.userDao().insert(user1);
+                    Log.d(TAG, "테스트 사용자 1 생성 완료");
+                }
+
+                // 테스트 사용자 2
+                com.example.timemate.data.model.User user2 = database.userDao().getUserById("test_user_2");
+                if (user2 == null) {
+                    user2 = new com.example.timemate.data.model.User();
+                    user2.userId = "test_user_2";
+                    user2.nickname = "테스트사용자2";
+                    user2.email = "test2@example.com";
+                    user2.password = "password";
+                    database.userDao().insert(user2);
+                    Log.d(TAG, "테스트 사용자 2 생성 완료");
+                }
+
+                // 테스트 사용자 3
+                com.example.timemate.data.model.User user3 = database.userDao().getUserById("test_user_3");
+                if (user3 == null) {
+                    user3 = new com.example.timemate.data.model.User();
+                    user3.userId = "test_user_3";
+                    user3.nickname = "테스트사용자3";
+                    user3.email = "test3@example.com";
+                    user3.password = "password";
+                    database.userDao().insert(user3);
+                    Log.d(TAG, "테스트 사용자 3 생성 완료");
+                }
+
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "테스트 사용자들이 생성되었습니다\ntest_user_1, test_user_2, test_user_3\n비밀번호: password", Toast.LENGTH_LONG).show();
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "테스트 사용자 생성 오류", e);
+            }
+        });
     }
 }

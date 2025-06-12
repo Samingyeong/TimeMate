@@ -31,6 +31,9 @@ public interface ScheduleReminderDao {
     
     @Query("SELECT * FROM schedule_reminder WHERE appointment_time LIKE :date || '%' AND is_active = 1")
     List<ScheduleReminder> getRemindersByDate(String date); // "yyyy-MM-dd" 형식
+
+    @Query("SELECT * FROM schedule_reminder WHERE user_id = :userId AND appointment_time LIKE :date || '%' AND is_active = 1")
+    List<ScheduleReminder> getRemindersByUserAndDate(String userId, String date); // 사용자별 날짜 리마인더
     
     @Query("SELECT * FROM schedule_reminder WHERE notification_sent = 0 AND is_active = 1")
     List<ScheduleReminder> getPendingNotifications();
