@@ -174,12 +174,18 @@ public class RecommendationActivity extends AppCompatActivity {
                 btnSearch.setOnClickListener(v -> performImageSearch());
             }
 
+            // 서비스 초기화
+            setupServices();
+
             // 이미지 포함 어댑터 초기화 (RecyclerView가 있을 때만)
             if (recyclerRecommendations != null) {
                 setupImageAdapter();
             } else {
                 Log.w("RecommendationActivity", "⚠️ recyclerRecommendations가 null이므로 어댑터 설정 건너뜀");
             }
+
+            // 초기 지도 설정
+            setupInitialMap();
 
             // 카테고리 버튼 클릭 리스너
             if (btnCategoryRestaurant != null) {
@@ -414,11 +420,20 @@ public class RecommendationActivity extends AppCompatActivity {
     }
 
     private void setupServices() {
-        // 다양한 검색 서비스 초기화
-        searchApiService = new com.example.timemate.network.api.NaverSearchApiService();
-        staticMapService = new com.example.timemate.network.api.NaverStaticMapService();
-        kakaoSearchService = new KakaoLocalSearchService();
-        dummySearchService = new DummyPlaceSearchService(); // 안정적인 폴백 서비스
+        try {
+            Log.d("RecommendationActivity", "🔧 서비스 초기화 시작");
+
+            // 다양한 검색 서비스 초기화
+            searchApiService = new com.example.timemate.network.api.NaverSearchApiService();
+            staticMapService = new com.example.timemate.network.api.NaverStaticMapService();
+            kakaoSearchService = new KakaoLocalSearchService();
+            dummySearchService = new DummyPlaceSearchService(); // 안정적인 폴백 서비스
+
+            Log.d("RecommendationActivity", "✅ 모든 서비스 초기화 완료");
+
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "❌ 서비스 초기화 오류", e);
+        }
     }
 
     private void setupClickListeners() {
@@ -1696,6 +1711,8 @@ public class RecommendationActivity extends AppCompatActivity {
             }
         }
     }
+
+
 
     /**
      * 이미지 포함 어댑터 설정

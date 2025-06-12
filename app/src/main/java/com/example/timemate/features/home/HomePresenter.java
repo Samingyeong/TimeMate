@@ -40,9 +40,12 @@ public class HomePresenter {
         executor.execute(() -> {
             try {
                 String userId = userSession.getCurrentUserId();
-                if (userId == null) {
-                    callback.onSchedulesLoaded(List.of());
-                    return;
+                if (userId == null || userId.trim().isEmpty()) {
+                    android.util.Log.w("HomePresenter", "사용자 ID가 null - 기본 사용자 사용");
+                    userId = "user1"; // 기본 사용자 ID
+
+                    // UserSession에 기본 사용자 정보 설정
+                    userSession.login(userId, "사용자1", "user1@test.com", true);
                 }
 
                 // 오늘 날짜 범위 계산
@@ -80,9 +83,12 @@ public class HomePresenter {
         executor.execute(() -> {
             try {
                 String userId = userSession.getCurrentUserId();
-                if (userId == null) {
-                    callback.onSchedulesLoaded(List.of());
-                    return;
+                if (userId == null || userId.trim().isEmpty()) {
+                    android.util.Log.w("HomePresenter", "사용자 ID가 null - 기본 사용자 사용");
+                    userId = "user1"; // 기본 사용자 ID
+
+                    // UserSession에 기본 사용자 정보 설정
+                    userSession.login(userId, "사용자1", "user1@test.com", true);
                 }
 
                 // 내일 날짜 범위 계산

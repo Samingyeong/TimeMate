@@ -286,11 +286,44 @@ public class ScheduleAddPresenter {
                 sharedSchedule.createdAt = System.currentTimeMillis();
                 sharedSchedule.updatedAt = System.currentTimeMillis();
 
-                database.sharedScheduleDao().insert(sharedSchedule);
+                long sharedScheduleId = database.sharedScheduleDao().insert(sharedSchedule);
                 android.util.Log.d("ScheduleAddPresenter", "공유 일정 저장: " + friend.friendNickname);
+
+                // 친구에게 알림 전송
+                sendInviteNotification(sharedSchedule, (int)sharedScheduleId);
             }
         } catch (Exception e) {
             android.util.Log.e("ScheduleAddPresenter", "Error saving shared schedules", e);
+        }
+    }
+
+    /**
+     * 친구에게 일정 초대 알림 전송
+     */
+    private void sendInviteNotification(com.example.timemate.data.model.SharedSchedule sharedSchedule, int sharedScheduleId) {
+        try {
+            // NotificationService를 사용하여 알림 전송
+            com.example.timemate.NotificationService notificationService =
+                new com.example.timemate.NotificationService(context);
+
+            String title = "일정 초대";
+            String content = sharedSchedule.creatorNickname + "님이 '" + sharedSchedule.title + "' 일정에 초대했습니다";
+
+            // 알림 전송
+            notificationService.sendFriendInviteNotification(
+                title,
+                content,
+                sharedScheduleId
+            );
+
+            // 알림 전송 상태 업데이트
+            sharedSchedule.isNotificationSent = true;
+            database.sharedScheduleDao().update(sharedSchedule);
+
+            android.util.Log.d("ScheduleAddPresenter", "✅ 알림 전송 완료: " + sharedSchedule.invitedNickname);
+
+        } catch (Exception e) {
+            android.util.Log.e("ScheduleAddPresenter", "❌ 알림 전송 오류", e);
         }
     }
 

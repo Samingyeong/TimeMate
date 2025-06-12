@@ -65,17 +65,25 @@
                 <AutoCompleteTextView
                     android:id="@+id/editSearchLocation"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:hint="지역을 선택하세요 (예: 강남, 해운대, 전주, 제주)"
+                    android:layout_height="56dp"
+                    android:hint="지역을 입력하세요"
                     android:background="@drawable/timemate_edittext_background"
-                    android:padding="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp"
                     android:layout_marginBottom="16dp"
                     android:drawableStart="@drawable/ic_location"
-                    android:drawablePadding="8dp"
-                    style="@style/iOSBody"
+                    android:drawablePadding="12dp"
+                    android:fontFamily="@font/pretendard_regular"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint"
                     android:completionThreshold="1"
-                    android:dropDownHeight="200dp" />
+                    android:dropDownHeight="200dp"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch" />
 
                 <!-- 카테고리 선택 -->
                 <TextView

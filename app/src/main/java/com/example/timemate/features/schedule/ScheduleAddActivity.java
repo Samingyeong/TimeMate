@@ -267,6 +267,34 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         rvDest = findViewById(R.id.rvDestSuggest);
 
         setupSuggestRecyclerViews();
+        setupMemoFocusListener();
+    }
+
+    /**
+     * 메모 필드 포커스 리스너 설정
+     */
+    private void setupMemoFocusListener() {
+        editMemo.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                // 포커스를 잃으면 키보드 숨김
+                hideKeyboard();
+            }
+        });
+    }
+
+    /**
+     * 키보드 숨김
+     */
+    private void hideKeyboard() {
+        try {
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            if (imm != null && getCurrentFocus() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        } catch (Exception e) {
+            Log.e("ScheduleAdd", "키보드 숨김 오류", e);
+        }
     }
 
     private void initPresenter() {
@@ -787,9 +815,18 @@ public class ScheduleAddActivity extends AppCompatActivity implements ScheduleAd
         btnBack.setOnClickListener(v -> finish());
         btnCancel.setOnClickListener(v -> finish());
 
-        btnSelectDate.setOnClickListener(v -> showDatePicker());
-        btnSelectTime.setOnClickListener(v -> showTimePicker());
-        btnSelectFriends.setOnClickListener(v -> showFriendSelector());
+        btnSelectDate.setOnClickListener(v -> {
+            hideKeyboard();
+            showDatePicker();
+        });
+        btnSelectTime.setOnClickListener(v -> {
+            hideKeyboard();
+            showTimePicker();
+        });
+        btnSelectFriends.setOnClickListener(v -> {
+            hideKeyboard();
+            showFriendSelector();
+        });
         btnGetDirections.setOnClickListener(v -> {
             try {
                 Log.d("ScheduleAdd", "🗺️ 길찾기 버튼 클릭됨");

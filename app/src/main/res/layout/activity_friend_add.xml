@@ -117,15 +117,23 @@
                     <EditText
                         android:id="@+id/editFriendId"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="친구의 고유 ID를 입력하세요"
+                        android:layout_height="56dp"
+                        android:hint="친구 ID 입력"
                         android:background="@drawable/timemate_edittext_background"
-                        android:padding="16dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
                         android:inputType="text"
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_hint"
+                        android:fontFamily="@font/pretendard_regular"
+                        android:textSize="16sp"
                         android:drawableStart="@drawable/ic_person"
                         android:drawablePadding="12dp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:imeOptions="actionNext"
                         app:drawableTint="@color/text_secondary" />
 
                 </LinearLayout>
@@ -159,15 +167,23 @@
                     <EditText
                         android:id="@+id/editFriendNickname"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="친구에게 표시될 닉네임을 입력하세요"
+                        android:layout_height="56dp"
+                        android:hint="닉네임 입력"
                         android:background="@drawable/timemate_edittext_background"
-                        android:padding="16dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp"
                         android:inputType="text"
                         android:textColor="@color/text_primary"
                         android:textColorHint="@color/text_hint"
+                        android:fontFamily="@font/pretendard_regular"
+                        android:textSize="16sp"
                         android:drawableStart="@drawable/ic_edit"
                         android:drawablePadding="12dp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:imeOptions="actionDone"
                         app:drawableTint="@color/text_secondary" />
 
                 </LinearLayout>

@@ -2,6 +2,7 @@ package com.example.timemate.features.friend;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
@@ -14,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Friend;
-import com.example.timemate.util.UserSession;
+import com.example.timemate.core.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.schedule.ScheduleListActivity;
 import com.example.timemate.features.profile.ProfileActivity;
@@ -35,6 +36,7 @@ import java.util.concurrent.Executors;
 public class FriendListActivity extends AppCompatActivity {
 
     private static final String TAG = "FriendListActivity";
+    private static final int REQUEST_ADD_FRIEND = 1001;
     
     private AppDatabase database;
     private UserSession userSession;
@@ -119,7 +121,7 @@ public class FriendListActivity extends AppCompatActivity {
     private void setupClickListeners() {
         fabAddFriend.setOnClickListener(v -> {
             Intent intent = new Intent(this, FriendAddActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_ADD_FRIEND);
         });
     }
 
@@ -127,25 +129,40 @@ public class FriendListActivity extends AppCompatActivity {
         executor.execute(() -> {
             try {
                 String currentUserId = userSession.getCurrentUserId();
-                if (currentUserId == null) {
+                if (currentUserId == null || currentUserId.trim().isEmpty()) {
+                    Log.w(TAG, "사용자 ID가 null - 기본 사용자 사용");
+                    currentUserId = "user1"; // 기본 사용자 ID
+
+                    // UserSession에 기본 사용자 정보 설정
+                    final String finalUserId = currentUserId;
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
-                        finish();
+                        userSession.login(finalUserId, "사용자1", "user1@test.com", true);
+                        Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
                     });
-                    return;
                 }
 
+                Log.d(TAG, "친구 목록 로드 시작 - 사용자 ID: " + currentUserId);
                 List<Friend> friends = database.friendDao().getFriendsByUserId(currentUserId);
-                
+                Log.d(TAG, "친구 목록 조회 결과: " + (friends != null ? friends.size() : "null") + "개");
+
                 runOnUiThread(() -> {
                     friendList.clear();
-                    friendList.addAll(friends);
+                    if (friends != null) {
+                        friendList.addAll(friends);
+                        Log.d(TAG, "친구 목록 업데이트 완료: " + friendList.size() + "개");
+                    }
                     friendAdapter.notifyDataSetChanged();
+
+                    // 친구 목록이 비어있으면 안내 메시지
+                    if (friendList.isEmpty()) {
+                        Toast.makeText(this, "등록된 친구가 없습니다. 친구를 추가해보세요!", Toast.LENGTH_SHORT).show();
+                    }
                 });
 
             } catch (Exception e) {
-                runOnUiThread(() -> 
-                    Toast.makeText(this, "친구 목록을 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show());
+                Log.e(TAG, "친구 목록 로드 오류", e);
+                runOnUiThread(() ->
+                    Toast.makeText(this, "친구 목록을 불러오는데 실패했습니다: " + e.getMessage(), Toast.LENGTH_LONG).show());
             }
         });
     }
@@ -219,6 +236,17 @@ public class FriendListActivity extends AppCompatActivity {
                     Toast.makeText(this, "친구 삭제에 실패했습니다", Toast.LENGTH_SHORT).show());
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ADD_FRIEND && resultCode == RESULT_OK) {
+            Log.d(TAG, "친구 추가 완료 - 목록 새로고침");
+            Toast.makeText(this, "친구 목록을 새로고침합니다", Toast.LENGTH_SHORT).show();
+            loadFriends(); // 친구 추가 완료 시 목록 새로고침
+        }
     }
 
     @Override

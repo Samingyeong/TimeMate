@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Schedule;
-import com.example.timemate.util.UserSession;
+import com.example.timemate.core.util.UserSession;
 import com.example.timemate.features.home.HomeActivity;
 import com.example.timemate.features.friend.FriendListActivity;
 import com.example.timemate.features.profile.ProfileActivity;
@@ -567,13 +567,16 @@ public class ScheduleListActivity extends AppCompatActivity {
                 String currentUserId = userSession.getCurrentUserId();
                 Log.d(TAG, "현재 사용자 ID: " + currentUserId);
 
-                if (currentUserId == null) {
-                    Log.e(TAG, "❌ 사용자 ID가 null입니다");
+                if (currentUserId == null || currentUserId.trim().isEmpty()) {
+                    Log.w(TAG, "⚠️ 사용자 ID가 null - 기본 사용자 사용");
+                    currentUserId = "user1"; // 기본 사용자 ID
+
+                    // UserSession에 기본 사용자 정보 설정
+                    final String finalUserId = currentUserId;
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "로그인이 필요합니다", Toast.LENGTH_SHORT).show();
-                        finish();
+                        userSession.login(finalUserId, "사용자1", "user1@test.com", true);
+                        Toast.makeText(this, "기본 사용자(user1)로 설정되었습니다", Toast.LENGTH_SHORT).show();
                     });
-                    return;
                 }
 
                 // 데이터베이스 연결 확인
