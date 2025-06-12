@@ -43,17 +43,54 @@ public class LoginHelper {
             }
 
             if (kakaoUser != null) {
-                String userId = String.valueOf(kakaoUser.getId());
-                String nickname = kakaoUser.getKakaoAccount().getProfile().getNickname();
-                String profileUrl = kakaoUser.getKakaoAccount().getProfile().getProfileImageUrl();
+                final String userId = String.valueOf(kakaoUser.getId());
+                final String nickname = kakaoUser.getKakaoAccount().getProfile().getNickname();
+                final String profileUrl = kakaoUser.getKakaoAccount().getProfile().getProfileImageUrl();
+
+                // 이메일 정보 가져오기 (있는 경우에만)
+                final String email;
+                if (kakaoUser.getKakaoAccount() != null &&
+                    kakaoUser.getKakaoAccount().getEmail() != null) {
+                    email = kakaoUser.getKakaoAccount().getEmail();
+                    Log.d("KAKAO_USER", "카카오 이메일: " + email);
+                } else {
+                    email = null;
+                    Log.d("KAKAO_USER", "카카오 이메일 정보 없음");
+                }
 
                 com.example.timemate.data.model.User newUser = new com.example.timemate.data.model.User();
                 newUser.userId = userId;
                 newUser.nickname = nickname;
+                newUser.email = email;
                 newUser.profileImage = profileUrl;
 
+                // UserSession에 로그인 정보 저장
+                com.example.timemate.util.UserSession userSession =
+                    com.example.timemate.util.UserSession.getInstance(context);
+                userSession.login(userId, nickname, email);
+
+                Log.d("KAKAO_USER", "로그인 정보 저장 완료 - ID: " + userId + ", 닉네임: " + nickname + ", 이메일: " + email);
+
                 Executors.newSingleThreadExecutor().execute(() -> {
-                    db.userDao().insert(newUser);
+                    try {
+                        // 기존 사용자가 있는지 확인
+                        com.example.timemate.data.model.User existingUser = db.userDao().getUserById(userId);
+                        if (existingUser != null) {
+                            // 기존 사용자 정보 업데이트
+                            existingUser.nickname = nickname;
+                            existingUser.email = email;
+                            existingUser.profileImage = profileUrl;
+                            existingUser.updateLastLogin();
+                            db.userDao().update(existingUser);
+                            Log.d("KAKAO_USER", "기존 사용자 정보 업데이트 완료");
+                        } else {
+                            // 새 사용자 생성
+                            db.userDao().insert(newUser);
+                            Log.d("KAKAO_USER", "새 사용자 생성 완료");
+                        }
+                    } catch (Exception e) {
+                        Log.e("KAKAO_USER", "사용자 정보 저장 오류", e);
+                    }
                 });
 
                 // ✅ 로그인 성공 시 홈 화면으로 이동 (수정된 경로)

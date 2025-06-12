@@ -95,8 +95,7 @@ public class RecommendationActivity extends AppCompatActivity {
 
             Log.d("RecommendationActivity", "🎉 RecommendationActivity 초기화 완료! 바텀 네비게이션 연동 성공");
 
-            // 성공 메시지 표시
-            Toast.makeText(this, "🎯 추천 페이지에 오신 것을 환영합니다!", Toast.LENGTH_SHORT).show();
+
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "❌ RecommendationActivity 초기화 오류", e);
@@ -117,15 +116,12 @@ public class RecommendationActivity extends AppCompatActivity {
                     Log.d("RecommendationActivity", "✅ 바텀 네비게이션 복구 성공");
                 }
 
-                // 성공 메시지로 변경
-                Toast.makeText(this, "🎯 추천 페이지가 준비되었습니다!", Toast.LENGTH_SHORT).show();
                 Log.d("RecommendationActivity", "✅ 기본 UI 복구 완료");
 
             } catch (Exception recoveryException) {
                 Log.e("RecommendationActivity", "❌ UI 복구도 실패", recoveryException);
 
-                // 최종 폴백: 사용자에게 알림 후 홈으로 이동
-                Toast.makeText(this, "추천 화면을 준비 중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show();
+                // 최종 폴백: 홈으로 이동
 
                 try {
                     Intent homeIntent = new Intent(this, com.example.timemate.features.home.HomeActivity.class);
@@ -597,13 +593,11 @@ public class RecommendationActivity extends AppCompatActivity {
         try {
             String location = editSearchLocation.getText().toString().trim();
             if (location.isEmpty()) {
-                Toast.makeText(this, "🔍 검색할 위치를 입력해주세요", Toast.LENGTH_SHORT).show();
                 editSearchLocation.requestFocus();
                 return;
             }
 
             if (selectedCategory == null || selectedCategory.isEmpty()) {
-                Toast.makeText(this, "📂 카테고리를 선택해주세요", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -613,9 +607,8 @@ public class RecommendationActivity extends AppCompatActivity {
             // 카테고리 한글 변환
             String categoryKorean = getCategoryKorean(selectedCategory);
 
-            // 검색 시작 알림
+            // 검색 시작
             String categoryIcon = getCategoryIcon(selectedCategory);
-            Toast.makeText(this, categoryIcon + " " + location + " " + categoryKorean + " 검색 중...", Toast.LENGTH_SHORT).show();
 
             // 카카오 로컬 API 우선 사용 (더 안정적)
             Log.d("RecommendationActivity", "🔍 검색 시작 - Category: " + categoryKorean + ", Location: " + location);
@@ -657,7 +650,6 @@ public class RecommendationActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "검색 실행 오류", e);
-            Toast.makeText(this, "검색 실행 중 오류가 발생했습니다", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -852,8 +844,6 @@ public class RecommendationActivity extends AppCompatActivity {
             saveRecentRegion(searchLocation);
 
             // 성공 피드백
-            Toast.makeText(this, "✅ " + categoryKorean + " " + dummyResults.size() + "개를 찾았습니다!",
-                          Toast.LENGTH_SHORT).show();
 
             Log.d("RecommendationActivity", "✅ 더미 데이터 검색 결과 표시 완료: " + dummyResults.size() + "개");
 
@@ -907,8 +897,6 @@ public class RecommendationActivity extends AppCompatActivity {
             saveRecentRegion(searchLocation);
 
             // 성공 피드백
-            Toast.makeText(this, "✅ " + categoryKorean + " " + kakaoResults.size() + "개를 찾았습니다! (카카오)",
-                          Toast.LENGTH_SHORT).show();
 
             Log.d("RecommendationActivity", "✅ 카카오 검색 결과 표시 완료: " + kakaoResults.size() + "개");
 
@@ -1018,8 +1006,6 @@ public class RecommendationActivity extends AppCompatActivity {
             saveRecentRegion(searchLocation);
 
             // 성공 피드백
-            Toast.makeText(this, "✅ " + categoryName + " " + results.size() + "개를 찾았습니다!",
-                          Toast.LENGTH_SHORT).show();
 
             Log.d("RecommendationActivity", "✅ 검색 결과 표시 완료: " + results.size() + "개");
 
@@ -1574,7 +1560,7 @@ public class RecommendationActivity extends AppCompatActivity {
 
                 // 클릭 시 안내 메시지
                 mapImageView.setOnClickListener(v -> {
-                    Toast.makeText(this, "🔍 장소를 검색하면 지도에 표시됩니다!", Toast.LENGTH_SHORT).show();
+                    // 지도 클릭 시 동작 없음
                 });
 
                 layoutMapContainer.addView(mapImageView);
@@ -1755,15 +1741,16 @@ public class RecommendationActivity extends AppCompatActivity {
      */
     private void performImageSearch() {
         try {
+            // 키보드 숨기기
+            hideKeyboard();
+
             String location = editSearchLocation != null ? editSearchLocation.getText().toString().trim() : "";
 
             if (location.isEmpty()) {
-                Toast.makeText(this, "검색할 위치를 입력해주세요", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (selectedCategory == null || selectedCategory.isEmpty()) {
-                Toast.makeText(this, "카테고리를 선택해주세요", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -1838,7 +1825,7 @@ public class RecommendationActivity extends AppCompatActivity {
                 layoutResultsContainer.setVisibility(View.GONE);
             }
 
-            Toast.makeText(this, "🔍 장소를 검색하고 이미지를 가져오는 중...", Toast.LENGTH_SHORT).show();
+
 
         } catch (Exception e) {
             Log.e("RecommendationActivity", "로딩 상태 표시 오류", e);
@@ -1905,7 +1892,6 @@ public class RecommendationActivity extends AppCompatActivity {
                     displayMapWithPlaceImages(places);
 
                     Log.d("RecommendationActivity", "✅ 이미지 검색 결과 표시 완료: " + places.size() + "개");
-                    Toast.makeText(this, "✅ " + places.size() + "개 장소를 찾았습니다!", Toast.LENGTH_SHORT).show();
 
                 } catch (Exception uiException) {
                     Log.e("RecommendationActivity", "UI 업데이트 중 오류", uiException);
@@ -2082,6 +2068,21 @@ public class RecommendationActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("RecommendationActivity", "구글 지도 열기 오류 (PlaceWithImage)", e);
             Toast.makeText(this, "구글 지도 앱이 설치되어 있지 않습니다", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * 키보드 숨기기
+     */
+    private void hideKeyboard() {
+        try {
+            android.view.inputmethod.InputMethodManager imm =
+                (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            if (imm != null && getCurrentFocus() != null) {
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        } catch (Exception e) {
+            Log.e("RecommendationActivity", "키보드 숨김 오류", e);
         }
     }
 

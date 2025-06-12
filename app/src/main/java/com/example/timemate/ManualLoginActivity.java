@@ -64,9 +64,9 @@ public class ManualLoginActivity extends AppCompatActivity {
                     if (user != null && user.password != null && user.password.equals(password)) {
                         runOnUiThread(() -> {
                             try {
-                                // 로그인 세션 설정
+                                // 로그인 세션 설정 (이메일 포함)
                                 com.example.timemate.util.UserSession session = com.example.timemate.util.UserSession.getInstance(this);
-                                session.login(user.userId, user.nickname);
+                                session.login(user.userId, user.nickname, user.email);
 
                                 Toast.makeText(this, "로그인 성공! " + user.nickname + "님 환영합니다.", Toast.LENGTH_SHORT).show();
 
@@ -199,8 +199,8 @@ public class ManualLoginActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 if (user != null) {
-                    // 로그인 성공
-                    UserSession.getInstance(ManualLoginActivity.this).login(user.userId, user.nickname);
+                    // 로그인 성공 (이메일 포함)
+                    UserSession.getInstance(ManualLoginActivity.this).login(user.userId, user.nickname, user.email);
                     Toast.makeText(this, "✅ 자동 로그인 성공!", Toast.LENGTH_SHORT).show();
 
                     // 홈 화면으로 이동
