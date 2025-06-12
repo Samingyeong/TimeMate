@@ -45,4 +45,7 @@ public interface FriendDao {
 
     @Query("SELECT COUNT(*) FROM friends WHERE userId = :userId AND isAccepted = 1")
     int getFriendCount(String userId);
+
+    @Query("SELECT * FROM friends")
+    List<Friend> getAllFriends();
 }

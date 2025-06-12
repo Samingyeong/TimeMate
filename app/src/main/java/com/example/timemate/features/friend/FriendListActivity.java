@@ -223,6 +223,17 @@ public class FriendListActivity extends AppCompatActivity {
                 List<Friend> friends = database.friendDao().getFriendsByUserId(currentUserId);
                 Log.d(TAG, "📋 친구 목록 조회 결과: " + (friends != null ? friends.size() : "null") + "개");
 
+                // 디버깅: 전체 친구 테이블 확인
+                List<Friend> allFriends = database.friendDao().getAllFriends();
+                Log.d(TAG, "🗄️ 전체 친구 테이블 레코드 수: " + (allFriends != null ? allFriends.size() : "null"));
+                if (allFriends != null && !allFriends.isEmpty()) {
+                    Log.d(TAG, "=== 전체 친구 테이블 내용 ===");
+                    for (Friend f : allFriends) {
+                        Log.d(TAG, "친구 레코드: ID=" + f.id + ", userId=" + f.userId + ", friendUserId=" + f.friendUserId + ", nickname=" + f.friendNickname + ", accepted=" + f.isAccepted);
+                    }
+                    Log.d(TAG, "========================");
+                }
+
                 runOnUiThread(() -> {
                     try {
                         if (friendList == null) {
@@ -235,16 +246,35 @@ public class FriendListActivity extends AppCompatActivity {
                             return;
                         }
 
+                        // 기존 목록 완전 초기화
                         friendList.clear();
-                        if (friends != null) {
+
+                        if (friends != null && !friends.isEmpty()) {
                             friendList.addAll(friends);
                             Log.d(TAG, "✅ 친구 목록 업데이트 완료: " + friendList.size() + "개");
+
+                            // 각 친구 정보 로그
+                            for (int i = 0; i < friendList.size(); i++) {
+                                Friend f = friendList.get(i);
+                                Log.d(TAG, "  [" + i + "] " + f.friendNickname + " (" + f.friendUserId + ") - 수락됨: " + f.isAccepted);
+                            }
+                        } else {
+                            Log.d(TAG, "📭 친구 목록이 비어있음");
                         }
+
+                        // 어댑터 강제 새로고침
                         friendAdapter.notifyDataSetChanged();
+
+                        // RecyclerView 스크롤을 맨 위로
+                        if (recyclerFriends != null) {
+                            recyclerFriends.scrollToPosition(0);
+                        }
 
                         // 친구 목록이 비어있으면 안내 메시지
                         if (friendList.isEmpty()) {
                             Toast.makeText(this, "등록된 친구가 없습니다. 친구를 추가해보세요!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "친구 목록이 업데이트되었습니다 (" + friendList.size() + "명)", Toast.LENGTH_SHORT).show();
                         }
 
                     } catch (Exception uiException) {
@@ -336,17 +366,43 @@ public class FriendListActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_ADD_FRIEND && resultCode == RESULT_OK) {
-            Log.d(TAG, "친구 추가 완료 - 목록 새로고침");
-            Toast.makeText(this, "친구 목록을 새로고침합니다", Toast.LENGTH_SHORT).show();
-            loadFriends(); // 친구 추가 완료 시 목록 새로고침
+        Log.d(TAG, "📱 onActivityResult - requestCode: " + requestCode + ", resultCode: " + resultCode);
+
+        if (requestCode == REQUEST_ADD_FRIEND) {
+            if (resultCode == RESULT_OK) {
+                // 전달받은 데이터 확인
+                String friendNickname = "";
+                String friendId = "";
+                if (data != null) {
+                    boolean friendAdded = data.getBooleanExtra("friend_added", false);
+                    friendNickname = data.getStringExtra("friend_nickname");
+                    friendId = data.getStringExtra("friend_id");
+
+                    Log.d(TAG, "✅ 친구 추가 결과 수신 - 추가됨: " + friendAdded + ", 닉네임: " + friendNickname + ", ID: " + friendId);
+                }
+
+                Log.d(TAG, "🔄 친구 추가 성공 - 즉시 목록 새로고침 시작");
+                Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_SHORT).show();
+
+                // 즉시 새로고침 (약간의 지연 후)
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    Log.d(TAG, "🔄 지연된 친구 목록 새로고침 실행");
+                    loadFriends();
+                }, 500); // 500ms 지연
+
+            } else {
+                Log.d(TAG, "❌ 친구 추가 실패 또는 취소 - resultCode: " + resultCode);
+            }
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadFriends(); // 화면 복귀 시 새로고침
+        Log.d(TAG, "🔄 onResume - 화면 복귀, 친구 목록 새로고침");
+
+        // 화면 복귀 시 강제 새로고침
+        loadFriends();
     }
 
     @Override

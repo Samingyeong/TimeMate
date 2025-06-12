@@ -1,5 +1,6 @@
 package com.example.timemate.features.friend;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -13,7 +14,7 @@ import com.example.timemate.R;
 import com.example.timemate.data.database.AppDatabase;
 import com.example.timemate.data.model.Friend;
 import com.example.timemate.data.model.User;
-import com.example.timemate.core.util.UserSession;
+import com.example.timemate.util.UserSession;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -126,7 +127,7 @@ public class FriendAddActivity extends AppCompatActivity {
                 final String finalTestUserEmail = testUser.email;
 
                 runOnUiThread(() -> {
-                    userSession.login(finalTestUserId, finalTestUserName, finalTestUserEmail, true);
+                    userSession.login(finalTestUserId, finalTestUserName);
                     Log.d(TAG, "테스트 사용자 자동 로그인 완료: " + finalTestUserId);
                     Toast.makeText(this, "테스트 사용자로 자동 로그인되었습니다", Toast.LENGTH_SHORT).show();
                 });
@@ -325,17 +326,23 @@ public class FriendAddActivity extends AppCompatActivity {
                 Log.d(TAG, "reverseFriend 삽입 결과: " + friendId2);
 
                 if (friendId1 > 0 && friendId2 > 0) {
-                    Log.d(TAG, "친구 추가 성공: " + friendNickname);
+                    Log.d(TAG, "✅ 친구 추가 성공: " + friendNickname + " (DB ID: " + friendId1 + ", " + friendId2 + ")");
                     runOnUiThread(() -> {
-                        Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "'" + friendNickname + "'님이 친구로 추가되었습니다!", Toast.LENGTH_LONG).show();
                         clearInputFields();
 
-                        // 결과를 부모 Activity에 전달
-                        setResult(RESULT_OK);
+                        // 성공 결과를 부모 Activity에 전달
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra("friend_added", true);
+                        resultIntent.putExtra("friend_nickname", friendNickname);
+                        resultIntent.putExtra("friend_id", friendId);
+                        setResult(RESULT_OK, resultIntent);
+
+                        Log.d(TAG, "🔄 FriendListActivity로 결과 전달 완료");
                         finish();
                     });
                 } else {
-                    Log.e(TAG, "친구 추가 실패: DB 삽입 오류");
+                    Log.e(TAG, "❌ 친구 추가 실패: DB 삽입 오류 (friendId1=" + friendId1 + ", friendId2=" + friendId2 + ")");
                     runOnUiThread(() -> {
                         Toast.makeText(this, "친구 추가에 실패했습니다", Toast.LENGTH_SHORT).show();
                         resetAddButton();
